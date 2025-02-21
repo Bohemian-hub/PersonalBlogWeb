@@ -30,8 +30,8 @@
 
 1. 克隆此项目到本地
 ```bash
-git clone https://github.com/Bohemian-hub/personalBlog.git
-cd hedong-blog
+git clone https://github.com/Bohemian-hub/PersonalBlogWeb.git
+cd PersonalBlogWeb
 ```
 2. 安装所需依赖
 本项目的前端使用了 Vue 3。你需要确保你的机器上安装了 Node.js 和 npm 或 yarn。
