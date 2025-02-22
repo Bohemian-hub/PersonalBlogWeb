@@ -37,6 +37,8 @@
 <script setup>
 import { ref, reactive } from 'vue'
 import { ElMessage } from 'element-plus'
+import { hello, login } from '@/api/auth'
+import { baseUrl } from '@/common/config/index'
 
 // 响应式数据
 const mainTitle = ref('Hello，你好！')
@@ -71,8 +73,10 @@ const handleStart = () => {
   ElMessage.success('欢迎开始使用！')
 }
 
-const showAbout = () => {
-  ElMessage.info('了解更多关于我们的信息')
+const showAbout = async() => {
+  const res = await hello()
+  console.log(res)
+  ElMessage.info(res)
 }
 
 // 如果需要暴露属性给父组件可以使用 defineExpose
