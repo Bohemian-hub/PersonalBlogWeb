@@ -1,6 +1,8 @@
 <template>
     <div class="about-page">
+        
         <el-container>
+            <TopBar />
             <el-header class="header">
                 <h1 class="title">关于我们</h1>
             </el-header>
@@ -16,7 +18,7 @@
 </template>
 
 <script setup>
-// 如果有需要可以在这里添加响应式数据或者方法
+import TopBar from './top_bar.vue'
 </script>
 
 <style scoped>
