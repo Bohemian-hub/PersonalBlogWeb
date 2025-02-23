@@ -2,6 +2,8 @@
     <div class="user" :class="{ 'show-panel': isShow }">
         <!-- 放一个小三角 -->
         <div class="angle"></div>
+        <!-- 下面开始写登录面板的内容 -->
+         <!-- 分为两个部分，一个注册一个登录 -->
     </div>
 </template>
 
