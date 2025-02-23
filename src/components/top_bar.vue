@@ -1,7 +1,7 @@
 <template>
     <div class="top-bar">
         <div class="site_title" @click="goHome">HEDONG</div>
-        <div class="login_avatar">
+        <div class="login_avatar" @click="toggleUserPanel">
             <el-image class="user_avatar" :src="notlogin"></el-image>
         </div>
         <div class="site_menu">
@@ -12,11 +12,14 @@
             </div>
         </div>
     </div>
+    <User v-if="showUserPanel" />
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import User from './User.vue'
+
 
 import icon_ai from '@/assets/icons/ai.png'
 import icon_book from '@/assets/icons/book.png'
@@ -24,6 +27,10 @@ import icon_chengjiu from '@/assets/icons/chengjiu.png'
 import icon_command from '@/assets/icons/command.png'
 import icon_index from '@/assets/icons/index.png'
 import notlogin from '@/assets/icons/notlogin.png'
+
+// 控制用户面板显示状态
+const showUserPanel = ref(false)
+
 
 // 响应式菜单数据
 const menuList = ref([
@@ -40,6 +47,10 @@ function navigate(route) {
 }
 function goHome() {
     router.push('/')
+}
+// 切换用户面板显示状态
+const toggleUserPanel = () => {
+    showUserPanel.value = !showUserPanel.value
 }
 </script>
 
