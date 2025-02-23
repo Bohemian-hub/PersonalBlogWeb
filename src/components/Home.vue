@@ -4,6 +4,7 @@
     <el-image class="bg-image" :src="bg8_url" :fit="'cover'" />
     <!-- 顶部栏组件 -->
     <TopBar />
+    <User />
     <div class="content">
       <div class="text1">{{ text1 }}</div>
       <div class="text2">
@@ -20,6 +21,7 @@ import { hello, login } from '@/api/auth'
 
 // 导入顶部栏组件
 import TopBar from './top_bar.vue'
+import User from './User.vue'
 import bg8Url from '@/assets/images/bg8.png'
 const bg8_url = bg8Url
 
