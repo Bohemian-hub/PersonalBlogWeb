@@ -97,6 +97,7 @@ const isRegister = ref(false)
 const loginForm = ref({ email: '', password: '' })
 const registerForm = ref({ email: '', code: '', username: '', password: '' })
 const isCountDown = ref(false)
+const countDown = ref(60) // 初始化倒计时时间
 const countDownText = ref('获取验证码')
 const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const user = ref(null);
@@ -116,21 +117,25 @@ const sendVerifyCode = async () => {
   }
   try {
     await sendCode({ email: registerForm.value.email });
-    isCountDown.value = true;
-    countDownText.value = `${countDown.value}s`;
+    ElMessage.success('验证码已发送'); // 成功提示信息提前
+
+    isCountDown.value = true; // 禁用按钮
+    countDownText.value = `${countDown.value}s`; // 立即显示倒计时
+
     const timer = setInterval(() => {
       countDown.value--;
       countDownText.value = `${countDown.value}s`;
       if (countDown.value <= 0) {
         clearInterval(timer);
-        isCountDown.value = false;
-        countDown.value = 60;
-        countDownText.value = '获取验证码';
+        isCountDown.value = false; // 倒计时结束，启用按钮
+        countDown.value = 60; // 重置倒计时时间
+        countDownText.value = '获取验证码'; // 重置按钮文本
       }
     }, 1000);
-    ElMessage.success('验证码已发送');
   } catch (error) {
-    // ElMessage.error(error.message || '验证码发送失败'); // 移除重复的错误提示
+    ElMessage.error(error.message || '验证码发送失败'); // 显示错误信息
+    isCountDown.value = false; // 发生错误，启用按钮
+    countDownText.value = '获取验证码'; // 发生错误，重置按钮文本
   }
 };
 
@@ -295,15 +300,20 @@ onMounted(() => {
 
 /* 鼠标悬停时的背景色变化 */
 .el-menu-item {
-  padding: 0 0 0 20px !important; /* 移除默认的 padding */
-  position: relative; /* 添加相对定位 */
+  padding: 0 0 0 20px !important;
+  /* 移除默认的 padding */
+  position: relative;
+  /* 添加相对定位 */
 }
 
 .el-menu-item .el-icon:last-child {
-  position: absolute; /* 使用绝对定位 */
+  position: absolute;
+  /* 使用绝对定位 */
   top: 50%;
-  right: 20px; /* 调整右边距 */
-  transform: translateY(-50%); /* 垂直居中 */
+  right: 20px;
+  /* 调整右边距 */
+  transform: translateY(-50%);
+  /* 垂直居中 */
 }
 
 .el-menu-item:hover {
