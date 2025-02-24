@@ -182,9 +182,16 @@ onMounted(() => {
 }
 
 .user-panel {
-    padding: 20px;
+    padding: 20px 20px 0 20px;
     height: 100%;
     overflow-y: auto;
+    /* 添加以下样式来隐藏滚动条 */
+    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;  /* IE and Edge */
+}
+/* 为 Webkit 浏览器（Chrome、Safari等）隐藏滚动条 */
+.user-panel::-webkit-scrollbar {
+    display: none;
 }
 
 .switch-buttons {
@@ -209,7 +216,7 @@ onMounted(() => {
 }
 
 .form-container {
-    padding: 20px;
+    padding: 20px 20px 0 20px;
 }
 
 .verify-code {
