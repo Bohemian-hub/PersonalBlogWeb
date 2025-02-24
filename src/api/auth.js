@@ -1,8 +1,10 @@
 import http from '@/common/request';
 
+// 发送验证码
+export const sendCode = data => http.post('/auth/send-code', data)
 
-//GET请求/hello 测试
-export const hello = () => http.get('/auth/hello')	// 测试
+// 注册
+export const register = data => http.post('/auth/register', data)
 
-// 登录
-export const login = data => http.post('/auth/login', data)	// 登录
+// 登录 
+export const login = data => http.post('/auth/login', data)

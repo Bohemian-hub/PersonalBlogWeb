@@ -1,25 +1,25 @@
 <template>
-    <div class="top-bar">
-        <div class="site_title" @click="goHome">HEDONG</div>
-        <div class="login_avatar" @click="toggleUserPanel">
-            <el-image class="user_avatar" :src="notlogin"></el-image>
-        </div>
-        <div class="site_menu">
-            <div v-for="(item, index) in menuList" :key="index" class="menu_item" @click="navigate(item.route)">
-                <el-image class="menu_item_icon" :src="item.icon"></el-image>
-                <div class="menu_item_text">{{ item.text }}</div>
-                <div class="menu_under"></div>
-            </div>
-        </div>
+  <div class="top-bar">
+    <div class="site_title" @click="goHome">HEDONG</div>
+    <div class="login_avatar" @click="toggleUserPanel">
+      <el-image class="user_avatar" :src="notlogin"></el-image>
     </div>
-    <User v-if="showUserPanel" />
+    <div class="site_menu">
+      <div v-for="(item, index) in menuList" :key="index" class="menu_item" @click="navigate(item.route)">
+        <el-image class="menu_item_icon" :src="item.icon"></el-image>
+        <div class="menu_item_text">{{ item.text }}</div>
+        <div class="menu_under"></div>
+      </div>
+    </div>
+  </div>
+  <User v-if="showUserPanel" />
 </template>
 
+// filepath: /Users/macbookair/Project/personalBlog/web/src/components/top_bar.vue
 <script setup>
-import { ref } from 'vue'
+import { ref, provide, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import User from './User.vue'
-
 
 import icon_ai from '@/assets/icons/ai.png'
 import icon_book from '@/assets/icons/book.png'
@@ -31,141 +31,154 @@ import notlogin from '@/assets/icons/notlogin.png'
 // 控制用户面板显示状态
 const showUserPanel = ref(false)
 
+provide('showUserPanel', showUserPanel)
 
 // 响应式菜单数据
 const menuList = ref([
-    { text: '首页', icon: icon_index, route: '/' },
-    { text: '成就', icon: icon_chengjiu, route: '/chengjiu' },
-    { text: '百宝箱', icon: icon_book, route: '/yanjiu' },
-    { text: '作品', icon: icon_command, route: '/zuopin' },
-    { text: '人工智能', icon: icon_ai, route: '/about' }
+  { text: '首页', icon: icon_index, route: '/' },
+  { text: '成就', icon: icon_chengjiu, route: '/chengjiu' },
+  { text: '百宝箱', icon: icon_book, route: '/yanjiu' },
+  { text: '作品', icon: icon_command, route: '/zuopin' },
+  { text: '人工智能', icon: icon_ai, route: '/about' }
 ])
 
 const router = useRouter()
 function navigate(route) {
-    router.push(route)
+  router.push(route)
 }
 function goHome() {
-    router.push('/')
+  router.push('/')
 }
 // 切换用户面板显示状态
 const toggleUserPanel = () => {
-    showUserPanel.value = !showUserPanel.value
+  showUserPanel.value = !showUserPanel.value
 }
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
+
+const handleClickOutside = (event) => {
+  const userPanel = document.querySelector('.user'); // 替换为你的用户面板的类名或 ID
+  const loginAvatar = document.querySelector('.login_avatar');
+  if (userPanel && !userPanel.contains(event.target) && loginAvatar && !loginAvatar.contains(event.target)) {
+    showUserPanel.value = false;
+  }
+};
 </script>
 
 <style scoped>
 .top-bar {
-    position: absolute;
-    top: 0;
-    width: 100%;
-    height: 50px;
-    transition: background-color 0.3s ease-in-out;
-    /* 添加过渡动画 */
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 50px;
+  transition: background-color 0.3s ease-in-out;
+  /* 添加过渡动画 */
 }
 
 .top-bar:hover {
-    background-color: #41414144;
+  background-color: #41414144;
 }
 
 .site_title {
-    float: left;
-    width: 100px;
-    height: 50px;
-    line-height: 50px;
-    margin-left: 20px;
-    font-size: 20px;
-    color: #fff;
-    text-align: center;
-    font-weight: 600;
-    cursor: pointer;
-    transition: color 0.3s ease-in-out;
-    /* 添加过渡动画 */
+  float: left;
+  width: 100px;
+  height: 50px;
+  line-height: 50px;
+  margin-left: 20px;
+  font-size: 20px;
+  color: #fff;
+  text-align: center;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.3s ease-in-out;
+  /* 添加过渡动画 */
 
 }
 
 .site_title:hover {
-    color: #414141;
-    font-weight: 900;
+  color: #414141;
+  font-weight: 900;
 }
 
 .site_menu {
-    float: right;
-    height: 50px;
+  float: right;
+  height: 50px;
 }
 
 .menu_item {
-    width: auto;
-    margin-right: 20px;
-    height: 50px;
-    float: left;
-    cursor: pointer;
+  width: auto;
+  margin-right: 20px;
+  height: 50px;
+  float: left;
+  cursor: pointer;
 }
 
 .menu_item_icon {
-    width: 20px;
-    height: 20px;
-    margin: 15px 10px 10px 10px;
-    float: left;
+  width: 20px;
+  height: 20px;
+  margin: 15px 10px 10px 10px;
+  float: left;
 }
 
 .menu_item_text {
-    height: 20px;
-    margin: 15px 5px 10px 5px;
-    line-height: 20px;
-    font-size: 14px;
-    color: #fff;
-    float: left;
+  height: 20px;
+  margin: 15px 5px 10px 5px;
+  line-height: 20px;
+  font-size: 14px;
+  color: #fff;
+  float: left;
 }
 
 .menu_under {
-    width: 0px;
-    float: left;
-    height: 5px;
-    background-color: #e06614;
-    transition: width 0.3s ease-in-out;
-    /* 添加过渡动画 */
+  width: 0px;
+  float: left;
+  height: 5px;
+  background-color: #e06614;
+  transition: width 0.3s ease-in-out;
+  /* 添加过渡动画 */
 }
 
 .menu_item:hover .menu_item_icon {
-    width: 30px;
-    height: 30px;
-    margin: 10px 5px 5px 5px;
+  width: 30px;
+  height: 30px;
+  margin: 10px 5px 5px 5px;
 }
 
 .menu_item:hover .menu_item_text {
-    height: 20px;
-    margin: 15px 5px 10px 5px;
-    line-height: 20px;
-    font-size: 14px;
-    color: #e06614;
-    font-weight: 800;
+  height: 20px;
+  margin: 15px 5px 10px 5px;
+  line-height: 20px;
+  font-size: 14px;
+  color: #e06614;
+  font-weight: 800;
 }
 
 .menu_item:hover .menu_under {
-    width: 100%;
-    float: left;
-    height: 5px;
-    background-color: #e06614;
+  width: 100%;
+  float: left;
+  height: 5px;
+  background-color: #e06614;
 }
 
 .login_avatar {
-    margin-right: 20px;
-    height: 50px;
-    width: 50px;
-    float: right;
+  margin-right: 20px;
+  height: 50px;
+  width: 50px;
+  float: right;
 }
 
 .user_avatar {
-    width: 40px;
-    height: 40px;
-    margin: 5px;
-    border-radius: 50%;
-    border: 2px solid rgba(238, 238, 238, 0.513);
+  width: 40px;
+  height: 40px;
+  margin: 5px;
+  border-radius: 50%;
+  border: 2px solid rgba(238, 238, 238, 0.513);
 }
 
 .user_avatar:hover {
-    cursor: pointer;
-    border: 2px solid rgb(255, 255, 255);
+  cursor: pointer;
+  border: 2px solid rgb(255, 255, 255);
 }
 </style>

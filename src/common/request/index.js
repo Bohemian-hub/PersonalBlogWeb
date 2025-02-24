@@ -1,3 +1,4 @@
+// filepath: /Users/macbookair/Project/personalBlog/web/src/common/request/index.js
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
 import router from '@/router'
@@ -10,7 +11,6 @@ const service = axios.create({
 service.interceptors.request.use(
     config => {
         config.baseURL = baseUrl;
-        // 设置 Authorization（根据需求自行调整）
         config.headers.Authorization = sessionStorage['token'] || '';
         return config;
     },
@@ -22,31 +22,39 @@ service.interceptors.request.use(
 
 service.interceptors.response.use(
     response => {
-        if (response.status !== 200) {
-            return Promise.reject(new Error(`请求错误，状态码 ${response.status}`));
-        }
-
         const { error, body, msg } = response.data;
-        if (error === 0) {
-            return body;
-        } else if (error === 10010 || error === 10011) {
-            ElMessage({
-                message: msg,
-                type: 'error'
-            });
-            sessionStorage.clear();
-            router.push('/login');
-            return Promise.reject(new Error(msg));
+        if (response.status === 200) {
+            if (error === 0) {
+                return body;
+            } else if (error === 10010 || error === 10011) {
+                ElMessage({
+                    message: msg,
+                    type: 'error'
+                });
+                sessionStorage.clear();
+                router.push('/login');
+                return Promise.reject(new Error(msg));
+            } else {
+                ElMessage({
+                    message: msg,
+                    type: 'error'
+                });
+                return Promise.reject(new Error(msg));
+            }
         } else {
             ElMessage({
-                message: msg,
+                message: msg || `请求错误，状态码 ${response.status}`,
                 type: 'error'
             });
-            return Promise.reject(new Error(msg));
+            return Promise.reject(new Error(`请求错误，状态码 ${response.status}`));
         }
     },
     error => {
         console.error('响应错误:', error);
+        ElMessage({
+            message: error.message || '网络错误',
+            type: 'error'
+        });
         return Promise.reject(error);
     }
 );
