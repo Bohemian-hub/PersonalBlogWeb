@@ -59,9 +59,17 @@ onMounted(() => {
 })
 
 const handleClickOutside = (event) => {
-  const userPanel = document.querySelector('.user'); // 替换为你的用户面板的类名或 ID
+
+  const userPanel = document.querySelector('.user');
   const loginAvatar = document.querySelector('.login_avatar');
-  if (userPanel && !userPanel.contains(event.target) && loginAvatar && !loginAvatar.contains(event.target)) {
+  const passwordButton = event.target.closest('svg');
+
+  if (userPanel &&  // 如果用户面板存在
+    !userPanel.contains(event.target) &&  // 点击的不是用户面板
+    loginAvatar &&  // 如果登录头像存在
+    !loginAvatar.contains(event.target) &&  // 点击的不是登录头像
+    !passwordButton  // 如果点击的不是密码按钮
+  ) {
     showUserPanel.value = false;
   }
 };
