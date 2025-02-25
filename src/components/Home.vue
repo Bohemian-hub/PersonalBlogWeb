@@ -6,7 +6,13 @@
     <TopBar />
     <!-- 封面标题文字 -->
     <div class="cover_text">
-      <div class="text1">{{ text1 }}</div>
+      <div class="text1">
+        <div class="text1">
+          <!-- 使用内联样式动态设置动画延迟 -->
+          <span v-for="(char, index) in text1.split('')" :key="index" class="animated-char"
+            :style="{ animationDelay: `${index * 0.3}s`, WebkitAnimationDelay: `${index * 0.4}s` }">{{ char }}</span>
+        </div>
+      </div>
       <div class="text2">
         <a :class="{ 'cursor-animation': showCursor }">{{ text2 }}</a>
       </div>
@@ -21,8 +27,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import { ElMessage } from 'element-plus'
-import { hello, login } from '@/api/auth'
+
 
 // 导入顶部栏组件
 import TopBar from './top_bar.vue'
@@ -123,12 +128,34 @@ onUnmounted(() => {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    /* 水平居中 */
     text-align: center;
 
     .text1 {
-      font-size: 30px;
+      height: 100px;
+      /* background-color: red; */
+      font-size: 40px;
       color: #fff;
-      margin-bottom: 20px;
+      margin-bottom: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      /* 添加浮动动画效果的字符样式 */
+      .animated-char {
+        /* background-color: greenyellow; */
+        display: inline-block;
+        /* 删除 float: left; 因为它会破坏居中效果 */
+        animation: float-animation 0.8s ease-in-out infinite alternate;
+        /* 保持文字在一行内不换行 */
+        white-space: nowrap;
+        /* 添加倒影效果 */
+        -webkit-box-reflect: below 0px linear-gradient(to bottom, rgba(225, 0, 0, 0), rgba(0, 0, 0, 0.4));
+        /* 添加一些间距，让倒影更明显 */
+        padding-bottom: 5px;
+        /* 可选：添加文字阴影使主文字更突出 */
+        text-shadow: 0 0 10px rgba(5, 5, 5, 0.5);
+      }
     }
 
     .text2 {
@@ -157,22 +184,35 @@ onUnmounted(() => {
         animation: cursor-fade 0.4s ease-in-out infinite;
       }
 
-      @keyframes cursor-fade {
 
-        0%,
-        100% {
-          opacity: 0;
-        }
-
-        50% {
-          opacity: 1;
-        }
-      }
     }
   }
 }
 
 
+
+/* 将关键帧动画移至顶级作用域 */
+@keyframes float-animation {
+  0% {
+    margin-top: 0px;
+  }
+
+  100% {
+    margin-top: 30px;
+  }
+}
+
+@keyframes cursor-fade {
+
+  0%,
+  100% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
 
 /* 首页主题内容 */
 .content {
