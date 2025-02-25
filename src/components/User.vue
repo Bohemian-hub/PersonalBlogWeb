@@ -60,6 +60,10 @@
           <!-- 已登录的用户菜单 -->
           <div v-if="isLoggedIn">
             <el-menu default-active="1" class="el-menu-vertical-demo" ellipsis-icon="ArrowRight">
+
+              <!-- 两个菜单上面是用户的账号名称 -->
+              <div class="username">{{ user.username }}</div>
+
               <el-menu-item index="1">
                 <el-icon>
                   <User />
@@ -146,9 +150,12 @@ const handleLogin = async () => {
   }
   try {
     const userData = await login(loginForm.value);
+    console.log(userData);
     ElMessage.success('登录成功');
-    sessionStorage.setItem('user', JSON.stringify(userData));
-    user.value = userData;
+    sessionStorage.setItem('user', JSON.stringify(userData.user));
+    user.value = userData.user;
+    console.log(user);
+
     showUserPanel.value = false; // 登录成功后关闭面板
   } catch (error) {
     // ElMessage.error(error.message || '登录失败'); // 移除重复的错误提示
@@ -189,7 +196,7 @@ onMounted(() => {
   isShow.value = true;
   if (storedUser) {
     user.value = JSON.parse(storedUser);
-    document.documentElement.style.setProperty('--panel-height', '150px');
+    document.documentElement.style.setProperty('--panel-height', '180px');
   }
 
 });
@@ -291,6 +298,15 @@ onMounted(() => {
 
 .el-menu-vertical-demo {
   border-right: none !important;
+
+  .username {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 20px;
+    font-weight: 900;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(128, 128, 128, 0.405);
+  }
 
   li {
     border-radius: 20px;

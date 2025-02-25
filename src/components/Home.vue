@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <!-- 背景图片 -->
-    <el-image class="bg-image" :src="bg8_url" :fit="'cover'" />
+    <el-image class="bg-image" :src="bg8_url" :fit="'cover'" draggable="false" />
     <!-- 顶部栏组件 -->
     <TopBar />
     <div class="content">
