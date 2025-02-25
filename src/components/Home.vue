@@ -1,15 +1,21 @@
 <template>
-  <div class="home">
+  <div class="cover">
     <!-- 背景图片 -->
     <el-image class="bg-image" :src="bg8_url" :fit="'cover'" draggable="false" />
     <!-- 顶部栏组件 -->
     <TopBar />
-    <div class="content">
+    <!-- 封面标题文字 -->
+    <div class="cover_text">
       <div class="text1">{{ text1 }}</div>
       <div class="text2">
         <a :class="{ 'cursor-animation': showCursor }">{{ text2 }}</a>
       </div>
     </div>
+
+  </div>
+  <!-- 首页主体内容 -->
+  <div class="content">
+    <div class="main"></div>
   </div>
 </template>
 
@@ -100,69 +106,86 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.home {
+.cover {
   width: 100%;
   height: 100vh;
   overflow: hidden;
   position: relative;
+
+  .bg-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .cover_text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+
+    .text1 {
+      font-size: 30px;
+      color: #fff;
+      margin-bottom: 20px;
+    }
+
+    .text2 {
+      font-size: 20px;
+      border-radius: 10px;
+      display: inline-block;
+      padding: 15px 0;
+      background-color: rgba(0, 0, 0, 0.412);
+      color: #fff;
+      min-width: 2px;
+
+      a {
+        margin: 0 20px;
+        position: relative;
+      }
+
+      /* 添加光标动画 */
+      .cursor-animation::after {
+        content: '';
+        position: absolute;
+        right: -2px;
+        top: 0;
+        width: 2px;
+        height: 100%;
+        background-color: #fff;
+        animation: cursor-fade 0.4s ease-in-out infinite;
+      }
+
+      @keyframes cursor-fade {
+
+        0%,
+        100% {
+          opacity: 0;
+        }
+
+        50% {
+          opacity: 1;
+        }
+      }
+    }
+  }
 }
 
-.bg-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
 
+
+/* 首页主题内容 */
 .content {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-}
-
-.text1 {
-  font-size: 30px;
-  color: #fff;
-  margin-bottom: 20px;
-}
-
-.text2 {
-  font-size: 20px;
-  border-radius: 10px;
-  display: inline-block;
-  padding: 15px 0;
-  background-color: rgba(0, 0, 0, 0.412);
-  color: #fff;
-  min-width: 2px;
-
-  a {
-    margin: 0 20px;
-    position: relative;
-  }
-}
-
-/* 添加光标动画 */
-.cursor-animation::after {
-  content: '';
-  position: absolute;
-  right: -2px;
-  top: 0;
-  width: 2px;
-  height: 100%;
+  width: 100%;
   background-color: #fff;
-  animation: cursor-fade 0.4s ease-in-out infinite;
-}
 
-@keyframes cursor-fade {
-
-  0%,
-  100% {
-    opacity: 0;
-  }
-
-  50% {
-    opacity: 1;
+  .main {
+    width: 1400px;
+    background-color: #fff;
+    height: 1400px;
+    /* 临时设置，后续会根据实际情况调整 */
+    margin: 0 auto;
+    padding-top: 40px;
   }
 }
 </style>
