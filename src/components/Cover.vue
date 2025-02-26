@@ -1,7 +1,8 @@
 <template>
     <div class="cover" :style="{ height: height }">
         <!-- 背景图片 -->
-        <el-image class="bg-image" :src="bg_url_list[bg_index]" :fit="'cover'" draggable="false" @click="changeBg" />
+        <el-image class="bg-image" :src="bg_url_list[bg_index]" :fit="'cover'" draggable="false" />
+        <!-- <el-image class="bg-image" :src="bg_url_list[bg_index]" :fit="'cover'" draggable="false" @click="changeBg" /> -->
         <!-- 封面标题文字 -->
         <div class="cover_text">
             <div class="text1">
@@ -52,7 +53,7 @@ const bg_url_list = [
     bg9Url,
     bg10Url
 ]
-const bg_index = ref(0)
+const bg_index = ref(6)
 
 const text1 = ref('温润如新')
 const fullTextList = [
@@ -174,11 +175,73 @@ const clearText = () => {
         }
     }, 100) // 每100ms删除一个字
 }
-//flyText，文字飞入效果
-const flyText = (char) => {
+
+// 打字效果函数
+// 打字效果函数
+const typeText = () => {
+    const currentText = fullTextList[currentTextIndex]
+    currentIndex = 0
+
+    // 存储每个字符的回调，以便按顺序处理
+    const charCallbacks = []
+
+    // 初始化所有字符的回调
+    for (let i = 0; i < currentText.length; i++) {
+        charCallbacks[i] = false
+    }
+
+    // 检查是否可以添加下一个字符
+    const checkAndAddChar = () => {
+        // 找到最小的未处理的索引
+        let nextIndex = charCallbacks.findIndex(cb => cb === true)
+
+        if (nextIndex !== -1) {
+            // 将该字符添加到文本中
+            text2.value += currentText[nextIndex]
+
+            // 标记为已处理
+            charCallbacks[nextIndex] = false
+
+            // 处理队列中的下一个字符
+            setTimeout(checkAndAddChar, 10)
+        }
+    }
+
+    // 启动所有字符的飞行，按一定的时间间隔
+    const launchChars = () => {
+        for (let i = 0; i < currentText.length; i++) {
+            setTimeout(() => {
+                flyText(currentText[i], i, () => {
+                    // 标记该字符已经到达目标位置
+                    charCallbacks[i] = true
+
+                    // 尝试添加字符
+                    checkAndAddChar()
+                })
+            }, i * 150) // 每150ms发射一个新字符
+        }
+
+        // 所有字符发射完毕后，等待一段时间再清除
+        setTimeout(() => {
+            // 切换到下一句话
+            currentTextIndex = (currentTextIndex + 1) % fullTextList.length
+            clearText()
+        }, currentText.length * 150 + 2000) // 等待所有字符飞行并额外停留2秒
+    }
+
+    // 开始发射字符
+    launchChars()
+}
+
+//flyText，文字飞入效果 (添加回调参数)
+const flyText = (char, i, callback) => {
+
     // 获取text2 a元素（这是文字真正显示的地方）
     const textElement = document.querySelector('.text2 a')
-    if (!textElement) return
+    if (!textElement) {
+        if (callback) callback() // 如果没有找到元素，仍要执行回调
+        return
+    }
 
     // 创建一个固定容器用于显示飞行字符（如果不存在）
     let flyingContainer = document.getElementById('flying-chars-container')
@@ -234,18 +297,14 @@ const flyText = (char) => {
 
     // 样式设置
     charElement.style.color = 'white'
-    charElement.style.fontSize = Math.random() * 20 + 10 + 'px'
+    charElement.style.fontSize = '20px'
     charElement.style.transition = 'all 0.8s ease-in-out'
 
     // 获取目标元素的位置信息（文字应该飞到的位置）
     const targetRect = textElement.getBoundingClientRect()
 
-    // 计算当前文字应该放置的位置（考虑已有文字的长度）
-    const currentTextWidth = textElement.offsetWidth
-    const charWidth = 20 // 估计每个字符的宽度
-
     // 计算目标元素文本结尾的位置（这是新字符应该飞向的位置）
-    const targetX = targetRect.left + currentTextWidth
+    const targetX = targetRect.left + 14 * i
     const targetY = targetRect.top + targetRect.height / 2
 
     // 强制重排，让元素立即显示
@@ -256,37 +315,18 @@ const flyText = (char) => {
     charElement.style.left = `${targetX}px`
     charElement.style.transform = 'translate(-50%, -50%)'
 
-    // 飞行完成后，淡出并移除元素
-    setTimeout(() => {
+    // 当过渡动画完成时，执行回调
+    charElement.addEventListener('transitionend', function handler() {
+        // 移除事件监听器以避免多次触发
+        charElement.removeEventListener('transitionend', handler)
+
+        // 2. 飞行文字到达目标位置了，触发回调
+        if (callback) callback()
+
+        // 飞行完成后，淡出并移除元素
         charElement.style.opacity = '0'
-        setTimeout(() => {
-            charElement.remove()
-        }, 300)
-    }, 700)
-}
-
-// 打字效果函数
-const typeText = () => {
-    const currentText = fullTextList[currentTextIndex]
-    currentIndex = 0
-
-    typeTimer = setInterval(() => {
-        if (currentIndex < currentText.length) {
-            flyText(currentText[currentIndex])
-            console.log(currentText[currentIndex]);
-
-            text2.value += currentText[currentIndex]
-            currentIndex++
-        } else {
-            clearInterval(typeTimer)
-            // 等待2秒后开始清除
-            setTimeout(() => {
-                // 切换到下一句话
-                currentTextIndex = (currentTextIndex + 1) % fullTextList.length
-                clearText()
-            }, 2000)
-        }
-    }, 100) // 每100ms打一个字
+        charElement.remove()
+    })
 }
 
 //输入光标效果
