@@ -214,6 +214,7 @@ onMounted(() => {
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
   opacity: 0;
   transition: all 0.3s ease-out;
+  z-index: 999;
 }
 
 .show-panel {

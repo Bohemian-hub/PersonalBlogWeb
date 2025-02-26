@@ -77,8 +77,9 @@ const handleClickOutside = (event) => {
 
 <style scoped>
 .top-bar {
-  position: absolute;
+  position: fixed;
   top: 0;
+  z-index: 999;
   width: 100%;
   height: 50px;
   transition: background-color 0.3s ease-in-out;
