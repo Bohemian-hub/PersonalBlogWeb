@@ -1,6 +1,6 @@
 <template>
-  <!-- 顶部栏组件 -->
-  <TopBar />
+  <!-- 顶部栏组件，当滚动位置为0时显示 -->
+  <TopBar :visible="showTopBar" />
   <!-- 使用封装的Cover组件，并设置高度为100vh -->
   <Cover height="100vh" />
   <!-- 首页主体内容 -->
@@ -10,14 +10,41 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 
 // 导入顶部栏组件和封装的Cover组件
-import TopBar from './top_bar.vue'
+import TopBar from './TopBar.vue'
 import Cover from './Cover.vue'
+
+// 创建一个响应式变量来控制TopBar的显示和隐藏
+const showTopBar = ref(true)
+
+// 处理滚动事件的函数
+const handleScroll = () => {
+  // 当滚动位置为0（页面顶部）时显示TopBar，否则隐藏
+  showTopBar.value = window.scrollY <= 40
+}
+
+// 组件挂载时添加滚动事件监听
+onMounted(() => {
+  window.addEventListener('scroll', handleScroll)
+  // 初始化状态
+  handleScroll()
+})
+
+// 组件卸载时移除事件监听，防止内存泄漏
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll)
+})
 </script>
 
 <style scoped>
+.hidden-topbar {
+  opacity: 0;
+  transform: translateY(-50px);
+  pointer-events: none;
+}
+
 /* 首页主题内容 */
 .content {
   width: 100%;

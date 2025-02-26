@@ -273,6 +273,8 @@ const typeText = () => {
     typeTimer = setInterval(() => {
         if (currentIndex < currentText.length) {
             flyText(currentText[currentIndex])
+            console.log(currentText[currentIndex]);
+
             text2.value += currentText[currentIndex]
             currentIndex++
         } else {
@@ -319,7 +321,6 @@ body {
     width: 100%;
     overflow: hidden;
     position: relative;
-    z-index: 998;
 
     .bg-image {
         width: 100%;

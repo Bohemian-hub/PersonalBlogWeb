@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-import TopBar from './top_bar.vue'
+import TopBar from './TopBar.vue'
 </script>
 
 <style scoped>
