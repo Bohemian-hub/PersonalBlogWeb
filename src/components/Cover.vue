@@ -21,7 +21,6 @@
         <div class="sea">
             <div class="wave"></div>
             <div class="wave"></div>
-            <div class="wave"></div>
             <el-image class="roll_icon" :src="roll_icon"></el-image>
         </div>
     </div>
@@ -483,6 +482,7 @@ body {
     position: absolute;
     left: 0;
     bottom: 0;
+    
 }
 
 .roll_icon {
@@ -506,32 +506,20 @@ body {
 }
 
 .wave {
-    /* 这里的背景用的是svg文件，这个文件我事先在PS里做好并导出 */
     background: url("@/assets/icons/wave.svg") repeat-x;
     width: 6400px;
-    height: 68px;
+    height: 98px;
     /* 绝对定位 */
     position: absolute;
-    top: -68px;
-    left: -100px;
+    top: -98px;
     /* 执行波动动画：动画名 时长 贝塞尔曲线 无限次播放 */
-    animation: wave 8s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite;
+    animation: wave 7s cubic-bezier(0.36,0.45,0.63,0.53) infinite;
 }
-
-.wave:nth-child(2) {
-    top: -55px;
-    left: -200px;
+.wave:nth-child(2){
+    top: -75px;
     /* 执行波动+上下浮动动画 */
-    animation: wave 11s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite, swell 11s ease infinite;
+    animation: wave 7s cubic-bezier(0.36,0.45,0.63,0.53) infinite,swell 7s ease infinite;
     animation-delay: -0.2s;
-}
-
-.wave:nth-child(3) {
-    top: -55px;
-    left: -200px;
-    /* 执行波动+上下浮动动画 */
-    animation: wave 14s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite, swell 14s ease infinite;
-    animation-delay: -0.6s;
 }
 
 /* 定义动画 */
