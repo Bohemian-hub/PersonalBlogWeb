@@ -206,6 +206,8 @@ const handleClickOutside = (event) => {
   height: 50px;
   width: 50px;
   float: right;
+  border-radius: 50%;
+  display: flex;
 }
 
 .user_avatar {
@@ -213,11 +215,11 @@ const handleClickOutside = (event) => {
   height: 40px;
   margin: 5px;
   border-radius: 50%;
-  border: 2px solid rgba(238, 238, 238, 0.513);
 }
 
-.user_avatar:hover {
+.login_avatar:hover {
   cursor: pointer;
-  border: 2px solid rgb(255, 255, 255);
+  box-shadow: inset 10px 10px 10px rgba(0, 0, 0, 0.05), 15px 25px 10px rgba(0, 0, 0, 0.05), 15px 20px 20px rgba(0, 0, 0, 0.05);
+  background-color: #41414144;
 }
 </style>

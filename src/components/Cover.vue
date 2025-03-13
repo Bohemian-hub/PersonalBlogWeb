@@ -17,6 +17,13 @@
                 <a :class="{ 'cursor-animation': showCursor }">{{ text2 }}</a>
             </div>
         </div>
+        <!-- 在封面的最底部做波浪 -->
+        <div class="sea">
+            <div class="wave"></div>
+            <div class="wave"></div>
+            <div class="wave"></div>
+            <el-image class="roll_icon" :src="roll_icon"></el-image>
+        </div>
     </div>
 </template>
 
@@ -41,6 +48,7 @@ import bg7Url from '@/assets/images/bg7.png'
 import bg8Url from '@/assets/images/bg8.png'
 import bg9Url from '@/assets/images/bg9.png'
 import bg10Url from '@/assets/images/bg10.png'
+import xia from '@/assets/icons/xia.png'
 const bg_url_list = [
     bg1Url,
     bg2Url,
@@ -54,7 +62,7 @@ const bg_url_list = [
     bg10Url
 ]
 const bg_index = ref(6)
-
+const roll_icon = xia
 const text1 = ref('温润如新')
 const fullTextList = [
     "投策命晨装，暂与园田疏。",
@@ -463,6 +471,91 @@ body {
 
     50% {
         opacity: 1;
+    }
+}
+
+/* 海平面 */
+.sea {
+    width: 100%;
+    height: 5%;
+    background-color: #015871;
+    /* 绝对定位 底部 */
+    position: absolute;
+    left: 0;
+    bottom: 0;
+}
+
+.roll_icon {
+    width: 70px;
+    height: 40px;
+    position: absolute;
+    opacity: .6;
+    left: calc(50% - 25px);
+    animation: rollFloat 2s ease-in-out infinite alternate;
+    /* 新增上下浮动动画 */
+}
+
+@keyframes rollFloat {
+    0% {
+        transform: translate(0, -20px);
+    }
+
+    100% {
+        transform: translate(0, -70px);
+    }
+}
+
+.wave {
+    /* 这里的背景用的是svg文件，这个文件我事先在PS里做好并导出 */
+    background: url("@/assets/icons/wave.svg") repeat-x;
+    width: 6400px;
+    height: 68px;
+    /* 绝对定位 */
+    position: absolute;
+    top: -68px;
+    left: -100px;
+    /* 执行波动动画：动画名 时长 贝塞尔曲线 无限次播放 */
+    animation: wave 8s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite;
+}
+
+.wave:nth-child(2) {
+    top: -55px;
+    left: -200px;
+    /* 执行波动+上下浮动动画 */
+    animation: wave 11s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite, swell 11s ease infinite;
+    animation-delay: -0.2s;
+}
+
+.wave:nth-child(3) {
+    top: -55px;
+    left: -200px;
+    /* 执行波动+上下浮动动画 */
+    animation: wave 14s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite, swell 14s ease infinite;
+    animation-delay: -0.6s;
+}
+
+/* 定义动画 */
+/* 波动动画 */
+@keyframes wave {
+    0% {
+        margin-left: 0;
+    }
+
+    100% {
+        margin-left: -1600px;
+    }
+}
+
+/* 上下浮动动画 */
+@keyframes swell {
+
+    0%,
+    100% {
+        transform: translate(0, -25px);
+    }
+
+    50% {
+        transform: translate(0, 5px);
     }
 }
 </style>
