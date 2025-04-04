@@ -30,6 +30,7 @@ import icon_hudong from '@/assets/icons/hudong.png'
 import icon_traval from '@/assets/icons/traval.png'
 import icon_command from '@/assets/icons/command.png'
 import icon_index from '@/assets/icons/index.png'
+import icon_about from '@/assets/icons/about.png'
 import notlogin from '@/assets/icons/notlogin.png'
 
 // 控制用户面板显示状态
@@ -46,11 +47,12 @@ provide('showUserPanel', showUserPanel)
 // 响应式菜单数据
 const menuList = ref([
   { text: '首页', icon: icon_index, route: '/' },
-  { text: '学术札记', icon: icon_ai, route: '/chengjiu' },
-  { text: '实践工坊', icon: icon_command, route: '/yanjiu' },
-  { text: '游民时代', icon: icon_traval, route: '/zuopin' },
-  { text: '认知轨迹', icon: icon_book, route: '/about' },
-  { text: '互动集市', icon: icon_hudong, route: '/about' }
+  { text: '学术札记', icon: icon_ai, route: '/research' },
+  { text: '实践工坊', icon: icon_command, route: '/studio' },
+  { text: '游民时代', icon: icon_traval, route: '/play' },
+  { text: '认知轨迹', icon: icon_book, route: '/feel' },
+  { text: '互动集市', icon: icon_hudong, route: '/say' },
+  { text: '关于我', icon: icon_about, route: '/about' }
 ])
 // 添加设置随机颜色的方法
 const setRandomColor = (element) => {

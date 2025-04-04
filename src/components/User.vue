@@ -73,6 +73,18 @@
                   <ArrowRight />
                 </el-icon>
               </el-menu-item>
+
+              <!-- 添加记录按钮，仅当用户auth为1时显示 -->
+              <el-menu-item v-if="user && user.auth === '1'" index="3" @click="navigateToRecord">
+                <el-icon>
+                  <EditPen />
+                </el-icon>
+                <span>记录</span>
+                <el-icon style="float: right">
+                  <ArrowRight />
+                </el-icon>
+              </el-menu-item>
+
               <el-menu-item index="2" @click="handleLogout">
                 <el-icon>
                   <SwitchButton />
@@ -87,13 +99,14 @@
   </div>
 </template>
 
-// filepath: /Users/macbookair/Project/personalBlog/web/src/components/User.vue
 <script setup>
 import { ref, onMounted, watch, computed, inject } from 'vue'
 import { ElMessage } from 'element-plus'
 import { sendCode, register, login } from '@/api/auth'
-import { Message, Lock, User, Key, ArrowRight, SwitchButton } from '@element-plus/icons-vue'
+import { Message, Lock, User, Key, ArrowRight, SwitchButton, EditPen } from '@element-plus/icons-vue'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const showUserPanel = inject('showUserPanel')
 
 const isShow = ref(false)
@@ -177,28 +190,29 @@ const handleRegister = async () => {
     // ElMessage.error(error.message || '注册失败'); // 移除重复的错误提示
   }
 };
+// 添加导航到记录页面的方法
+const navigateToRecord = () => {
+  router.push('/record')
+  showUserPanel.value = false // 点击后关闭面板
+}
 
 const handleLogout = () => {
   sessionStorage.removeItem('user');
   user.value = null;
   showUserPanel.value = true; // 退出登录后显示登录/注册面板
-  document.documentElement.style.setProperty('--panel-height', '300px');
 };
 
+// 不再需要监听isRegister变化来调整高度
 watch(isRegister, (newVal) => {
-  const root = document.documentElement;
-  root.style.setProperty('--panel-height', newVal ? '420px' : '300px');
+  // 不再需要设置面板高度
 });
 
 onMounted(() => {
-  document.documentElement.style.setProperty('--panel-height', '300px');
   const storedUser = sessionStorage.getItem('user');
   isShow.value = true;
   if (storedUser) {
     user.value = JSON.parse(storedUser);
-    document.documentElement.style.setProperty('--panel-height', '180px');
   }
-
 });
 </script>
 
@@ -215,10 +229,14 @@ onMounted(() => {
   opacity: 0;
   transition: all 0.3s ease-out;
   z-index: 1;
+  max-height: 80vh;
+  /* 添加最大高度限制，避免面板太长 */
+  overflow: hidden;
 }
 
 .show-panel {
-  height: var(--panel-height);
+  height: auto !important;
+  /* 改为自动高度 */
   opacity: .95;
 }
 
@@ -246,7 +264,7 @@ onMounted(() => {
 }
 
 .user-panel {
-  padding: 20px 20px 0 20px;
+  padding: 20px 20px 20px 20px;
   height: 100%;
   overflow-y: auto;
   scrollbar-width: none;

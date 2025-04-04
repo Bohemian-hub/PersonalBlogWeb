@@ -62,7 +62,7 @@ const bg_url_list = [
 ]
 const bg_index = ref(6)
 const roll_icon = xia
-const text1 = ref('温润如新')
+const text1 = ref('HeDong个人站')
 const fullTextList = [
     "投策命晨装，暂与园田疏。",
     "花明玉关雪，叶暖金窗烟。"
@@ -74,6 +74,7 @@ let timer = null
 let typeTimer = null
 let currentIndex = 0
 let currentTextIndex = 0 // 当前显示第几句话
+
 
 //changeBg
 const changeBg = () => {

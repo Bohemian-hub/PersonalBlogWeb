@@ -1,17 +1,42 @@
 <template>
     <div class="main">
         <!-- 个人介绍板块 -->
+        <!-- 个人介绍板块 - 重构为三个区域 -->
         <section class="section personal-intro">
             <div class="section-header">
                 <h2>个人介绍</h2>
             </div>
             <div class="section-content">
-                <div class="avatar-container">
-                    <!-- 头像区域 -->
-                    <div class="avatar-placeholder"></div>
+                <!-- 左侧头像与数据区域 -->
+                <div class="profile-left">
+                    <div class="avatar-container">
+                        <div class="avatar-placeholder"></div>
+                    </div>
+                    <div class="profile-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">528</div>
+                            <div class="stat-label">访问量</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">42</div>
+                            <div class="stat-label">文章</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">365</div>
+                            <div class="stat-label">运营天数</div>
+                        </div>
+                    </div>
+                    <button class="about-btn">关于我</button>
                 </div>
-                <div class="intro-text">
-                    <p class="tagline">「一句话介绍会放在这里」</p>
+
+                <!-- 右侧内容区域 -->
+                <div class="profile-right">
+                    <!-- 右上角一句话介绍/通知区域 -->
+                    <div class="profile-intro">
+                        <p class="tagline">「浅夜未央，星河流转，无论走到哪里，都是追寻自我的旅程」</p>
+                    </div>
+
+                    <!-- 右下角每日动态格子 -->
                     <div class="contribution-grid">
                         <p class="grid-title">每日动态</p>
                         <!-- 贡献格子区域 -->
@@ -44,27 +69,27 @@
                             <div class="color-legend">
                                 <div class="legend-item">
                                     <div class="color-box work"></div>
-                                    <span>专注和专业</span>
+                                    <span>研究</span>
                                 </div>
                                 <div class="legend-item">
                                     <div class="color-box study"></div>
-                                    <span>知识和智慧</span>
+                                    <span>学习</span>
                                 </div>
                                 <div class="legend-item">
                                     <div class="color-box play"></div>
-                                    <span>活力和热情</span>
+                                    <span>玩耍</span>
                                 </div>
                                 <div class="legend-item">
                                     <div class="color-box rest"></div>
-                                    <span>平静和恢复</span>
+                                    <span>休息</span>
                                 </div>
                                 <div class="legend-item">
                                     <div class="color-box relax"></div>
-                                    <span>舒适和自然</span>
+                                    <span>放松</span>
                                 </div>
                                 <div class="legend-item">
                                     <div class="color-box busy"></div>
-                                    <span>高效和活力</span>
+                                    <span>忙碌</span>
                                 </div>
                             </div>
                         </div>
@@ -345,12 +370,19 @@ onMounted(() => {
 
 .personal-intro .section-content {
     display: flex;
+    gap: 25px;
+}
+
+/* 左侧区域 */
+.profile-left {
+    flex: 0 0 200px;
+    display: flex;
+    flex-direction: column;
     align-items: center;
 }
 
 .avatar-container {
-    flex: 0 0 150px;
-    margin-right: 30px;
+    margin-bottom: 20px;
 }
 
 .avatar-placeholder {
@@ -361,28 +393,105 @@ onMounted(() => {
     background-color: rgba(255, 255, 255, 0.08);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25),
         inset 0 0 0 2px rgba(255, 255, 255, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
+
+.avatar-placeholder:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3),
+        inset 0 0 0 2px rgba(255, 255, 255, 0.3);
+}
+
+
+/* 数据统计样式 */
+.profile-stats {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 0 10px;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+/* 关于我按钮 */
+.about-btn {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: white;
+    padding: 8px 30px;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.about-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* 右侧区域 */
+.profile-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* 右侧上部区域 - 介绍 */
+.profile-intro {
+    background-color: rgba(40, 40, 55, 0.4);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.tagline {
+    font-size: 20px;
+    font-weight: 300;
+    margin: 0;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    line-height: 1.4;
+    text-align: center;
+    font-style: italic;
+    background: linear-gradient(45deg, #ffffff, #b8c6db);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+/* 右侧下部区域 - 每日动态 */
+.contribution-grid {
+    background-color: rgba(35, 35, 45, 0.35);
+    border-radius: 12px;
+    padding: 18px;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+    flex: 1;
+}
+
 
 .intro-text {
     flex: 1;
 }
 
 
-.tagline {
-    font-size: 20px;
-    font-weight: 300;
-    margin-bottom: 24px;
-    letter-spacing: 0.5px;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-/* 贡献格子样式 */
-.contribution-grid {
-    background-color: rgba(35, 35, 45, 0.35);
-    border-radius: 12px;
-    padding: 18px;
-    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
-}
 
 .grid-title {
     margin-top: 0;

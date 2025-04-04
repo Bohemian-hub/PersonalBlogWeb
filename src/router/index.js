@@ -1,7 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from '../components/Home.vue'
-// 假设你有其它页面组件，比如 About.vue
-import About from '../components/About.vue'
+import Home from '../views/Home.vue'
+import About from '../views/About.vue'
+import Research from '../views/Research.vue'
+import Studio from '../views/Studio.vue'
+import Play from '../views/Play.vue'
+import Feel from '../views/Feel.vue'
+import Say from '../views/Say.vue'
+import Record from '../views/Record.vue'
 
 const routes = [
     {
@@ -9,7 +14,7 @@ const routes = [
         name: 'Home',
         component: Home,
         meta: {
-            title: '首页 - 何东的博客'
+            title: '首页 - HeDong的博客'
         }
     },
     {
@@ -17,7 +22,55 @@ const routes = [
         name: 'About',
         component: About,
         meta: {
-            title: '关于我们 - 何东的博客'
+            title: '关于我 - HeDong的博客'
+        }
+    },
+    {
+        path: '/research',
+        name: 'Research',
+        component: Research,
+        meta: {
+            title: '学术札记 - HeDong的博客'
+        }
+    },
+    {
+        path: '/studio',
+        name: 'Studio',
+        component: Studio,
+        meta: {
+            title: '实践工坊 - HeDong的博客'
+        }
+    },
+    {
+        path: '/play',
+        name: 'Play',
+        component: Play,
+        meta: {
+            title: '游民时代 - HeDong的博客'
+        }
+    },
+    {
+        path: '/feel',
+        name: 'Feel',
+        component: Feel,
+        meta: {
+            title: '认知轨迹 - HeDong的博客'
+        }
+    },
+    {
+        path: '/say',
+        name: 'Say',
+        component: Say,
+        meta: {
+            title: '互动集市 - HeDong的博客'
+        }
+    },
+    {
+        path: '/record',
+        name: 'Record',
+        component: Record,
+        meta: {
+            title: '新建记录'
         }
     }
 ]
