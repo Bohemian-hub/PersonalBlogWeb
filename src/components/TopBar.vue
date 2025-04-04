@@ -26,7 +26,8 @@ import User from './User.vue'
 
 import icon_ai from '@/assets/icons/ai.png'
 import icon_book from '@/assets/icons/book.png'
-import icon_chengjiu from '@/assets/icons/chengjiu.png'
+import icon_hudong from '@/assets/icons/hudong.png'
+import icon_traval from '@/assets/icons/traval.png'
 import icon_command from '@/assets/icons/command.png'
 import icon_index from '@/assets/icons/index.png'
 import notlogin from '@/assets/icons/notlogin.png'
@@ -45,10 +46,11 @@ provide('showUserPanel', showUserPanel)
 // 响应式菜单数据
 const menuList = ref([
   { text: '首页', icon: icon_index, route: '/' },
-  { text: '成就', icon: icon_chengjiu, route: '/chengjiu' },
-  { text: '百宝箱', icon: icon_book, route: '/yanjiu' },
-  { text: '作品', icon: icon_command, route: '/zuopin' },
-  { text: '人工智能', icon: icon_ai, route: '/about' }
+  { text: '学术札记', icon: icon_ai, route: '/chengjiu' },
+  { text: '实践工坊', icon: icon_command, route: '/yanjiu' },
+  { text: '游民时代', icon: icon_traval, route: '/zuopin' },
+  { text: '认知轨迹', icon: icon_book, route: '/about' },
+  { text: '互动集市', icon: icon_hudong, route: '/about' }
 ])
 // 添加设置随机颜色的方法
 const setRandomColor = (element) => {

@@ -1,7 +1,7 @@
 <template>
     <div class="cover" :style="{ height: height }">
         <!-- 背景图片 -->
-        <el-image class="bg-image" :src="bg_url_list[bg_index]" :fit="'cover'" draggable="false" />
+        <!-- <el-image class="bg-image" :src="bg_url_list[bg_index]" :fit="'cover'" draggable="false" /> -->
         <!-- <el-image class="bg-image" :src="bg_url_list[bg_index]" :fit="'cover'" draggable="false" @click="changeBg" /> -->
         <!-- 封面标题文字 -->
         <div class="cover_text">
@@ -18,11 +18,11 @@
             </div>
         </div>
         <!-- 在封面的最底部做波浪 -->
-        <div class="sea">
+        <!-- <div class="sea">
             <div class="wave"></div>
             <div class="wave"></div>
             <el-image class="roll_icon" :src="roll_icon"></el-image>
-        </div>
+        </div> -->
     </div>
 </template>
 
@@ -101,20 +101,25 @@ const dropChar = (char) => {
     const textElement = document.querySelector('.text2 a')
     if (!textElement) return
 
-    // 创建一个固定容器用于显示掉落字符（如果不存在）
+    // 获取 Cover 元素作为容器的参照物
+    const coverElement = document.querySelector('.cover')
+    if (!coverElement) return
+
+
+    // 创建一个容器用于显示掉落字符（如果不存在）
     let droppingContainer = document.getElementById('dropping-chars-container')
     if (!droppingContainer) {
         droppingContainer = document.createElement('div')
         droppingContainer.id = 'dropping-chars-container'
-        droppingContainer.style.position = 'fixed'
+        droppingContainer.style.position = 'absolute'
         droppingContainer.style.top = '0'
         droppingContainer.style.left = '0'
-        droppingContainer.style.width = '100vw'
-        droppingContainer.style.height = '100vh'
+        droppingContainer.style.width = '100%'
+        droppingContainer.style.height = '100%'
         droppingContainer.style.overflow = 'hidden'
-        droppingContainer.style.pointerEvents = 'none' // 不阻挡鼠标事件
+        droppingContainer.style.pointerEvents = 'none'
         droppingContainer.style.zIndex = '999'
-        document.body.appendChild(droppingContainer)
+        coverElement.appendChild(droppingContainer)
     }
 
     // 创建字符元素
@@ -147,9 +152,9 @@ const dropChar = (char) => {
     // 设置动画过渡
     charElement.style.transition = 'all 1.2s cubic-bezier(0.55, 0.085, 0.68, 0.53)'
 
-    // 设置最终位置（随机向下掉落）
-    const randomX = lastCharPosition + (Math.random() * 100 - 50) // 左右随机偏移一点
-    const randomY = window.innerHeight + 50 // 确保掉到屏幕外
+    // 计算最终位置（随机向下掉落，但限制在cover内）
+    const randomX = lastCharPosition + (Math.random() * 100 - 50)
+    const randomY = coverElement.clientHeight - 20 // 确保掉到cover底部
 
     // 添加旋转效果
     charElement.style.transform = `translate(${randomX - lastCharPosition}px, ${randomY - targetRect.top}px) rotate(${Math.random() * 720 - 360}deg)`
@@ -250,21 +255,32 @@ const flyText = (char, i, callback) => {
         return
     }
 
-    // 创建一个固定容器用于显示飞行字符（如果不存在）
+
+    // 获取 Cover 元素作为容器的参照物
+    const coverElement = document.querySelector('.cover')
+    if (!coverElement) {
+        if (callback) callback()
+        return
+    }
+
+    // 创建一个容器用于显示飞行字符（如果不存在）
     let flyingContainer = document.getElementById('flying-chars-container')
     if (!flyingContainer) {
         flyingContainer = document.createElement('div')
         flyingContainer.id = 'flying-chars-container'
-        flyingContainer.style.position = 'fixed'
+        flyingContainer.style.position = 'absolute'
         flyingContainer.style.top = '0'
         flyingContainer.style.left = '0'
-        flyingContainer.style.width = '100vw'
-        flyingContainer.style.height = '100vh'
+        flyingContainer.style.width = '100%'
+        flyingContainer.style.height = '100%'
         flyingContainer.style.overflow = 'hidden'
-        flyingContainer.style.pointerEvents = 'none' // 不阻挡鼠标事件
+        flyingContainer.style.pointerEvents = 'none'
         flyingContainer.style.zIndex = '999'
-        document.body.appendChild(flyingContainer)
+        //color
+        flyingContainer.style.color = 'white'
+        coverElement.appendChild(flyingContainer)
     }
+
 
     // 创建字符元素
     const charElement = document.createElement('span')
@@ -278,9 +294,9 @@ const flyText = (char, i, callback) => {
     // 随机起始位置 (屏幕四周)
     const startPosition = Math.floor(Math.random() * 4) // 0-3
 
-    // 计算安全的边界位置（略微内缩以避免任何可能的溢出）
-    const safeWidth = window.innerWidth - 20
-    const safeHeight = window.innerHeight - 20
+    // 计算安全的边界位置（现在是相对于cover的大小）
+    const safeWidth = coverElement.clientWidth - 20
+    const safeHeight = coverElement.clientHeight - 20
 
     // 设置随机起始位置 (上、右、下、左)
     switch (startPosition) {
@@ -310,9 +326,10 @@ const flyText = (char, i, callback) => {
     // 获取目标元素的位置信息（文字应该飞到的位置）
     const targetRect = textElement.getBoundingClientRect()
 
-    // 计算目标元素文本结尾的位置（这是新字符应该飞向的位置）
-    const targetX = targetRect.left + 14 * i
-    const targetY = targetRect.top + targetRect.height / 2
+    // 计算目标位置时获取相对于飞行容器的坐标
+    const coverRect = coverElement.getBoundingClientRect()
+    const targetX = targetRect.left - coverRect.left + 14 * i
+    const targetY = targetRect.top - coverRect.top + targetRect.height / 2
 
     // 强制重排，让元素立即显示
     void charElement.getBoundingClientRect()
@@ -482,7 +499,7 @@ body {
     position: absolute;
     left: 0;
     bottom: 0;
-    
+
 }
 
 .roll_icon {
@@ -513,12 +530,13 @@ body {
     position: absolute;
     top: -98px;
     /* 执行波动动画：动画名 时长 贝塞尔曲线 无限次播放 */
-    animation: wave 7s cubic-bezier(0.36,0.45,0.63,0.53) infinite;
+    animation: wave 7s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite;
 }
-.wave:nth-child(2){
+
+.wave:nth-child(2) {
     top: -75px;
     /* 执行波动+上下浮动动画 */
-    animation: wave 7s cubic-bezier(0.36,0.45,0.63,0.53) infinite,swell 7s ease infinite;
+    animation: wave 7s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite, swell 7s ease infinite;
     animation-delay: -0.2s;
 }
 
