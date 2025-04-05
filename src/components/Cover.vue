@@ -4,7 +4,7 @@
         <!-- <el-image class="bg-image" :src="bg_url_list[bg_index]" :fit="'cover'" draggable="false" /> -->
         <!-- <el-image class="bg-image" :src="bg_url_list[bg_index]" :fit="'cover'" draggable="false" @click="changeBg" /> -->
         <!-- 封面标题文字 -->
-        <div class="cover_text">
+        <div class="cover_text" v-if="isComponentVisible">
             <div class="text1">
                 <div class="text1">
                     <!-- 使用内联样式动态设置动画延迟 -->
@@ -27,7 +27,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 
 // 接收传递的高度参数，默认为300px
 const props = defineProps({
@@ -37,32 +37,8 @@ const props = defineProps({
     }
 })
 
-import bg1Url from '@/assets/images/bg1.png'
-import bg2Url from '@/assets/images/bg2.png'
-import bg3Url from '@/assets/images/bg3.png'
-import bg4Url from '@/assets/images/bg4.png'
-import bg5Url from '@/assets/images/bg5.png'
-import bg6Url from '@/assets/images/bg6.png'
-import bg7Url from '@/assets/images/bg7.png'
-import bg8Url from '@/assets/images/bg8.png'
-import bg9Url from '@/assets/images/bg9.png'
-import bg10Url from '@/assets/images/bg10.png'
-import xia from '@/assets/icons/xia.png'
-const bg_url_list = [
-    bg1Url,
-    bg2Url,
-    bg3Url,
-    bg4Url,
-    bg5Url,
-    bg6Url,
-    bg7Url,
-    bg8Url,
-    bg9Url,
-    bg10Url
-]
-const bg_index = ref(6)
-const roll_icon = xia
-const text1 = ref('HeDong个人站')
+
+const text1 = ref('纸醉金迷')
 const fullTextList = [
     "投策命晨装，暂与园田疏。",
     "花明玉关雪，叶暖金窗烟。"
@@ -70,32 +46,12 @@ const fullTextList = [
 const text2 = ref('')
 const showCursor = ref(true)
 
-let timer = null
-let typeTimer = null
 let currentIndex = 0
 let currentTextIndex = 0 // 当前显示第几句话
+// 添加控制组件显示/隐藏的状态变量
+const isComponentVisible = ref(true)
 
 
-//changeBg
-const changeBg = () => {
-    // 先将当前图片淡出
-    const currentImage = document.querySelector('.bg-image');
-    if (currentImage) {
-        currentImage.style.opacity = '0';
-
-        // 等待过渡完成后切换图片
-        setTimeout(() => {
-            bg_index.value = (bg_index.value + 1) % bg_url_list.length;
-            // 然后将新图片淡入
-            setTimeout(() => {
-                currentImage.style.opacity = '1';
-            }, 50);
-        }, 750); // 这个时间应该是过渡时间的一半，确保平滑衔接
-    } else {
-        // 如果没有找到元素，直接切换
-        bg_index.value = (bg_index.value + 1) % bg_url_list.length;
-    }
-}
 // 文字掉落效果函数
 const dropChar = (char) => {
     // 获取text2 a元素（这是文字真正显示的地方）
@@ -357,23 +313,50 @@ const flyText = (char, i, callback) => {
 //输入光标效果
 const inputCunsor = () => {
     // 光标闪烁
-    timer = setInterval(() => {
+    setInterval(() => {
         showCursor.value = !showCursor.value
     }, 300)
 }
 
-onMounted(() => {
-    //输入光标效果
-    inputCunsor()
+// 检测页面可见性变化
+const handleVisibilityChange = () => {
+    if (document.visibilityState === 'visible') {
+        isComponentVisible.value = true
+        console.log('打开一次');
+    } else {
+        // 当页面不可见时，隐藏组件
+        isComponentVisible.value = false
+        text2.value = '' // 清空文字
+        currentTextIndex = 0 // 重置索引
+        currentIndex = 0 // 重置索引
+        // 清除所有飞行和掉落的字符
+        const flyingContainer = document.getElementById('flying-chars-container')
+        const droppingContainer = document.getElementById('dropping-chars-container')
+        if (flyingContainer) {
+            flyingContainer.innerHTML = ''
+        }
+        if (droppingContainer) {
+            droppingContainer.innerHTML = ''
+        }
+        // 清除光标
+        showCursor.value = false
+    }
+};
 
-    // 启动打字效果
+onMounted(() => {
+    // 初始化动画效果
+    inputCunsor()
     typeText()
+
+    // 添加页面可见性变化监听器
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 })
 
 onUnmounted(() => {
-    clearInterval(timer)
-    clearInterval(typeTimer)
+    // 移除事件监听器以防止内存泄漏
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
 })
+
 </script>
 
 <style scoped>
