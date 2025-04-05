@@ -51,6 +51,21 @@ let currentTextIndex = 0 // 当前显示第几句话
 // 添加控制组件显示/隐藏的状态变量
 const isComponentVisible = ref(true)
 
+// 添加计时器和定时器的引用
+let cursorTimer = null;
+let clearTextTimer = null;
+const timeoutIds = [];
+// 包装 setTimeout，记录 ID
+const safeSetTimeout = (callback, delay) => {
+    const id = setTimeout(callback, delay);
+    timeoutIds.push(id);
+    return id;
+};
+
+const clearAllTimeouts = () => {
+    timeoutIds.forEach((id) => clearTimeout(id));
+    timeoutIds.length = 0; // 清空数组
+};
 
 // 文字掉落效果函数
 const dropChar = (char) => {
@@ -120,27 +135,27 @@ const dropChar = (char) => {
     charElement.style.opacity = '0'
 
     // 动画结束后移除元素
-    setTimeout(() => {
+    safeSetTimeout(() => {
         charElement.remove()
-    }, 1500)
+    }, 1200)
 }
 // 清除文字效果函数
 const clearText = () => {
     const textLength = text2.value.length
     let clearIndex = textLength
 
-    const clearTimer = setInterval(() => {
+    clearTextTimer = setInterval(() => {
         if (clearIndex > 0) {
             const last_char = text2.value[text2.value.length - 1]
             dropChar(last_char)
             text2.value = text2.value.slice(0, -1)
             clearIndex--
         } else {
-            clearInterval(clearTimer)
+            clearInterval(clearTextTimer)
             // 清除完成后等待1秒再开始打字效果
-            setTimeout(() => {
-                typeText()
-            }, 1000)
+            safeSetTimeout(() => {
+                typeText();
+            }, 1000);
         }
     }, 100) // 每100ms删除一个字
 }
@@ -172,30 +187,26 @@ const typeText = () => {
             charCallbacks[nextIndex] = false
 
             // 处理队列中的下一个字符
-            setTimeout(checkAndAddChar, 10)
+            safeSetTimeout(checkAndAddChar, 10)
         }
     }
 
     // 启动所有字符的飞行，按一定的时间间隔
     const launchChars = () => {
         for (let i = 0; i < currentText.length; i++) {
-            setTimeout(() => {
+            safeSetTimeout(() => {
                 flyText(currentText[i], i, () => {
-                    // 标记该字符已经到达目标位置
-                    charCallbacks[i] = true
-
-                    // 尝试添加字符
-                    checkAndAddChar()
-                })
-            }, i * 150) // 每150ms发射一个新字符
+                    charCallbacks[i] = true;
+                    checkAndAddChar();
+                });
+            }, i * 150);
         }
 
         // 所有字符发射完毕后，等待一段时间再清除
-        setTimeout(() => {
-            // 切换到下一句话
-            currentTextIndex = (currentTextIndex + 1) % fullTextList.length
-            clearText()
-        }, currentText.length * 150 + 2000) // 等待所有字符飞行并额外停留2秒
+        safeSetTimeout(() => {
+            currentTextIndex = (currentTextIndex + 1) % fullTextList.length;
+            clearText();
+        }, currentText.length * 150 + 2000);
     }
 
     // 开始发射字符
@@ -312,8 +323,7 @@ const flyText = (char, i, callback) => {
 
 //输入光标效果
 const inputCunsor = () => {
-    // 光标闪烁
-    setInterval(() => {
+    cursorTimer = setInterval(() => {
         showCursor.value = !showCursor.value
     }, 300)
 }
@@ -322,25 +332,34 @@ const inputCunsor = () => {
 const handleVisibilityChange = () => {
     if (document.visibilityState === 'visible') {
         isComponentVisible.value = true
-        console.log('打开一次');
+        inputCunsor()
+        typeText()
     } else {
-        // 当页面不可见时，隐藏组件
-        isComponentVisible.value = false
-        text2.value = '' // 清空文字
-        currentTextIndex = 0 // 重置索引
-        currentIndex = 0 // 重置索引
-        // 清除所有飞行和掉落的字符
-        const flyingContainer = document.getElementById('flying-chars-container')
-        const droppingContainer = document.getElementById('dropping-chars-container')
-        if (flyingContainer) {
-            flyingContainer.innerHTML = ''
-        }
-        if (droppingContainer) {
-            droppingContainer.innerHTML = ''
-        }
-        // 清除光标
-        showCursor.value = false
+        // 页面不可见时，执行关闭动画
+        closeAnimate()
     }
+};
+
+const closeAnimate = () => {
+    console.log('关闭动画');
+    // 当页面不可见时，隐藏组件
+    isComponentVisible.value = false
+    text2.value = '' // 清空文字
+    currentTextIndex = 0 // 重置索引
+    currentIndex = 0 // 重置索引
+    // 清除所有飞行和掉落的字符
+    const flyingContainer = document.getElementById('flying-chars-container')
+    const droppingContainer = document.getElementById('dropping-chars-container')
+    if (flyingContainer) flyingContainer.remove(); // 移除飞行字符容器
+    if (droppingContainer) droppingContainer.remove(); // 移除掉落字符容器
+    // 清除光标
+    showCursor.value = false
+    // 清除所有计时器、定时器
+    if (cursorTimer) clearInterval(cursorTimer);
+    if (clearTextTimer) clearInterval(clearTextTimer);
+
+
+    clearAllTimeouts();
 };
 
 onMounted(() => {
@@ -355,6 +374,7 @@ onMounted(() => {
 onUnmounted(() => {
     // 移除事件监听器以防止内存泄漏
     document.removeEventListener('visibilitychange', handleVisibilityChange);
+    closeAnimate()
 })
 
 </script>
