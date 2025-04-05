@@ -5,11 +5,13 @@
   <Cover height="400px" />
   <!-- 首页主体内容 -->
   <Index height="100vh" />
+  <!-- 底部版权和备案信息 -->
+  <Footer />
   <el-image class="bg-image" :src="bgUrl" :fit="'cover'" draggable="false" />
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 // import bg1Url from '@/assets/images/bg1.png'
 // import bg2Url from '@/assets/images/bg2.png'
 // import bg3Url from '@/assets/images/bg3.png'
@@ -26,6 +28,7 @@ const bgUrl = bg7Url
 import TopBar from '../components/TopBar.vue'
 import Cover from '../components/Cover.vue'
 import Index from '../components/Index.vue'
+import Footer from '../components/Footer.vue'  // 导入新的Footer组件
 
 // 创建一个响应式变量来控制TopBar的显示和隐藏
 const showTopBar = ref(true)
@@ -62,4 +65,6 @@ onUnmounted(() => {
   opacity: 1;
   z-index: -2;
 }
+
+
 </style>

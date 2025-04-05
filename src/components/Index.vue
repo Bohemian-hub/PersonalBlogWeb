@@ -111,10 +111,40 @@
                     <div class="section-content">
                         <p class="section-desc">分享科研心得、学术观点与专业探索</p>
                         <div class="article-grid">
-                            <!-- 文章预览卡片位置 -->
-                            <div class="article-card-placeholder"></div>
-                            <div class="article-card-placeholder"></div>
-                            <div class="article-card-placeholder"></div>
+                            <!-- 文章预览卡片 -->
+                            <div class="article-card">
+                                <div class="article-image" style="background-image: url('https://picsum.photos/400/250?random=1')"></div>
+                                <div class="article-content">
+                                    <h3 class="article-title">复杂网络与知识图谱</h3>
+                                    <div class="article-tags">
+                                        <span class="tag">数据科学</span>
+                                        <span class="tag">网络分析</span>
+                                    </div>
+                                    <p class="article-summary">探索知识图谱在复杂网络分析中的应用，及其在科研数据挖掘中的潜力...</p>
+                                </div>
+                            </div>
+                            <div class="article-card">
+                                <div class="article-image" style="background-image: url('https://picsum.photos/400/250?random=2')"></div>
+                                <div class="article-content">
+                                    <h3 class="article-title">深度学习模型优化策略</h3>
+                                    <div class="article-tags">
+                                        <span class="tag">AI</span>
+                                        <span class="tag">机器学习</span>
+                                    </div>
+                                    <p class="article-summary">分析当前主流深度学习模型的性能瓶颈，并提出创新优化方法...</p>
+                                </div>
+                            </div>
+                            <div class="article-card">
+                                <div class="article-image" style="background-image: url('https://picsum.photos/400/250?random=3')"></div>
+                                <div class="article-content">
+                                    <h3 class="article-title">数据可视化的认知基础</h3>
+                                    <div class="article-tags">
+                                        <span class="tag">可视化</span>
+                                        <span class="tag">认知科学</span>
+                                    </div>
+                                    <p class="article-summary">从认知科学角度探讨有效数据可视化的设计原则与方法论...</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -129,8 +159,38 @@
                         <p class="section-desc">展示个人项目、工具开发与方法分享</p>
                         <div class="project-showcase">
                             <!-- 项目展示区 -->
-                            <div class="project-card-placeholder"></div>
-                            <div class="project-card-placeholder"></div>
+                            <div class="project-card">
+                                <div class="project-image" style="background-image: url('https://picsum.photos/500/300?random=4')"></div>
+                                <div class="project-content">
+                                    <h3 class="project-title">自动化数据分析平台</h3>
+                                    <div class="project-tags">
+                                        <span class="tag">Python</span>
+                                        <span class="tag">数据分析</span>
+                                        <span class="tag">开源</span>
+                                    </div>
+                                    <p class="project-summary">基于Python的自动化数据分析工具，支持多种数据源和可视化输出...</p>
+                                    <div class="project-meta">
+                                        <span class="meta-item"><i class="fa fa-star"></i> 进行中</span>
+                                        <span class="meta-item"><i class="fa fa-calendar"></i> 2023-09</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="project-card">
+                                <div class="project-image" style="background-image: url('https://picsum.photos/500/300?random=5')"></div>
+                                <div class="project-content">
+                                    <h3 class="project-title">知识库管理系统</h3>
+                                    <div class="project-tags">
+                                        <span class="tag">Vue.js</span>
+                                        <span class="tag">Node.js</span>
+                                        <span class="tag">MongoDB</span>
+                                    </div>
+                                    <p class="project-summary">一款轻量级个人知识管理系统，支持笔记整理、标签管理和全文检索...</p>
+                                    <div class="project-meta">
+                                        <span class="meta-item"><i class="fa fa-check-circle"></i> 已完成</span>
+                                        <span class="meta-item"><i class="fa fa-calendar"></i> 2023-06</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -148,9 +208,39 @@
                         <p class="section-desc">思考与观点的表达空间</p>
                         <div class="thought-list">
                             <!-- 文章列表 -->
-                            <div class="thought-item-placeholder"></div>
-                            <div class="thought-item-placeholder"></div>
-                            <div class="thought-item-placeholder"></div>
+                            <div class="thought-item">
+                                <div class="thought-date">2023-11-15</div>
+                                <div class="thought-content">
+                                    <h3 class="thought-title">创造性思维的培养</h3>
+                                    <div class="thought-tags">
+                                        <span class="tag">思维模式</span>
+                                        <span class="tag">创新</span>
+                                    </div>
+                                    <p class="thought-summary">关于如何培养和激发创造性思维的个人思考与实践方法...</p>
+                                </div>
+                            </div>
+                            <div class="thought-item">
+                                <div class="thought-date">2023-10-28</div>
+                                <div class="thought-content">
+                                    <h3 class="thought-title">数字极简主义</h3>
+                                    <div class="thought-tags">
+                                        <span class="tag">数字生活</span>
+                                        <span class="tag">效率</span>
+                                    </div>
+                                    <p class="thought-summary">在信息过载时代如何实践数字极简主义，提升注意力质量...</p>
+                                </div>
+                            </div>
+                            <div class="thought-item">
+                                <div class="thought-date">2023-10-05</div>
+                                <div class="thought-content">
+                                    <h3 class="thought-title">专注与心流</h3>
+                                    <div class="thought-tags">
+                                        <span class="tag">心理学</span>
+                                        <span class="tag">生产力</span>
+                                    </div>
+                                    <p class="thought-summary">探讨进入心流状态的条件与方法，以及其对创造力的影响...</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -181,10 +271,54 @@
                 <p class="section-desc">生活瞬间、旅行记忆与个人故事集</p>
                 <div class="media-gallery">
                     <!-- 照片/视频网格 -->
-                    <div class="media-item-placeholder"></div>
-                    <div class="media-item-placeholder"></div>
-                    <div class="media-item-placeholder"></div>
-                    <div class="media-item-placeholder"></div>
+                    <div class="media-item">
+                        <div class="media-image" style="background-image: url('https://picsum.photos/600/400?random=6')"></div>
+                        <div class="media-overlay">
+                            <h3 class="media-title">京都古寺之旅</h3>
+                            <div class="media-tags">
+                                <span class="tag">旅行</span>
+                                <span class="tag">日本</span>
+                                <span class="tag">摄影</span>
+                            </div>
+                            <p class="media-summary">漫步京都古寺，感受千年文化底蕴...</p>
+                        </div>
+                    </div>
+                    <div class="media-item">
+                        <div class="media-image" style="background-image: url('https://picsum.photos/600/400?random=7')"></div>
+                        <div class="media-overlay">
+                            <h3 class="media-title">阿尔卑斯山脉徒步</h3>
+                            <div class="media-tags">
+                                <span class="tag">户外</span>
+                                <span class="tag">瑞士</span>
+                                <span class="tag">徒步</span>
+                            </div>
+                            <p class="media-summary">在阿尔卑斯山脉的壮丽景色中徒步探险...</p>
+                        </div>
+                    </div>
+                    <div class="media-item">
+                        <div class="media-image" style="background-image: url('https://picsum.photos/600/400?random=8')"></div>
+                        <div class="media-overlay">
+                            <h3 class="media-title">咖啡馆的午后时光</h3>
+                            <div class="media-tags">
+                                <span class="tag">日常</span>
+                                <span class="tag">咖啡</span>
+                                <span class="tag">阅读</span>
+                            </div>
+                            <p class="media-summary">在城市角落的咖啡馆，与一本好书度过宁静午后...</p>
+                        </div>
+                    </div>
+                    <div class="media-item">
+                        <div class="media-image" style="background-image: url('https://picsum.photos/600/400?random=9')"></div>
+                        <div class="media-overlay">
+                            <h3 class="media-title">城市夜景探索</h3>
+                            <div class="media-tags">
+                                <span class="tag">城市</span>
+                                <span class="tag">夜景</span>
+                                <span class="tag">摄影</span>
+                            </div>
+                            <p class="media-summary">探索城市的夜晚面貌，捕捉光影交织的瞬间...</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -789,5 +923,330 @@ h3 {
     font-weight: 500;
     margin-top: 0;
     margin-bottom: 15px;
+}
+
+/* 学术札记卡片样式 */
+.article-card {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: rgba(30, 30, 40, 0.7);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.article-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25);
+}
+
+.article-image {
+    height: 140px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.article-image::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40px;
+    background: linear-gradient(to top, rgba(30, 30, 40, 1), rgba(30, 30, 40, 0));
+}
+
+.article-content {
+    padding: 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.article-title {
+    margin: 0 0 10px 0;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: 0.3px;
+    background: linear-gradient(45deg, #ffffff, #b8c6db);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.article-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.article-summary {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+    opacity: 0.8;
+    flex: 1;
+}
+
+/* 实践工坊卡片样式 */
+.project-card {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: rgba(30, 30, 40, 0.7);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.project-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25);
+}
+
+.project-image {
+    height: 160px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.project-image::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background: linear-gradient(to top, rgba(30, 30, 40, 1), rgba(30, 30, 40, 0));
+}
+
+.project-content {
+    padding: 18px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.project-title {
+    margin: 0 0 10px 0;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.3;
+    background: linear-gradient(45deg, #ffffff, #b8c6db);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.project-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.project-summary {
+    margin: 0 0 15px 0;
+    font-size: 14px;
+    line-height: 1.5;
+    opacity: 0.8;
+    flex: 1;
+}
+
+.project-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    opacity: 0.7;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* 认知轨迹卡片样式 */
+.thought-item {
+    background-color: rgba(30, 30, 40, 0.7);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 15px;
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    display: flex;
+    gap: 15px;
+}
+
+.thought-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    background-color: rgba(35, 35, 45, 0.75);
+}
+
+.thought-date {
+    padding-top: 3px;
+    font-size: 13px;
+    opacity: 0.7;
+    white-space: nowrap;
+}
+
+.thought-content {
+    flex: 1;
+}
+
+.thought-title {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.3;
+    background: linear-gradient(45deg, #ffffff, #b8c6db);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.thought-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+.thought-summary {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+    opacity: 0.8;
+}
+
+/* 游民时代卡片样式 */
+.media-item {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    height: 200px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.media-item:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+}
+
+.media-image {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.5s ease;
+}
+
+.media-item:hover .media-image {
+    transform: scale(1.1);
+}
+
+.media-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 20px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0));
+    transition: all 0.3s ease;
+}
+
+.media-item:hover .media-overlay {
+    padding-bottom: 30px;
+}
+
+.media-title {
+    margin: 0 0 8px 0;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.3;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.media-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+.media-summary {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+    opacity: 0;
+    height: 0;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.media-item:hover .media-summary {
+    opacity: 0.9;
+    height: auto;
+}
+
+/* 标签样式 */
+.tag {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    transition: all 0.2s ease;
+}
+
+.tag:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+/* 随机标签颜色 */
+.article-tags .tag:nth-child(3n+1),
+.project-tags .tag:nth-child(3n+1),
+.thought-tags .tag:nth-child(3n+1),
+.media-tags .tag:nth-child(3n+1) {
+    background-color: rgba(84, 112, 198, 0.2);
+    border: 1px solid rgba(84, 112, 198, 0.3);
+}
+
+.article-tags .tag:nth-child(3n+2),
+.project-tags .tag:nth-child(3n+2),
+.thought-tags .tag:nth-child(3n+2),
+.media-tags .tag:nth-child(3n+2) {
+    background-color: rgba(154, 96, 180, 0.2);
+    border: 1px solid rgba(154, 96, 180, 0.3);
+}
+
+.article-tags .tag:nth-child(3n+3),
+.project-tags .tag:nth-child(3n+3),
+.thought-tags .tag:nth-child(3n+3),
+.media-tags .tag:nth-child(3n+3) {
+    background-color: rgba(238, 102, 102, 0.2);
+    border: 1px solid rgba(238, 102, 102, 0.3);
+}
+
+/* 移除原占位符样式 */
+.article-card-placeholder,
+.project-card-placeholder,
+.thought-item-placeholder,
+.media-item-placeholder {
+    display: none;
 }
 </style>
