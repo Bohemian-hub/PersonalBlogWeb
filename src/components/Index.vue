@@ -1,39 +1,31 @@
 <template>
     <div class="main">
         <!-- 个人介绍板块 -->
-        <!-- 个人介绍板块 - 重构为三个区域 -->
         <section class="section personal-intro">
             <div class="section-header">
-                <h2>个人介绍</h2>
+                <h2>{{ personalInfo.sectionTitle }}</h2>
             </div>
             <div class="section-content">
                 <!-- 左侧头像与数据区域 -->
                 <div class="profile-left">
                     <div class="avatar-container">
-                        <div class="avatar-placeholder"></div>
+                        <div class="avatar-placeholder"
+                            :style="personalInfo.avatar ? `background-image: url('${personalInfo.avatar}')` : ''"></div>
                     </div>
                     <div class="profile-stats">
-                        <div class="stat-item">
-                            <div class="stat-value">528</div>
-                            <div class="stat-label">访问量</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value">42</div>
-                            <div class="stat-label">文章</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value">365</div>
-                            <div class="stat-label">运营天数</div>
+                        <div class="stat-item" v-for="(stat, index) in personalInfo.stats" :key="index">
+                            <div class="stat-value">{{ stat.value }}</div>
+                            <div class="stat-label">{{ stat.label }}</div>
                         </div>
                     </div>
-                    <button class="about-btn">关于我</button>
+                    <button class="about-btn" @click="handleAboutClick">{{ personalInfo.aboutBtnText }}</button>
                 </div>
 
                 <!-- 右侧内容区域 -->
                 <div class="profile-right">
                     <!-- 右上角一句话介绍/通知区域 -->
                     <div class="profile-intro">
-                        <p class="tagline">「浅夜未央，星河流转，无论走到哪里，都是追寻自我的旅程」</p>
+                        <p class="tagline">「{{ personalInfo.tagline }}」</p>
                     </div>
 
                     <!-- 右下角每日动态格子 -->
@@ -46,50 +38,36 @@
         <div class="content-columns">
             <!-- 左侧主要内容列 -->
             <div class="main-column">
-                <!-- 学术札记 -->
+                <!-- 学术札记部分的模板修改 -->
                 <section class="section academic-notes">
                     <div class="section-header">
-                        <h2>学术札记</h2>
-                        <span class="view-all">查看全部</span>
+                        <h2>{{ academicSection.title }}</h2>
+                        <span class="view-all">{{ academicSection.viewAllText }}</span>
                     </div>
                     <div class="section-content">
-                        <p class="section-desc">分享科研心得、学术观点与专业探索</p>
+                        <p class="section-desc">{{ academicSection.description }}</p>
                         <div class="article-grid">
-                            <!-- 文章预览卡片 -->
-                            <div class="article-card">
-                                <div class="article-image"
-                                    style="background-image: url('https://picsum.photos/400/250?random=1')"></div>
+                            <!-- 使用v-for循环渲染文章卡片 -->
+                            <div class="article-card" v-for="article in academicSection.articles" :key="article.id">
+                                <div class="article-image" :style="`background-image: url('${article.image}')`"></div>
                                 <div class="article-content">
-                                    <h3 class="article-title">复杂网络与知识图谱</h3>
+                                    <h3 class="article-title">{{ article.title }}</h3>
                                     <div class="article-tags">
-                                        <span class="tag">数据科学</span>
-                                        <span class="tag">网络分析</span>
+                                        <span class="tag" v-for="(tag, index) in article.tags" :key="index">{{ tag
+                                        }}</span>
                                     </div>
-                                    <p class="article-summary">探索知识图谱在复杂网络分析中的应用，及其在科研数据挖掘中的潜力...</p>
-                                </div>
-                            </div>
-                            <div class="article-card">
-                                <div class="article-image"
-                                    style="background-image: url('https://picsum.photos/400/250?random=2')"></div>
-                                <div class="article-content">
-                                    <h3 class="article-title">深度学习模型优化策略</h3>
-                                    <div class="article-tags">
-                                        <span class="tag">AI</span>
-                                        <span class="tag">机器学习</span>
+                                    <p class="article-summary">{{ article.summary }}</p>
+                                    <!-- 点赞和评论 -->
+                                    <div class="interaction-stats">
+                                        <div class="stat-action">
+                                            <i class="icon-heart"></i>
+                                            <span>{{ article.likes }}</span>
+                                        </div>
+                                        <div class="stat-action">
+                                            <i class="icon-comment"></i>
+                                            <span>{{ article.comments }}</span>
+                                        </div>
                                     </div>
-                                    <p class="article-summary">分析当前主流深度学习模型的性能瓶颈，并提出创新优化方法...</p>
-                                </div>
-                            </div>
-                            <div class="article-card">
-                                <div class="article-image"
-                                    style="background-image: url('https://picsum.photos/400/250?random=3')"></div>
-                                <div class="article-content">
-                                    <h3 class="article-title">数据可视化的认知基础</h3>
-                                    <div class="article-tags">
-                                        <span class="tag">可视化</span>
-                                        <span class="tag">认知科学</span>
-                                    </div>
-                                    <p class="article-summary">从认知科学角度探讨有效数据可视化的设计原则与方法论...</p>
                                 </div>
                             </div>
                         </div>
@@ -99,44 +77,37 @@
                 <!-- 实践工坊 -->
                 <section class="section workshop">
                     <div class="section-header">
-                        <h2>实践工坊</h2>
-                        <span class="view-all">查看全部</span>
+                        <h2>{{ workshopSection.title }}</h2>
+                        <span class="view-all">{{ workshopSection.viewAllText }}</span>
                     </div>
                     <div class="section-content">
-                        <p class="section-desc">展示个人项目、工具开发与方法分享</p>
+                        <p class="section-desc">{{ workshopSection.description }}</p>
                         <div class="project-showcase">
                             <!-- 项目展示区 -->
-                            <div class="project-card">
-                                <div class="project-image"
-                                    style="background-image: url('https://picsum.photos/500/300?random=4')"></div>
+                            <div class="project-card" v-for="project in workshopSection.projects" :key="project.id">
+                                <div class="project-image" :style="`background-image: url('${project.image}')`"></div>
                                 <div class="project-content">
-                                    <h3 class="project-title">自动化数据分析平台</h3>
+                                    <h3 class="project-title">{{ project.title }}</h3>
                                     <div class="project-tags">
-                                        <span class="tag">Python</span>
-                                        <span class="tag">数据分析</span>
-                                        <span class="tag">开源</span>
+                                        <span class="tag" v-for="(tag, index) in project.tags" :key="index">{{ tag
+                                        }}</span>
                                     </div>
-                                    <p class="project-summary">基于Python的自动化数据分析工具，支持多种数据源和可视化输出...</p>
+                                    <p class="project-summary">{{ project.summary }}</p>
                                     <div class="project-meta">
-                                        <span class="meta-item"><i class="fa fa-star"></i> 进行中</span>
-                                        <span class="meta-item"><i class="fa fa-calendar"></i> 2023-09</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="project-card">
-                                <div class="project-image"
-                                    style="background-image: url('https://picsum.photos/500/300?random=5')"></div>
-                                <div class="project-content">
-                                    <h3 class="project-title">知识库管理系统</h3>
-                                    <div class="project-tags">
-                                        <span class="tag">Vue.js</span>
-                                        <span class="tag">Node.js</span>
-                                        <span class="tag">MongoDB</span>
-                                    </div>
-                                    <p class="project-summary">一款轻量级个人知识管理系统，支持笔记整理、标签管理和全文检索...</p>
-                                    <div class="project-meta">
-                                        <span class="meta-item"><i class="fa fa-check-circle"></i> 已完成</span>
-                                        <span class="meta-item"><i class="fa fa-calendar"></i> 2023-06</span>
+                                        <span class="meta-item"><i :class="project.statusIcon"></i> {{ project.status
+                                        }}</span>
+                                        <span class="meta-item"><i class="fa fa-calendar"></i> {{ project.date }}</span>
+                                        <!-- 点赞和评论 -->
+                                        <div class="interaction-stats">
+                                            <div class="stat-action">
+                                                <i class="icon-heart"></i>
+                                                <span>{{ project.likes }}</span>
+                                            </div>
+                                            <div class="stat-action">
+                                                <i class="icon-comment"></i>
+                                                <span>{{ project.comments }}</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -150,56 +121,26 @@
                 <!-- 认知轨迹 -->
                 <section class="section thoughts">
                     <div class="section-header">
-                        <h2>认知轨迹</h2>
-                        <span class="view-all">查看全部</span>
+                        <h2>{{ thoughtsSection.title }}</h2>
+                        <span class="view-all">{{ thoughtsSection.viewAllText }}</span>
                     </div>
                     <div class="section-content">
-                        <p class="section-desc">思考与观点的表达空间</p>
+                        <p class="section-desc">{{ thoughtsSection.description }}</p>
                         <div class="thought-list">
                             <!-- 文章列表 -->
-                            <div class="thought-item">
-                                <div class="thought-date" :data-date="'2023-11-15'">
-                                    <span class="date-month">11月</span>
-                                    <span class="date-day">15</span>
-                                    <span class="date-year">2023</span>
+                            <div class="thought-item" v-for="thought in thoughtsSection.thoughts" :key="thought.id">
+                                <div class="thought-date" :data-date="thought.date">
+                                    <span class="date-month">{{ formatDate(thought.date).month }}</span>
+                                    <span class="date-day">{{ formatDate(thought.date).day }}</span>
+                                    <span class="date-year">{{ formatDate(thought.date).year }}</span>
                                 </div>
                                 <div class="thought-content">
-                                    <h3 class="thought-title">创造性思维的培养</h3>
+                                    <h3 class="thought-title">{{ thought.title }}</h3>
                                     <div class="thought-tags">
-                                        <span class="tag">思维模式</span>
-                                        <span class="tag">创新</span>
+                                        <span class="tag" v-for="(tag, index) in thought.tags" :key="index">{{ tag
+                                        }}</span>
                                     </div>
-                                    <p class="thought-summary">关于如何培养和激发创造性思维的个人思考与实践方法...</p>
-                                </div>
-                            </div>
-                            <div class="thought-item">
-                                <div class="thought-date" :data-date="'2023-11-15'">
-                                    <span class="date-month">11月</span>
-                                    <span class="date-day">15</span>
-                                    <span class="date-year">2023</span>
-                                </div>
-                                <div class="thought-content">
-                                    <h3 class="thought-title">数字极简主义</h3>
-                                    <div class="thought-tags">
-                                        <span class="tag">数字生活</span>
-                                        <span class="tag">效率</span>
-                                    </div>
-                                    <p class="thought-summary">在信息过载时代如何实践数字极简主义，提升注意力质量...</p>
-                                </div>
-                            </div>
-                            <div class="thought-item">
-                                <div class="thought-date" :data-date="'2023-11-15'">
-                                    <span class="date-month">11月</span>
-                                    <span class="date-day">15</span>
-                                    <span class="date-year">2023</span>
-                                </div>
-                                <div class="thought-content">
-                                    <h3 class="thought-title">专注与心流</h3>
-                                    <div class="thought-tags">
-                                        <span class="tag">心理学</span>
-                                        <span class="tag">生产力</span>
-                                    </div>
-                                    <p class="thought-summary">探讨进入心流状态的条件与方法，以及其对创造力的影响...</p>
+                                    <p class="thought-summary">{{ thought.summary }}</p>
                                 </div>
                             </div>
                         </div>
@@ -225,63 +166,32 @@
         <!-- 游民时代 - 全宽度区域 -->
         <section class="section life-section">
             <div class="section-header">
-                <h2>游民时代</h2>
-                <span class="view-all">查看全部</span>
+                <h2>{{ lifeSection.title }}</h2>
+                <span class="view-all">{{ lifeSection.viewAllText }}</span>
             </div>
             <div class="section-content">
-                <p class="section-desc">生活瞬间、旅行记忆与个人故事集</p>
+                <p class="section-desc">{{ lifeSection.description }}</p>
                 <div class="media-gallery">
                     <!-- 照片/视频网格 -->
-                    <div class="media-item">
-                        <div class="media-image"
-                            style="background-image: url('https://picsum.photos/600/400?random=6')"></div>
+                    <div class="media-item" v-for="media in lifeSection.mediaItems" :key="media.id">
+                        <div class="media-image" :style="`background-image: url('${media.image}')`"></div>
                         <div class="media-overlay">
-                            <h3 class="media-title">京都古寺之旅</h3>
+                            <h3 class="media-title">{{ media.title }}</h3>
                             <div class="media-tags">
-                                <span class="tag">旅行</span>
-                                <span class="tag">日本</span>
-                                <span class="tag">摄影</span>
+                                <span class="tag" v-for="(tag, index) in media.tags" :key="index">{{ tag }}</span>
                             </div>
-                            <p class="media-summary">漫步京都古寺，感受千年文化底蕴...</p>
-                        </div>
-                    </div>
-                    <div class="media-item">
-                        <div class="media-image"
-                            style="background-image: url('https://picsum.photos/600/400?random=7')"></div>
-                        <div class="media-overlay">
-                            <h3 class="media-title">阿尔卑斯山脉徒步</h3>
-                            <div class="media-tags">
-                                <span class="tag">户外</span>
-                                <span class="tag">瑞士</span>
-                                <span class="tag">徒步</span>
+                            <p class="media-summary">{{ media.summary }}</p>
+                            <!-- 点赞和评论 -->
+                            <div class="interaction-stats media-stats">
+                                <div class="stat-action">
+                                    <i class="icon-heart"></i>
+                                    <span>{{ media.likes }}</span>
+                                </div>
+                                <div class="stat-action">
+                                    <i class="icon-comment"></i>
+                                    <span>{{ media.comments }}</span>
+                                </div>
                             </div>
-                            <p class="media-summary">在阿尔卑斯山脉的壮丽景色中徒步探险...</p>
-                        </div>
-                    </div>
-                    <div class="media-item">
-                        <div class="media-image"
-                            style="background-image: url('https://picsum.photos/600/400?random=8')"></div>
-                        <div class="media-overlay">
-                            <h3 class="media-title">咖啡馆的午后时光</h3>
-                            <div class="media-tags">
-                                <span class="tag">日常</span>
-                                <span class="tag">咖啡</span>
-                                <span class="tag">阅读</span>
-                            </div>
-                            <p class="media-summary">在城市角落的咖啡馆，与一本好书度过宁静午后...</p>
-                        </div>
-                    </div>
-                    <div class="media-item">
-                        <div class="media-image"
-                            style="background-image: url('https://picsum.photos/600/400?random=9')"></div>
-                        <div class="media-overlay">
-                            <h3 class="media-title">城市夜景探索</h3>
-                            <div class="media-tags">
-                                <span class="tag">城市</span>
-                                <span class="tag">夜景</span>
-                                <span class="tag">摄影</span>
-                            </div>
-                            <p class="media-summary">探索城市的夜晚面貌，捕捉光影交织的瞬间...</p>
                         </div>
                     </div>
                 </div>
@@ -315,10 +225,178 @@
     </div>
 </template>
 <script setup>
-import { onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import Activity from '../components/Activity.vue'  // 导入新的Footer组件
 
+// 个人介绍数据
+const personalInfo = ref({
+    sectionTitle: '个人介绍',
+    avatar: 'https://picsum.photos/600/400?random=8', // 可以添加头像URL
+    stats: [
+        { value: 528, label: '访问量' },
+        { value: 42, label: '文章' },
+        { value: 365, label: '运营天数' }
+    ],
+    aboutBtnText: '关于我',
+    tagline: '浅夜未央，星河流转，无论走到哪里，都是追寻自我的旅程'
+});
 
+// 学术札记数据
+const academicSection = ref({
+    title: '学术札记',
+    description: '分享科研心得、学术观点与专业探索',
+    viewAllText: '查看全部',
+    articles: [
+        {
+            id: 1,
+            title: '复杂网络与知识图谱',
+            image: 'https://picsum.photos/400/250?random=1',
+            summary: '探索知识图谱在复杂网络分析中的应用，及其在科研数据挖掘中的潜力...',
+            tags: ['数据科学', '网络分析'],
+            likes: 42,
+            comments: 18
+        },
+        {
+            id: 2,
+            title: '深度学习模型优化策略',
+            image: 'https://picsum.photos/400/250?random=2',
+            summary: '分析当前主流深度学习模型的性能瓶颈，并提出创新优化方法...',
+            tags: ['AI', '机器学习'],
+            likes: 42,
+            comments: 18
+        },
+        {
+            id: 3,
+            title: '数据可视化的认知基础',
+            image: 'https://picsum.photos/400/250?random=3',
+            summary: '从认知科学角度探讨有效数据可视化的设计原则与方法论...',
+            tags: ['可视化', '认知科学'],
+            likes: 42,
+            comments: 18
+        }
+    ]
+});
+
+
+// 实践工坊数据
+const workshopSection = ref({
+    title: '实践工坊',
+    description: '展示个人项目、工具开发与方法分享',
+    viewAllText: '查看全部',
+    projects: [
+        {
+            id: 1,
+            title: '自动化数据分析平台',
+            image: 'https://picsum.photos/500/300?random=4',
+            summary: '基于Python的自动化数据分析工具，支持多种数据源和可视化输出...',
+            tags: ['Python', '数据分析', '开源'],
+            status: '进行中',
+            statusIcon: 'fa fa-star',
+            date: '2023-09',
+            likes: 76,
+            comments: 24
+        },
+        {
+            id: 2,
+            title: '知识库管理系统',
+            image: 'https://picsum.photos/500/300?random=5',
+            summary: '一款轻量级个人知识管理系统，支持笔记整理、标签管理和全文检索...',
+            tags: ['Vue.js', 'Node.js', 'MongoDB'],
+            status: '已完成',
+            statusIcon: 'fa fa-check-circle',
+            date: '2023-06',
+            likes: 76,
+            comments: 24
+        }
+    ]
+});
+// 认知轨迹数据
+const thoughtsSection = ref({
+    title: '认知轨迹',
+    description: '思考与观点的表达空间',
+    viewAllText: '查看全部',
+    thoughts: [
+        {
+            id: 1,
+            title: '创造性思维的培养',
+            date: '2023-11-15',
+            tags: ['思维模式', '创新'],
+            summary: '关于如何培养和激发创造性思维的个人思考与实践方法...'
+        },
+        {
+            id: 2,
+            title: '数字极简主义',
+            date: '2023-11-15',
+            tags: ['数字生活', '效率'],
+            summary: '在信息过载时代如何实践数字极简主义，提升注意力质量...'
+        },
+        {
+            id: 3,
+            title: '专注与心流',
+            date: '2023-11-15',
+            tags: ['心理学', '生产力'],
+            summary: '探讨进入心流状态的条件与方法，以及其对创造力的影响...'
+        }
+    ]
+});
+// 游民时代数据
+const lifeSection = ref({
+    title: '游民时代',
+    description: '生活瞬间、旅行记忆与个人故事集',
+    viewAllText: '查看全部',
+    mediaItems: [
+        {
+            id: 1,
+            title: '京都古寺之旅',
+            image: 'https://picsum.photos/600/400?random=6',
+            summary: '漫步京都古寺，感受千年文化底蕴...',
+            tags: ['旅行', '日本', '摄影'],
+            likes: 123,
+            comments: 36
+        },
+        {
+            id: 2,
+            title: '阿尔卑斯山脉徒步',
+            image: 'https://picsum.photos/600/400?random=7',
+            summary: '在阿尔卑斯山脉的壮丽景色中徒步探险...',
+            tags: ['户外', '瑞士', '徒步'],
+            likes: 128,
+            comments: 36
+        },
+        {
+            id: 3,
+            title: '咖啡馆的午后时光',
+            image: 'https://picsum.photos/600/400?random=8',
+            summary: '在城市角落的咖啡馆，与一本好书度过宁静午后...',
+            tags: ['日常', '咖啡', '阅读'],
+            likes: 128,
+            comments: 36
+        },
+        {
+            id: 4,
+            title: '城市夜景探索',
+            image: 'https://picsum.photos/600/400?random=9',
+            summary: '探索城市的夜晚面貌，捕捉光影交织的瞬间...',
+            tags: ['城市', '夜景', '摄影'],
+            likes: 128,
+            comments: 36
+        }
+    ]
+});
+// 日期格式化函数
+const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return {
+        month: `${date.getMonth() + 1}月`,
+        day: date.getDate(),
+        year: date.getFullYear()
+    };
+};
+// 关于我按钮点击处理
+const handleAboutClick = () => {
+    console.log('关于我按钮被点击');
+    // 这里可以添加导航到关于页面或显示关于信息弹窗的逻辑
+};
 // 在DOM加载后生成格子
 onMounted(() => {
 
@@ -432,12 +510,15 @@ onMounted(() => {
     margin-bottom: 20px;
 }
 
+/* 为头像添加背景图片支持 */
 .avatar-placeholder {
     width: 150px;
     height: 150px;
     border-radius: 50%;
     border: none;
     background-color: rgba(255, 255, 255, 0.08);
+    background-size: cover;
+    background-position: center;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25),
         inset 0 0 0 2px rgba(255, 255, 255, 0.2);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -856,9 +937,11 @@ h3 {
     flex: 1;
 }
 
+/* 项目卡片调整 */
 .project-meta {
     display: flex;
-    justify-content: space-between;
+    flex-wrap: wrap;
+    align-items: center;
     font-size: 13px;
     opacity: 0.7;
 }
@@ -1104,5 +1187,68 @@ h3 {
 .thought-item-placeholder,
 .media-item-placeholder {
     display: none;
+}
+
+/* 点赞和评论图标样式 */
+.interaction-stats {
+    display: flex;
+    gap: 15px;
+}
+
+.project-meta .interaction-stats {
+    margin-top: 0;
+    margin-left: auto;
+}
+
+.stat-action {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+    opacity: 0.8;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.stat-action:hover {
+    opacity: 1;
+    transform: translateY(-2px);
+}
+
+.stat-action i {
+    font-size: 15px;
+}
+
+.icon-heart::before {
+    content: '♥';
+    color: rgba(238, 102, 102, 0.9);
+}
+
+.icon-comment::before {
+    content: '💬';
+    color: rgba(115, 192, 222, 0.9);
+}
+
+/* 游民时代调整 */
+.media-stats {
+    margin-top: 10px;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.media-item:hover .media-stats {
+    opacity: 1;
+}
+
+/* 让项目卡片的内容区更灵活对齐 */
+.article-content,
+.project-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.article-summary,
+.project-summary {
+    flex: 1;
 }
 </style>
