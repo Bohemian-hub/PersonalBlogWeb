@@ -37,63 +37,7 @@
                     </div>
 
                     <!-- 右下角每日动态格子 -->
-                    <div class="contribution-grid">
-                        <p class="grid-title">每日动态</p>
-                        <!-- 贡献格子区域 -->
-                        <div class="grid-container">
-                            <!-- 月份标签 -->
-                            <div class="months-row">
-                                <span>一月</span>
-                                <span>二月</span>
-                                <span>三月</span>
-                                <span>四月</span>
-                                <span>五月</span>
-                                <span>六月</span>
-                                <span>七月</span>
-                            </div>
-
-                            <!-- 星期标签 -->
-                            <div class="days-column">
-                                <span>周一</span>
-                                <span>周三</span>
-                                <span>周五</span>
-                                <span>周日</span>
-                            </div>
-
-                            <!-- 活动格子 -->
-                            <div class="activity-grid">
-                                <!-- 这里会通过JavaScript动态生成格子 -->
-                            </div>
-
-                            <!-- 颜色图例 -->
-                            <div class="color-legend">
-                                <div class="legend-item">
-                                    <div class="color-box work"></div>
-                                    <span>研究</span>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="color-box study"></div>
-                                    <span>学习</span>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="color-box play"></div>
-                                    <span>玩耍</span>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="color-box rest"></div>
-                                    <span>休息</span>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="color-box relax"></div>
-                                    <span>放松</span>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="color-box busy"></div>
-                                    <span>忙碌</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <Activity />
                 </div>
             </div>
         </section>
@@ -113,7 +57,8 @@
                         <div class="article-grid">
                             <!-- 文章预览卡片 -->
                             <div class="article-card">
-                                <div class="article-image" style="background-image: url('https://picsum.photos/400/250?random=1')"></div>
+                                <div class="article-image"
+                                    style="background-image: url('https://picsum.photos/400/250?random=1')"></div>
                                 <div class="article-content">
                                     <h3 class="article-title">复杂网络与知识图谱</h3>
                                     <div class="article-tags">
@@ -124,7 +69,8 @@
                                 </div>
                             </div>
                             <div class="article-card">
-                                <div class="article-image" style="background-image: url('https://picsum.photos/400/250?random=2')"></div>
+                                <div class="article-image"
+                                    style="background-image: url('https://picsum.photos/400/250?random=2')"></div>
                                 <div class="article-content">
                                     <h3 class="article-title">深度学习模型优化策略</h3>
                                     <div class="article-tags">
@@ -135,7 +81,8 @@
                                 </div>
                             </div>
                             <div class="article-card">
-                                <div class="article-image" style="background-image: url('https://picsum.photos/400/250?random=3')"></div>
+                                <div class="article-image"
+                                    style="background-image: url('https://picsum.photos/400/250?random=3')"></div>
                                 <div class="article-content">
                                     <h3 class="article-title">数据可视化的认知基础</h3>
                                     <div class="article-tags">
@@ -160,7 +107,8 @@
                         <div class="project-showcase">
                             <!-- 项目展示区 -->
                             <div class="project-card">
-                                <div class="project-image" style="background-image: url('https://picsum.photos/500/300?random=4')"></div>
+                                <div class="project-image"
+                                    style="background-image: url('https://picsum.photos/500/300?random=4')"></div>
                                 <div class="project-content">
                                     <h3 class="project-title">自动化数据分析平台</h3>
                                     <div class="project-tags">
@@ -176,7 +124,8 @@
                                 </div>
                             </div>
                             <div class="project-card">
-                                <div class="project-image" style="background-image: url('https://picsum.photos/500/300?random=5')"></div>
+                                <div class="project-image"
+                                    style="background-image: url('https://picsum.photos/500/300?random=5')"></div>
                                 <div class="project-content">
                                     <h3 class="project-title">知识库管理系统</h3>
                                     <div class="project-tags">
@@ -209,7 +158,11 @@
                         <div class="thought-list">
                             <!-- 文章列表 -->
                             <div class="thought-item">
-                                <div class="thought-date">2023-11-15</div>
+                                <div class="thought-date" :data-date="'2023-11-15'">
+                                    <span class="date-month">11月</span>
+                                    <span class="date-day">15</span>
+                                    <span class="date-year">2023</span>
+                                </div>
                                 <div class="thought-content">
                                     <h3 class="thought-title">创造性思维的培养</h3>
                                     <div class="thought-tags">
@@ -220,7 +173,11 @@
                                 </div>
                             </div>
                             <div class="thought-item">
-                                <div class="thought-date">2023-10-28</div>
+                                <div class="thought-date" :data-date="'2023-11-15'">
+                                    <span class="date-month">11月</span>
+                                    <span class="date-day">15</span>
+                                    <span class="date-year">2023</span>
+                                </div>
                                 <div class="thought-content">
                                     <h3 class="thought-title">数字极简主义</h3>
                                     <div class="thought-tags">
@@ -231,7 +188,11 @@
                                 </div>
                             </div>
                             <div class="thought-item">
-                                <div class="thought-date">2023-10-05</div>
+                                <div class="thought-date" :data-date="'2023-11-15'">
+                                    <span class="date-month">11月</span>
+                                    <span class="date-day">15</span>
+                                    <span class="date-year">2023</span>
+                                </div>
                                 <div class="thought-content">
                                     <h3 class="thought-title">专注与心流</h3>
                                     <div class="thought-tags">
@@ -272,7 +233,8 @@
                 <div class="media-gallery">
                     <!-- 照片/视频网格 -->
                     <div class="media-item">
-                        <div class="media-image" style="background-image: url('https://picsum.photos/600/400?random=6')"></div>
+                        <div class="media-image"
+                            style="background-image: url('https://picsum.photos/600/400?random=6')"></div>
                         <div class="media-overlay">
                             <h3 class="media-title">京都古寺之旅</h3>
                             <div class="media-tags">
@@ -284,7 +246,8 @@
                         </div>
                     </div>
                     <div class="media-item">
-                        <div class="media-image" style="background-image: url('https://picsum.photos/600/400?random=7')"></div>
+                        <div class="media-image"
+                            style="background-image: url('https://picsum.photos/600/400?random=7')"></div>
                         <div class="media-overlay">
                             <h3 class="media-title">阿尔卑斯山脉徒步</h3>
                             <div class="media-tags">
@@ -296,7 +259,8 @@
                         </div>
                     </div>
                     <div class="media-item">
-                        <div class="media-image" style="background-image: url('https://picsum.photos/600/400?random=8')"></div>
+                        <div class="media-image"
+                            style="background-image: url('https://picsum.photos/600/400?random=8')"></div>
                         <div class="media-overlay">
                             <h3 class="media-title">咖啡馆的午后时光</h3>
                             <div class="media-tags">
@@ -308,7 +272,8 @@
                         </div>
                     </div>
                     <div class="media-item">
-                        <div class="media-image" style="background-image: url('https://picsum.photos/600/400?random=9')"></div>
+                        <div class="media-image"
+                            style="background-image: url('https://picsum.photos/600/400?random=9')"></div>
                         <div class="media-overlay">
                             <h3 class="media-title">城市夜景探索</h3>
                             <div class="media-tags">
@@ -351,64 +316,12 @@
 </template>
 <script setup>
 import { onMounted } from 'vue';
+import Activity from '../components/Activity.vue'  // 导入新的Footer组件
 
-// 将days变量定义在顶层作用域
-const days = 26 * 7; // 26周，约6个月
-
-// 模拟数据生成函数
-function generateActivityData() {
-    const activities = ['work', 'study', 'play', 'rest', 'relax', 'busy', 'empty'];
-    const weights = [3, 2, 1, 2, 1, 1, 0.5]; // 权重控制各种活动出现的概率
-    const totalWeight = weights.reduce((a, b) => a + b, 0);
-
-    // 生成过去6个月的数据
-    const data = [];
-
-    for (let i = 0; i < days; i++) {
-        // 随机选择一种活动类型，基于权重
-        let random = Math.random() * totalWeight;
-        let activity = 'empty';
-
-        for (let j = 0; j < activities.length; j++) {
-            if (random < weights[j]) {
-                activity = activities[j];
-                break;
-            }
-            random -= weights[j];
-        }
-
-        data.push(activity);
-    }
-
-    return data;
-}
 
 // 在DOM加载后生成格子
 onMounted(() => {
-    const activityData = generateActivityData();
-    const gridElement = document.querySelector('.activity-grid');
 
-    if (gridElement) {
-        // 清空格子区域
-        gridElement.innerHTML = '';
-
-        // 生成格子
-        activityData.forEach((activity, index) => {
-            const cell = document.createElement('div');
-            cell.className = `grid-cell ${activity}`;
-
-            // 添加日期提示
-            const today = new Date();
-            const dayOffset = days - index - 1;
-            const cellDate = new Date(today);
-            cellDate.setDate(today.getDate() - dayOffset);
-
-            const dateStr = `${cellDate.getFullYear()}-${cellDate.getMonth() + 1}-${cellDate.getDate()}`;
-            cell.setAttribute('title', dateStr);
-
-            gridElement.appendChild(cell);
-        });
-    }
 });
 </script>
 
@@ -611,124 +524,6 @@ onMounted(() => {
     color: transparent;
 }
 
-/* 右侧下部区域 - 每日动态 */
-.contribution-grid {
-    background-color: rgba(35, 35, 45, 0.35);
-    border-radius: 12px;
-    padding: 18px;
-    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
-    flex: 1;
-}
-
-
-.intro-text {
-    flex: 1;
-}
-
-
-
-.grid-title {
-    margin-top: 0;
-    margin-bottom: 15px;
-    font-size: 15px;
-    font-weight: 500;
-}
-
-.grid-container {
-    position: relative;
-    padding-left: 30px;
-    padding-top: 20px;
-}
-
-/* 月份行样式 */
-.months-row {
-    display: flex;
-    position: absolute;
-    top: 0;
-    left: 30px;
-    right: 0;
-    height: 20px;
-}
-
-.months-row span {
-    flex: 1;
-    text-align: center;
-    font-size: 11px;
-    color: rgba(255, 255, 255, 0.6);
-}
-
-/* 星期列样式 */
-.days-column {
-    position: absolute;
-    left: 0;
-    top: 20px;
-    bottom: 30px;
-    width: 30px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-.days-column span {
-    font-size: 11px;
-    color: rgba(255, 255, 255, 0.6);
-    text-align: center;
-}
-
-/* 活动网格样式 */
-.activity-grid {
-    display: grid;
-    grid-template-columns: repeat(26, 1fr);
-    grid-template-rows: repeat(7, 1fr);
-    gap: 3px;
-    height: 110px;
-}
-
-.grid-cell {
-    border-radius: 2px;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.grid-cell:hover {
-    transform: scale(1.3);
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-    z-index: 2;
-}
-
-/* 各种状态的颜色 */
-.grid-cell.empty {
-    background-color: rgba(255, 255, 255, 0.07);
-}
-
-.grid-cell.work {
-    background-color: #5470c6;
-    /* 蓝色：专注、专业 */
-}
-
-.grid-cell.study {
-    background-color: #9a60b4;
-    /* 紫色：知识、智慧 */
-}
-
-.grid-cell.play {
-    background-color: #ee6666;
-    /* 红色：活力、热情 */
-}
-
-.grid-cell.rest {
-    background-color: #73c0de;
-    /* 淡蓝色：安静、平静 */
-}
-
-.grid-cell.relax {
-    background-color: #3ba272;
-    /* 绿色：舒适、自然 */
-}
-
-.grid-cell.busy {
-    background-color: #fc8452;
-    /* 橙色：活力、效率 */
-}
 
 /* 颜色图例样式 */
 .color-legend {
@@ -1087,17 +882,78 @@ h3 {
     gap: 15px;
 }
 
-.thought-item:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-    background-color: rgba(35, 35, 45, 0.75);
-}
 
 .thought-date {
-    padding-top: 3px;
+    min-width: 80px;
+    height: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(40, 40, 55, 0.6);
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.05);
     font-size: 13px;
-    opacity: 0.7;
     white-space: nowrap;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.thought-item:hover .thought-date {
+    background-color: rgba(50, 50, 70, 0.7);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.thought-date::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+}
+
+/* 拆分日期显示为两部分 */
+.thought-date::after {
+    content: attr(data-date);
+    display: none;
+    /* 隐藏原始日期 */
+}
+
+.thought-date .date-month,
+.thought-date .date-day,
+.thought-date .date-year {
+    display: block;
+    text-align: center;
+}
+
+.thought-date .date-day {
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1;
+    margin: 4px 0;
+    background: linear-gradient(45deg, #ffffff, #b8c6db);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.thought-date .date-month {
+    font-size: 14px;
+    font-weight: 500;
+    opacity: 0.9;
+    margin-bottom: 2px;
+}
+
+.thought-date .date-year {
+    font-size: 12px;
+    opacity: 0.7;
+    margin-top: 2px;
 }
 
 .thought-content {

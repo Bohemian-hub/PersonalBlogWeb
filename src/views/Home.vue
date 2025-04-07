@@ -1,13 +1,15 @@
 <template>
-  <!-- 顶部栏组件，当滚动位置为0时显示 -->
-  <TopBar :visible="showTopBar" />
-  <!-- 使用封装的Cover组件，并设置高度为100vh -->
-  <Cover height="400px" />
-  <!-- 首页主体内容 -->
-  <Index height="100vh" />
-  <!-- 底部版权和备案信息 -->
-  <Footer />
-  <el-image class="bg-image" :src="bgUrl" :fit="'cover'" draggable="false" />
+  <div>
+    <!-- 顶部栏组件，当滚动位置为0时显示 -->
+    <TopBar :visible="showTopBar" />
+    <!-- 使用封装的Cover组件，并设置高度为100vh -->
+    <Cover height="400px" />
+    <!-- 首页主体内容 -->
+    <Index height="100vh" />
+    <!-- 底部版权和备案信息 -->
+    <Footer />
+    <el-image class="bg-image" :src="bgUrl" :fit="'cover'" draggable="false" />
+  </div>
 </template>
 
 <script setup>
