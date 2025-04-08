@@ -7,6 +7,7 @@ import Play from '../views/Play.vue'
 import Feel from '../views/Feel.vue'
 import Say from '../views/Say.vue'
 import Record from '../views/Record.vue'
+import Article from '../views/Article.vue'
 
 const routes = [
     {
@@ -71,6 +72,14 @@ const routes = [
         component: Record,
         meta: {
             title: '新建记录'
+        }
+    },
+    {
+        path: '/article',
+        name: 'Article',
+        component: Article,
+        meta: {
+            title: '文章'
         }
     }
 ]

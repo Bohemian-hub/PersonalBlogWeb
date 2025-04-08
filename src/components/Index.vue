@@ -48,13 +48,14 @@
                         <p class="section-desc">{{ academicSection.description }}</p>
                         <div class="article-grid">
                             <!-- 使用v-for循环渲染文章卡片 -->
-                            <div class="article-card" v-for="article in academicSection.articles" :key="article.id">
+                            <div class="article-card" v-for="article in academicSection.articles" :key="article.id"
+                                @click="goToArticle(article.id)">
                                 <div class="article-image" :style="`background-image: url('${article.image}')`"></div>
                                 <div class="article-content">
                                     <h3 class="article-title">{{ article.title }}</h3>
                                     <div class="article-tags">
                                         <span class="tag" v-for="(tag, index) in article.tags" :key="index">{{ tag
-                                        }}</span>
+                                            }}</span>
                                     </div>
                                     <p class="article-summary">{{ article.summary }}</p>
                                     <!-- 点赞和评论 -->
@@ -84,18 +85,18 @@
                         <p class="section-desc">{{ workshopSection.description }}</p>
                         <div class="project-showcase">
                             <!-- 项目展示区 -->
-                            <div class="project-card" v-for="project in workshopSection.projects" :key="project.id">
+                            <div class="project-card" v-for="project in workshopSection.projects" :key="project.id"   @click="goToArticle(article.id)">
                                 <div class="project-image" :style="`background-image: url('${project.image}')`"></div>
                                 <div class="project-content">
                                     <h3 class="project-title">{{ project.title }}</h3>
                                     <div class="project-tags">
                                         <span class="tag" v-for="(tag, index) in project.tags" :key="index">{{ tag
-                                        }}</span>
+                                            }}</span>
                                     </div>
                                     <p class="project-summary">{{ project.summary }}</p>
                                     <div class="project-meta">
                                         <span class="meta-item"><i :class="project.statusIcon"></i> {{ project.status
-                                        }}</span>
+                                            }}</span>
                                         <span class="meta-item"><i class="fa fa-calendar"></i> {{ project.date }}</span>
                                         <!-- 点赞和评论 -->
                                         <div class="interaction-stats">
@@ -128,7 +129,7 @@
                         <p class="section-desc">{{ thoughtsSection.description }}</p>
                         <div class="thought-list">
                             <!-- 文章列表 -->
-                            <div class="thought-item" v-for="thought in thoughtsSection.thoughts" :key="thought.id">
+                            <div class="thought-item" v-for="thought in thoughtsSection.thoughts" :key="thought.id"   @click="goToArticle(article.id)">
                                 <div class="thought-date" :data-date="thought.date">
                                     <span class="date-month">{{ formatDate(thought.date).month }}</span>
                                     <span class="date-day">{{ formatDate(thought.date).day }}</span>
@@ -138,7 +139,7 @@
                                     <h3 class="thought-title">{{ thought.title }}</h3>
                                     <div class="thought-tags">
                                         <span class="tag" v-for="(tag, index) in thought.tags" :key="index">{{ tag
-                                        }}</span>
+                                            }}</span>
                                     </div>
                                     <p class="thought-summary">{{ thought.summary }}</p>
                                 </div>
@@ -173,7 +174,7 @@
                 <p class="section-desc">{{ lifeSection.description }}</p>
                 <div class="media-gallery">
                     <!-- 照片/视频网格 -->
-                    <div class="media-item" v-for="media in lifeSection.mediaItems" :key="media.id">
+                    <div class="media-item" v-for="media in lifeSection.mediaItems" :key="media.id"   @click="goToArticle(article.id)">
                         <div class="media-image" :style="`background-image: url('${media.image}')`"></div>
                         <div class="media-overlay">
                             <h3 class="media-title">{{ media.title }}</h3>
@@ -209,15 +210,57 @@
                     <div class="friends-links">
                         <h3>友情链接</h3>
                         <div class="links-grid">
-                            <!-- 友链位置 -->
-                            <div class="link-placeholder"></div>
-                            <div class="link-placeholder"></div>
-                            <div class="link-placeholder"></div>
+                            <!-- 使用v-for循环渲染友链 -->
+                            <a v-for="link in friendLinks" :key="link.id" :href="link.url" target="_blank"
+                                class="friend-link">
+                                <div class="link-icon">
+                                    <img :src="link.logo" :alt="`${link.name} logo`" class="link-logo">
+                                </div>
+                                <div class="link-info">
+                                    <span class="link-name">{{ link.name }}</span>
+                                    <span class="link-desc">{{ link.description }}</span>
+                                </div>
+                            </a>
                         </div>
                     </div>
                     <div class="message-board">
                         <h3>留言板</h3>
-                        <div class="message-preview"></div>
+
+                        <!-- 留言输入区域 -->
+                        <div class="message-input-container">
+                            <textarea v-model="messageInput" placeholder="写下你的留言..." class="message-input"></textarea>
+
+                            <div class="message-actions">
+                                <div class="privacy-toggle">
+                                    <input type="checkbox" id="privacy-toggle" v-model="isPrivate">
+                                    <label for="privacy-toggle">
+                                        <span v-if="isPrivate">私密留言</span>
+                                        <span v-else>公开留言</span>
+                                    </label>
+                                </div>
+
+                                <button class="send-btn" @click="addMessage">发送</button>
+                            </div>
+                        </div>
+
+                        <!-- 留言展示区域 -->
+                        <div class="message-list">
+                            <div class="message-item" v-for="message in displayMessages" :key="message.id">
+                                <div class="message-avatar">
+                                    <img :src="message.avatar" :alt="`${message.author} avatar`">
+                                </div>
+                                <div class="message-content">
+                                    <div class="message-header">
+                                        <span class="message-author">{{ message.author }}</span>
+                                        <span class="message-date">{{ message.date }}</span>
+                                    </div>
+                                    <p class="message-text">{{ message.content }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 查看更多按钮 -->
+                        <button class="view-more-btn" @click="viewMoreMessages">查看更多留言</button>
                     </div>
                 </div>
             </section>
@@ -225,8 +268,10 @@
     </div>
 </template>
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
+import { useRouter } from 'vue-router';
 import Activity from '../components/Activity.vue'  // 导入新的Footer组件
+const router = useRouter();
 
 // 个人介绍数据
 const personalInfo = ref({
@@ -383,6 +428,141 @@ const lifeSection = ref({
         }
     ]
 });
+
+// 友情链接数据
+const friendLinks = ref([
+    {
+        id: 1,
+        name: 'Google',
+        url: 'https://www.google.com',
+        logo: 'https://www.google.com/s2/favicons?domain=google.com&sz=64',
+        description: '全球最大搜索引擎'
+    },
+    {
+        id: 2,
+        name: '百度',
+        url: 'https://www.baidu.com',
+        logo: 'https://www.google.com/s2/favicons?domain=baidu.com&sz=64',
+        description: '中文搜索引擎'
+    },
+    {
+        id: 3,
+        name: 'Google Scholar',
+        url: 'https://scholar.google.com',
+        logo: 'https://www.google.com/s2/favicons?domain=scholar.google.com&sz=64',
+        description: '学术文献搜索'
+    },
+    {
+        id: 4,
+        name: 'ResearchGate',
+        url: 'https://www.researchgate.net',
+        logo: 'https://www.google.com/s2/favicons?domain=researchgate.net&sz=64',
+        description: '科研社交平台'
+    },
+    {
+        id: 5,
+        name: '中国知网',
+        url: 'https://www.cnki.net',
+        logo: 'https://piccache.cnki.net/kdn/index/kns8s/nimages/logo.png',
+        description: '学术资源平台'
+    },
+    {
+        id: 6,
+        name: 'arXiv',
+        url: 'https://arxiv.org',
+        logo: 'https://www.google.com/s2/favicons?domain=arxiv.org&sz=64',
+        description: '开放学术预印本'
+    }
+]);
+
+
+// 留言板数据
+const messageInput = ref(''); // 用户输入的留言内容
+const isPrivate = ref(false); // 是否是私密留言
+const messages = ref([
+    {
+        id: 1,
+        author: '张三',
+        avatar: 'https://randomuser.me/api/portraits/men/1.jpg',
+        content: '博客内容非常精彩，期待更多更新！',
+        date: '2025-04-05',
+        isPrivate: false
+    },
+    {
+        id: 2,
+        author: '李四',
+        avatar: 'https://randomuser.me/api/portraits/women/2.jpg',
+        content: '学术札记部分的观点很有启发性，已经收藏了。',
+        date: '2025-04-04',
+        isPrivate: false
+    },
+    {
+        id: 3,
+        author: '王五',
+        avatar: 'https://randomuser.me/api/portraits/men/3.jpg',
+        content: '请问实践工坊中提到的知识库管理系统是否已开源？很感兴趣！',
+        date: '2025-04-03',
+        isPrivate: false
+    },
+    {
+        id: 4,
+        author: '赵六',
+        avatar: 'https://randomuser.me/api/portraits/women/4.jpg',
+        content: '游民时代的照片拍得太美了，请问使用的是什么相机？',
+        date: '2025-04-02',
+        isPrivate: false
+    },
+    {
+        id: 5,
+        author: '钱七',
+        avatar: 'https://randomuser.me/api/portraits/men/5.jpg',
+        content: '认知轨迹中关于数字极简主义的文章对我帮助很大，谢谢分享！',
+        date: '2025-04-01',
+        isPrivate: false
+    }
+]);
+
+// 添加跳转函数
+const goToArticle = (articleId) => {
+  router.push({
+    name: 'Article',
+    query: { id: articleId }
+  });
+};
+
+// 计算属性：只显示最新的5条公开留言
+const displayMessages = computed(() => {
+    return messages.value
+        .filter(message => !message.isPrivate)
+        .slice(0, 5);
+});
+
+// 添加留言方法
+const addMessage = () => {
+    if (!messageInput.value.trim()) return;
+
+    // 创建新留言
+    const newMessage = {
+        id: Date.now(), // 使用时间戳作为唯一ID
+        author: '访客用户', // 实际应用中可能需要登录系统
+        avatar: 'https://randomuser.me/api/portraits/lego/1.jpg',
+        content: messageInput.value,
+        date: new Date().toISOString().split('T')[0],
+        isPrivate: isPrivate.value
+    };
+
+    // 添加到留言列表最前面
+    messages.value.unshift(newMessage);
+
+    // 清空输入框
+    messageInput.value = '';
+};
+
+// 查看更多留言
+const viewMoreMessages = () => {
+    console.log('查看更多留言被点击');
+    // 这里可以添加导航到留言详情页面的逻辑
+};
 // 日期格式化函数
 const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -739,7 +919,10 @@ onMounted(() => {
     gap: 30px;
 }
 
-.friends-links,
+.friends-links {
+    flex: 2;
+}
+
 .message-board {
     flex: 1;
 }
@@ -757,11 +940,57 @@ onMounted(() => {
     border: 1px dashed rgba(255, 255, 255, 0.2);
 }
 
-.message-preview {
-    height: 150px;
-    background-color: rgba(255, 255, 255, 0.05);
+.friend-link {
+    display: flex;
+    align-items: center;
+    background-color: rgba(40, 40, 55, 0.7);
+    border-radius: 10px;
+    padding: 10px;
+    text-decoration: none;
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    height: 60px;
+}
+
+.friend-link:hover {
+    transform: translateY(-4px);
+    background-color: rgba(50, 50, 70, 0.85);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.link-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.1);
     border-radius: 8px;
-    border: 1px dashed rgba(255, 255, 255, 0.2);
+    margin-right: 10px;
+    overflow: hidden;
+}
+
+.link-logo {
+    max-width: 80%;
+    max-height: 80%;
+    object-fit: contain;
+}
+
+.link-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.link-name {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 3px;
+}
+
+.link-desc {
+    font-size: 11px;
+    opacity: 0.7;
 }
 
 /* 各种占位符元素的样式修改 */
@@ -770,8 +999,7 @@ onMounted(() => {
 .thought-item-placeholder,
 .update-item-placeholder,
 .media-item-placeholder,
-.link-placeholder,
-.message-preview {
+.link-placeholder {
     background-color: rgba(255, 255, 255, 0.07);
     /* 稍微调亮 */
     border-radius: 12px;
@@ -812,6 +1040,7 @@ h3 {
     height: 100%;
     display: flex;
     flex-direction: column;
+    cursor: pointer; /* 添加鼠标指针样式 */
 }
 
 .article-card:hover {
@@ -880,6 +1109,7 @@ h3 {
     transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
+    cursor: pointer;
 }
 
 .project-card:hover {
@@ -963,6 +1193,7 @@ h3 {
     transition: all 0.3s ease;
     display: flex;
     gap: 15px;
+    cursor: pointer;
 }
 
 
@@ -1076,6 +1307,7 @@ h3 {
     height: 200px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
+    cursor: pointer;
 }
 
 .media-item:hover {
@@ -1250,5 +1482,174 @@ h3 {
 .article-summary,
 .project-summary {
     flex: 1;
+}
+
+/* 留言板样式 */
+.message-board {
+    background-color: rgba(30, 30, 40, 0.7);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* 留言输入区域 */
+.message-input-container {
+    margin-bottom: 20px;
+}
+
+.message-input {
+    width: 100%;
+    height: 100px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 12px;
+    color: white;
+    font-size: 14px;
+    resize: none;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+}
+
+.message-input:focus {
+    outline: none;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.message-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.privacy-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.privacy-toggle input[type="checkbox"] {
+    appearance: none;
+    width: 40px;
+    height: 20px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.privacy-toggle input[type="checkbox"]:checked {
+    background-color: rgba(154, 96, 180, 0.5);
+}
+
+.privacy-toggle input[type="checkbox"]::before {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: white;
+    top: 2px;
+    left: 2px;
+    transition: all 0.3s ease;
+}
+
+.privacy-toggle input[type="checkbox"]:checked::before {
+    left: 22px;
+}
+
+.send-btn {
+    background-color: rgba(84, 112, 198, 0.6);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.send-btn:hover {
+    background-color: rgba(84, 112, 198, 0.8);
+    transform: translateY(-2px);
+}
+
+/* 留言列表 */
+.message-list {
+    margin-bottom: 15px;
+}
+
+.message-item {
+    display: flex;
+    margin-bottom: 15px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 12px;
+    transition: all 0.3s ease;
+}
+
+.message-item:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    transform: translateY(-2px);
+}
+
+.message-avatar {
+    margin-right: 12px;
+}
+
+.message-avatar img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.message-content {
+    flex: 1;
+}
+
+.message-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.message-author {
+    font-weight: 500;
+    font-size: 14px;
+    color: white;
+}
+
+.message-date {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.message-text {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* 查看更多按钮 */
+.view-more-btn {
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    padding: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.view-more-btn:hover {
+    background-color: rgba(255, 255, 255, 0.15);
 }
 </style>
