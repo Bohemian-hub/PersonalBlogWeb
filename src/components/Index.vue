@@ -85,7 +85,7 @@
                         <p class="section-desc">{{ workshopSection.description }}</p>
                         <div class="project-showcase">
                             <!-- 项目展示区 -->
-                            <div class="project-card" v-for="project in workshopSection.projects" :key="project.id"   @click="goToArticle(article.id)">
+                            <div class="project-card" v-for="project in workshopSection.projects" :key="project.id"   @click="goToArticle(project.id)">
                                 <div class="project-image" :style="`background-image: url('${project.image}')`"></div>
                                 <div class="project-content">
                                     <h3 class="project-title">{{ project.title }}</h3>
@@ -129,7 +129,7 @@
                         <p class="section-desc">{{ thoughtsSection.description }}</p>
                         <div class="thought-list">
                             <!-- 文章列表 -->
-                            <div class="thought-item" v-for="thought in thoughtsSection.thoughts" :key="thought.id"   @click="goToArticle(article.id)">
+                            <div class="thought-item" v-for="thought in thoughtsSection.thoughts" :key="thought.id"   @click="goToArticle(thought.id)">
                                 <div class="thought-date" :data-date="thought.date">
                                     <span class="date-month">{{ formatDate(thought.date).month }}</span>
                                     <span class="date-day">{{ formatDate(thought.date).day }}</span>
@@ -174,7 +174,7 @@
                 <p class="section-desc">{{ lifeSection.description }}</p>
                 <div class="media-gallery">
                     <!-- 照片/视频网格 -->
-                    <div class="media-item" v-for="media in lifeSection.mediaItems" :key="media.id"   @click="goToArticle(article.id)">
+                    <div class="media-item" v-for="media in lifeSection.mediaItems" :key="media.id"   @click="goToArticle(media.id)">
                         <div class="media-image" :style="`background-image: url('${media.image}')`"></div>
                         <div class="media-overlay">
                             <h3 class="media-title">{{ media.title }}</h3>
