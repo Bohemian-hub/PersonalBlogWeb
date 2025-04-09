@@ -13,4 +13,4 @@
  * @Date 2021-3-9
  */
 
-export const baseUrl = process.env.NODE_ENV === 'development' ? 'http://127.0.0.1:5000' : '/api/'
+export const baseUrl = process.env.NODE_ENV === 'development' ? 'http://127.0.0.1:5000' : '/api'
