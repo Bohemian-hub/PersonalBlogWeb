@@ -1,103 +1,110 @@
 <template>
-    <div class="record-container">
-        <div class="record-header">
-            <h1>创建新文章</h1>
-            <div class="record-actions">
-                <el-button type="info" @click="saveAsDraft">保存草稿</el-button>
-                <el-button type="primary" @click="publishArticle">发布文章</el-button>
-            </div>
-        </div>
-
-        <el-form :model="articleForm" label-position="top" class="article-form">
-            <!-- 标题 -->
-            <el-form-item label="文章标题" required>
-                <el-input v-model="articleForm.title" placeholder="请输入文章标题" maxlength="100" show-word-limit />
-            </el-form-item>
-
-            <!-- 两列布局：左侧分类和标签，右侧封面图片 -->
-            <div class="two-column-layout">
-                <div class="left-column">
-                    <!-- 分类 -->
-                    <el-form-item label="分类" required>
-                        <el-select v-model="articleForm.category" placeholder="选择分类" class="full-width">
-                            <el-option v-for="item in categories" :key="item.value" :label="item.label"
-                                :value="item.value" />
-                        </el-select>
-                    </el-form-item>
-
-                    <!-- 标签（带自定义添加功能） -->
-                    <el-form-item label="标签">
-                        <el-select v-model="articleForm.tags" multiple filterable allow-create default-first-option
-                            :reserve-keyword="false" placeholder="选择或添加标签" class="full-width">
-                            <el-option v-for="item in tags" :key="item.value" :label="item.label" :value="item.value" />
-                        </el-select>
-                    </el-form-item>
-
-                    <!-- 摘要 -->
-                    <el-form-item label="文章摘要">
-                        <el-input v-model="articleForm.summary" type="textarea" :rows="4"
-                            placeholder="请输入文章摘要，不填写将自动提取正文前150字" maxlength="200" show-word-limit />
-                    </el-form-item>
+    <div class="record-page">
+        <!-- 添加顶部栏 -->
+        <TopBar :visible="showTopBar" />
+        
+        <div class="record-container">
+            <div class="record-header">
+                <h1>创建新文章</h1>
+                <div class="record-actions">
+                    <el-button type="info" @click="saveAsDraft">保存草稿</el-button>
+                    <el-button type="primary" @click="publishArticle">发布文章</el-button>
                 </div>
+            </div>
 
-                <div class="right-column">
-                    <!-- 封面图片 -->
-                    <el-form-item label="封面图片">
-                        <div class="cover-container">
-                            <!-- 切换封面图片获取方式 -->
-                            <div class="cover-method-switch">
-                                <el-radio-group v-model="coverMethod" size="small">
-                                    <el-radio-button label="upload">上传图片</el-radio-button>
-                                    <el-radio-button label="link">图片链接</el-radio-button>
-                                </el-radio-group>
-                            </div>
+            <el-form :model="articleForm" label-position="top" class="article-form">
+                <!-- 标题 -->
+                <el-form-item label="文章标题" required>
+                    <el-input v-model="articleForm.title" placeholder="请输入文章标题" maxlength="100" show-word-limit />
+                </el-form-item>
 
-                            <!-- 上传图片 -->
-                            <div v-if="coverMethod === 'upload'" class="cover-upload-container">
-                                <el-upload class="cover-uploader" :show-file-list="false"
-                                    :on-success="handleCoverSuccess" :before-upload="beforeCoverUpload"
-                                    action="/api/upload">
-                                    <img v-if="articleForm.coverUrl" :src="articleForm.coverUrl" class="cover-image" />
-                                    <div v-else class="upload-placeholder">
-                                        <el-icon class="cover-uploader-icon">
-                                            <Plus />
-                                        </el-icon>
-                                        <div class="upload-text">点击上传封面图片</div>
-                                    </div>
-                                </el-upload>
-                            </div>
+                <!-- 两列布局：左侧分类和标签，右侧封面图片 -->
+                <div class="two-column-layout">
+                    <div class="left-column">
+                        <!-- 分类 -->
+                        <el-form-item label="分类" required>
+                            <el-select v-model="articleForm.category" placeholder="选择分类" class="full-width">
+                                <el-option v-for="item in categories" :key="item.value" :label="item.label"
+                                    :value="item.value" />
+                            </el-select>
+                        </el-form-item>
 
-                            <!-- 图片链接 -->
-                            <div v-else class="cover-link-container">
-                                <el-input v-model="coverLink" placeholder="请输入图片链接URL" @blur="handleCoverLinkInput"
-                                    class="cover-link-input" clearable>
-                                    <template #append>
-                                        <el-button @click="handleCoverLinkInput">确认</el-button>
-                                    </template>
-                                </el-input>
-                                <div class="cover-preview">
-                                    <img v-if="articleForm.coverUrl" :src="articleForm.coverUrl" class="cover-image" />
-                                    <div v-else class="preview-placeholder">
-                                        <el-icon>
-                                            <Picture />
-                                        </el-icon>
-                                        <div class="preview-text">图片预览区域</div>
+                        <!-- 标签（带自定义添加功能） -->
+                        <el-form-item label="标签">
+                            <el-select v-model="articleForm.tags" multiple filterable allow-create default-first-option
+                                :reserve-keyword="false" placeholder="选择或添加标签" class="full-width">
+                                <el-option v-for="item in tags" :key="item.value" :label="item.label" :value="item.value" />
+                            </el-select>
+                        </el-form-item>
+
+                        <!-- 摘要 -->
+                        <el-form-item label="文章摘要">
+                            <el-input v-model="articleForm.summary" type="textarea" :rows="4"
+                                placeholder="请输入文章摘要，不填写将自动提取正文前150字" maxlength="200" show-word-limit />
+                        </el-form-item>
+                    </div>
+
+                    <div class="right-column">
+                        <!-- 封面图片 -->
+                        <el-form-item label="封面图片">
+                            <div class="cover-container">
+                                <!-- 切换封面图片获取方式 -->
+                                <div class="cover-method-switch">
+                                    <el-radio-group v-model="coverMethod" size="small">
+                                        <el-radio-button label="upload">上传图片</el-radio-button>
+                                        <el-radio-button label="link">图片链接</el-radio-button>
+                                    </el-radio-group>
+                                </div>
+
+                                <!-- 上传图片 -->
+                                <div v-if="coverMethod === 'upload'" class="cover-upload-container">
+                                    <el-upload class="cover-uploader" :show-file-list="false"
+                                        :on-success="handleCoverSuccess" :before-upload="beforeCoverUpload"
+                                        action="/api/upload">
+                                        <img v-if="articleForm.coverUrl" :src="articleForm.coverUrl" class="cover-image" />
+                                        <div v-else class="upload-placeholder">
+                                            <el-icon class="cover-uploader-icon">
+                                                <Plus />
+                                            </el-icon>
+                                            <div class="upload-text">点击上传封面图片</div>
+                                        </div>
+                                    </el-upload>
+                                </div>
+
+                                <!-- 图片链接 -->
+                                <div v-else class="cover-link-container">
+                                    <el-input v-model="coverLink" placeholder="请输入图片链接URL" @blur="handleCoverLinkInput"
+                                        class="cover-link-input" clearable>
+                                        <template #append>
+                                            <el-button @click="handleCoverLinkInput">确认</el-button>
+                                        </template>
+                                    </el-input>
+                                    <div class="cover-preview">
+                                        <img v-if="articleForm.coverUrl" :src="articleForm.coverUrl" class="cover-image" />
+                                        <div v-else class="preview-placeholder">
+                                            <el-icon>
+                                                <Picture />
+                                            </el-icon>
+                                            <div class="preview-text">图片预览区域</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-
-                        </div>
-                    </el-form-item>
+                        </el-form-item>
+                    </div>
                 </div>
-            </div>
 
-            <!-- mavonEditor 编辑器 -->
-            <el-form-item label="文章内容" required>
-                <mavon-editor v-model="articleForm.content" :toolbars="markdownToolbars" :box-shadow="false"
-                    :code-style="'github'" @imgAdd="handleImgAdd" placeholder="开始创作你的文章..." class="md-editor"
-                    ref="mdEditor" />
-            </el-form-item>
-        </el-form>
+                <!-- mavonEditor 编辑器 -->
+                <el-form-item label="文章内容" required>
+                    <mavon-editor v-model="articleForm.content" :toolbars="markdownToolbars" :box-shadow="false"
+                        :code-style="'github'" @imgAdd="handleImgAdd" placeholder="开始创作你的文章..." class="md-editor"
+                        ref="mdEditor" />
+                </el-form-item>
+            </el-form>
+        </div>
+        
+        <!-- 添加背景图片 -->
+        <el-image class="bg-image" :src="bgUrl" :fit="'cover'" draggable="false" />
     </div>
 </template>
 
@@ -108,8 +115,26 @@ import { Plus, Picture } from '@element-plus/icons-vue';
 import { useRouter } from 'vue-router';
 import { mavonEditor } from 'mavon-editor';
 import 'mavon-editor/dist/css/index.css';
+import TopBar from '../components/TopBar.vue';
 
-// 脚本部分保持不变
+// 背景图片URL
+const bgUrl = 'https://picsum.photos/1920/1080?blur=5'; // 使用模糊效果的背景图
+
+// 控制TopBar的显示和隐藏
+const showTopBar = ref(true);
+
+// 处理滚动事件的函数
+const handleScroll = () => {
+    // 当滚动位置小于等于400px时显示TopBar，否则隐藏
+    showTopBar.value = window.scrollY <= 400;
+};
+
+// 检测屏幕尺寸
+const isMobileView = ref(false);
+const checkScreenSize = () => {
+    isMobileView.value = window.innerWidth < 768;
+};
+
 const router = useRouter();
 const mdEditor = ref(null);
 const coverMethod = ref('upload'); // 封面图片的获取方式：'upload' 或 'link'
@@ -291,17 +316,51 @@ onMounted(() => {
         router.push('/');
         return;
     }
+    
+    // 添加滚动和窗口大小变化事件监听
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('resize', checkScreenSize);
+    
+    // 初始检查屏幕尺寸
+    checkScreenSize();
+});
+
+// 组件卸载时移除事件监听器
+onBeforeUnmount(() => {
+    window.removeEventListener('scroll', handleScroll);
+    window.removeEventListener('resize', checkScreenSize);
 });
 </script>
 
 <style scoped>
+.record-page {
+    min-height: 100vh;
+    padding-top: 50px; /* 为顶部栏留出空间 */
+    position: relative;
+    background-color: rgba(20, 20, 30, 0.7);
+    color: white;
+}
+
+.bg-image {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0.8;
+}
+
 .record-container {
     max-width: 1200px;
     margin: 20px auto;
     padding: 30px;
-    background-color: white;
+    background-color: rgba(255, 255, 255, 0.9);
     border-radius: 8px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    color: #333;
+    position: relative;
+    z-index: 1;
 }
 
 .record-header {
@@ -317,6 +376,10 @@ onMounted(() => {
     font-size: 24px;
     color: #333;
     margin: 0;
+    background: linear-gradient(45deg, #333333, #666666);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
 }
 
 .record-actions {
@@ -491,12 +554,89 @@ onMounted(() => {
 
 /* 响应式调整 */
 @media (max-width: 992px) {
-
     .cover-uploader,
     .cover-preview {
         max-width: 350px;
-        /* 在小屏幕上适当增加最大宽度 */
         height: 197px;
+    }
+    
+    .record-container {
+        margin: 20px 15px;
+        padding: 20px;
+    }
+}
+
+/* 移动端布局适配 */
+@media (max-width: 768px) {
+    .two-column-layout {
+        flex-direction: column;
+    }
+    
+    .left-column,
+    .right-column {
+        flex: 1;
+        width: 100%;
+        min-width: auto;
+    }
+    
+    .record-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .record-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .record-actions .el-button {
+        flex: 1;
+    }
+    
+    .record-container {
+        padding: 15px;
+        margin: 15px;
+    }
+    
+    .md-editor {
+        min-height: 300px;
+    }
+    
+    :deep(.v-note-wrapper) {
+        min-height: 300px;
+    }
+    
+    /* 优化移动端工具栏 */
+    :deep(.v-note-op) {
+        flex-wrap: wrap;
+        padding: 5px;
+    }
+    
+    :deep(.op-icon) {
+        margin: 3px !important;
+    }
+}
+
+/* 小型移动设备调整 */
+@media (max-width: 480px) {
+    .record-header h1 {
+        font-size: 20px;
+    }
+    
+    .record-container {
+        padding: 10px;
+        margin: 10px;
+    }
+    
+    .cover-method-switch .el-radio-button {
+        padding: 0 5px;
+    }
+    
+    .cover-uploader,
+    .cover-preview {
+        max-width: 100%;
+        height: 180px;
     }
 }
 </style>

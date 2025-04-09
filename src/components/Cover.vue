@@ -333,7 +333,7 @@ const handleVisibilityChange = () => {
 };
 
 const closeAnimate = () => {
-    console.log('关闭动画');
+    // console.log('关闭动画');
     // 当页面不可见时，隐藏组件
     isComponentVisible.value = false
     text2.value = '' // 清空文字

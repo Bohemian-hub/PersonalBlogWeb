@@ -172,20 +172,20 @@ const checkMenuOverflow = () => {
   const loginAvatarWidth = document.querySelector('.login_avatar')?.offsetWidth || 70;
   const loginAvatarMargin = parseInt(getComputedStyle(document.querySelector('.login_avatar')).marginRight) || 0;
   const mobileButtonWidth = 50; // 为移动菜单按钮预留宽度
-  console.log(topBarWidth);
-  console.log(siteTitleWidth);
-  console.log(siteTitleMargin);
-  console.log(loginAvatarWidth);
-  console.log(loginAvatarMargin);
-  console.log(mobileButtonWidth);
+  // console.log(topBarWidth);
+  // console.log(siteTitleWidth);
+  // console.log(siteTitleMargin);
+  // console.log(loginAvatarWidth);
+  // console.log(loginAvatarMargin);
+  // console.log(mobileButtonWidth);
 
   // 可用于菜单的空间
   const availableWidth = topBarWidth - siteTitleWidth - loginAvatarWidth - mobileButtonWidth - siteTitleMargin - loginAvatarMargin;
-  console.log(availableWidth);
+  // console.log(availableWidth);
 
   //直接获取包含了菜单的site_menu的总宽度
   const menuWidth = document.querySelector('.site_menu')?.offsetWidth || 815;
-  console.log(menuWidth);
+  // console.log(menuWidth);
   // 如果可用宽度小于菜单需要的宽度，切换到移动端视图
   isMobileView.value = availableWidth < menuWidth;
 

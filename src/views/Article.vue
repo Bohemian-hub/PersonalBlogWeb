@@ -132,11 +132,18 @@
                     </div>
                     <span>分享</span>
                 </div>
+                <!-- 添加回到顶部按钮 -->
+                <!-- <div class="action-btn" @click="scrollToTop">
+                    <div class="action-icon-wrapper">
+                        <i class="icon-arrow-up"></i>
+                    </div>
+                    <span>回到顶部</span>
+                </div> -->
             </div>
         </div>
 
         <!-- 返回顶部按钮 -->
-        <div class="back-to-top" v-show="showBackToTop" @click="scrollToTop">
+        <div class="back-to-top" v-show="showBackToTop" :class="{ 'show': showBackToTop }" @click="scrollToTop">
             <i class="icon-arrow-up"></i>
         </div>
 
@@ -190,7 +197,8 @@ const showShareModal = ref(false);
 const commentsSection = ref(null);
 // 创建一个响应式变量来控制TopBar的显示和隐藏
 const showTopBar = ref(true)
-
+// 声明一个变量存储添加的meta标签
+let articleMetaTags = [];
 // 当前用户信息（实际应用中应从用户系统获取）
 const currentUser = {
     id: 'current-user',
@@ -446,13 +454,58 @@ const handleScroll = () => {
     // 当滚动位置为0（页面顶部）时显示TopBar，否则隐藏
     showTopBar.value = window.scrollY <= 400
 };
-
 onMounted(() => {
     window.addEventListener('scroll', handleScroll);
+
+    // 设置文章标题为网页标题
+    document.title = `${article.value.title} - Hedong的个人博客`;
+
+    // 添加分享所需的meta标签
+    const metaTags = [
+        // Open Graph协议标签（微信、微博等平台通用）
+        { property: 'og:title', content: article.value.title },
+        { property: 'og:description', content: article.value.summary },
+        { property: 'og:image', content: article.value.coverUrl },
+        { property: 'og:url', content: window.location.href },
+        { property: 'og:type', content: 'article' },
+
+        // 微信特定标签
+        { name: 'description', content: article.value.summary },
+        { itemprop: 'name', content: article.value.title },
+        { itemprop: 'description', content: article.value.summary },
+        { itemprop: 'image', content: article.value.coverUrl }
+    ];
+
+    // 保存已添加的标签引用，以便在组件卸载时移除
+    const addedTags = [];
+
+    metaTags.forEach(tagInfo => {
+        const metaTag = document.createElement('meta');
+
+        // 设置标签属性
+        Object.keys(tagInfo).forEach(key => {
+            metaTag.setAttribute(key, tagInfo[key]);
+        });
+
+        // 添加到文档头部
+        document.head.appendChild(metaTag);
+        addedTags.push(metaTag);
+    });
+
+    // 添加到组件实例上，以便在卸载时引用
+    articleMetaTags = addedTags;
 });
+
 
 onUnmounted(() => {
     window.removeEventListener('scroll', handleScroll);
+
+    // 移除添加的meta标签
+    articleMetaTags.forEach(tag => {
+        if (document.head.contains(tag)) {
+            document.head.removeChild(tag);
+        }
+    });
 });
 </script>
 

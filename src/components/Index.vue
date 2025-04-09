@@ -55,7 +55,7 @@
                                     <h3 class="article-title">{{ article.title }}</h3>
                                     <div class="article-tags">
                                         <span class="tag" v-for="(tag, index) in article.tags" :key="index">{{ tag
-                                        }}</span>
+                                            }}</span>
                                     </div>
                                     <p class="article-summary">{{ article.summary }}</p>
                                     <!-- 点赞和评论 -->
@@ -91,12 +91,12 @@
                                     <h3 class="project-title">{{ project.title }}</h3>
                                     <div class="project-tags">
                                         <span class="tag" v-for="(tag, index) in project.tags" :key="index">{{ tag
-                                        }}</span>
+                                            }}</span>
                                     </div>
                                     <p class="project-summary">{{ project.summary }}</p>
                                     <div class="project-meta">
                                         <span class="meta-item"><i :class="project.statusIcon"></i> {{ project.status
-                                        }}</span>
+                                            }}</span>
                                         <span class="meta-item"><i class="fa fa-calendar"></i> {{ project.date }}</span>
                                         <!-- 点赞和评论 -->
                                         <div class="interaction-stats">
@@ -155,7 +155,7 @@
                                     <h3 class="thought-title">{{ thought.title }}</h3>
                                     <div class="thought-tags">
                                         <span class="tag" v-for="(tag, index) in thought.tags" :key="index">{{ tag
-                                        }}</span>
+                                            }}</span>
                                     </div>
                                     <p class="thought-summary">{{ thought.summary }}</p>
                                 </div>
@@ -591,7 +591,7 @@ const addMessage = () => {
 
 // 查看更多留言
 const viewMoreMessages = () => {
-    console.log('查看更多留言被点击');
+    // console.log('查看更多留言被点击');
     // 这里可以添加导航到留言详情页面的逻辑
 };
 // 日期格式化函数
@@ -605,7 +605,7 @@ const formatDate = (dateString) => {
 };
 // 关于我按钮点击处理
 const handleAboutClick = () => {
-    console.log('关于我按钮被点击');
+    // console.log('关于我按钮被点击');
     // 这里可以添加导航到关于页面或显示关于信息弹窗的逻辑
 };
 // 在DOM加载后生成格子
@@ -1809,6 +1809,27 @@ h3 {
 
     .links-grid {
         grid-template-columns: 1fr;
+    }
+
+    /* 移动端游民时代卡片默认显示摘要和点赞信息 */
+    .media-summary {
+        opacity: 0.9;
+        height: auto;
+        margin-bottom: 8px;
+    }
+
+    .media-stats {
+        opacity: 1;
+    }
+
+    .media-overlay {
+        padding-bottom: 25px;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.6) 70%, rgba(0, 0, 0, 0.3));
+    }
+
+    /* 确保媒体项目有足够的空间显示内容 */
+    .media-item {
+        height: 220px;
     }
 }
 

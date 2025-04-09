@@ -86,7 +86,11 @@ const routes = [
 
 const router = createRouter({
     history: createWebHistory(process.env.BASE_URL),
-    routes
+    routes,
+    scrollBehavior(to, from, savedPosition) {
+        // 始终滚动到顶部
+        return { top: 0 }
+    },
 })
 
 // 全局路由守卫，根据路由 meta 中的 title 修改文档标题

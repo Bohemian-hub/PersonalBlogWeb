@@ -1,5 +1,5 @@
 <template>
-    <div class="activity_grid">
+    <div class="activity_grid" :class="{ 'two-row-layout': isTablet }">
         <div class="each_month" v-for="(monthData, index) in displayedMonths" :key="index">
             <div class="top_month">{{ monthData.monthName }} 月</div>
             <div class="bottom_day">
@@ -62,20 +62,24 @@ const currentDate = ref(new Date())
 
 // 新增：是否为移动端
 const isMobile = ref(false)
+// 新增：是否为平板/中等尺寸屏幕
+const isTablet = ref(false)
 
-// 监听窗口大小变化，更新isMobile状态
-const checkMobile = () => {
-    isMobile.value = window.innerWidth < 768 // 小于768px认为是移动设备
+// 监听窗口大小变化，更新设备类型状态
+const checkDeviceType = () => {
+    const windowWidth = window.innerWidth
+    isMobile.value = windowWidth < 768 // 小于768px认为是移动设备
+    isTablet.value = windowWidth >= 768 && windowWidth < 1200 // 768-1200px认为是平板或中等尺寸屏幕
 }
 
 // 组件挂载和卸载时设置/移除窗口大小监听
 onMounted(() => {
-    checkMobile() // 初始检查
-    window.addEventListener('resize', checkMobile)
+    checkDeviceType() // 初始检查
+    window.addEventListener('resize', checkDeviceType)
 })
 
 onUnmounted(() => {
-    window.removeEventListener('resize', checkMobile)
+    window.removeEventListener('resize', checkDeviceType)
 })
 
 // 计算最近4个月（包括当前月）
@@ -118,7 +122,7 @@ const displayedMonths = computed(() => {
         // 移动端只显示最新的1个月
         return recentMonths.value.slice(3, 4)
     } else {
-        // 桌面端显示所有月份
+        // 平板和桌面端显示所有月份
         return recentMonths.value
     }
 })
@@ -193,9 +197,17 @@ const getDaysForColumn = (col, daysInMonth, year, month) => {
     justify-content: space-between;
 }
 
+/* 添加两行布局样式 */
+.activity_grid.two-row-layout {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 15px;
+}
+
 .each_month {
     /* 移除固定宽度，改为自适应内容 */
     min-width: 150px;
+    max-width: 100%;
     height: 200px;
     background-color: rgba(30, 30, 40, 0.7);
     border-radius: 12px;
@@ -205,9 +217,26 @@ const getDaysForColumn = (col, daysInMonth, year, month) => {
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2),
         0 2px 5px rgba(0, 0, 0, 0.15),
         0 0 1px rgba(255, 255, 255, 0.1);
-    margin-right: 10px;
-    /* 添加右侧间距 */
     flex: 1;
+}
+
+/* 中等尺寸屏幕样式 */
+@media (min-width: 768px) and (max-width: 1199px) {
+    .activity_grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-gap: 15px;
+    }
+
+    .each_month {
+        margin-right: 0;
+        width: auto;
+    }
+
+    /* 图例需要横跨两列 */
+    .mood-legend {
+        grid-column: 1 / span 2;
+    }
 }
 
 /* 移除最后一个月份卡片的右侧外边距 */
@@ -465,6 +494,7 @@ const getDaysForColumn = (col, daysInMonth, year, month) => {
     .legend-items {
         justify-content: flex-start;
         flex-wrap: wrap;
+        justify-content: center;
         gap: 8px;
     }
 
