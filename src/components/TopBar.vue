@@ -8,19 +8,39 @@
     <div class="login_avatar" @click="toggleUserPanel">
       <el-image class="user_avatar" :src="notlogin"></el-image>
     </div>
-    <div class="site_menu">
-      <div v-for="(item, index) in menuList" :key="index" class="menu_item" @click="navigate(item.route)">
+    <!-- 汉堡菜单按钮 - 移动到头像左侧 -->
+    <div class="mobile-menu-button" @click="toggleMobileMenu" :class="{ 'show': isMobileView }">
+      <div class="menu-icon" :class="{ 'active': showMobileMenu }">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+
+
+    <div class="site_menu" :class="{ 'hide': isMobileView }" ref="siteMenu">
+      <div v-for="(item, index) in menuList" :key="index" class="menu_item" @click="navigate(item.route)"
+        ref="menuItems">
         <el-image class="menu_item_icon" :src="item.icon"></el-image>
         <div class="menu_item_text">{{ item.text }}</div>
         <div class="menu_under"></div>
       </div>
     </div>
   </div>
+
+  <!-- 直接显示菜单，不用遮罩层 -->
+  <div class="mobile-menu" v-if="showMobileMenu" @click.stop>
+    <div v-for="(item, index) in menuList" :key="index" class="mobile-menu-item" @click="navigateAndClose(item.route)">
+      <el-image class="mobile-menu-item-icon" :src="item.icon"></el-image>
+      <div class="mobile-menu-item-text">{{ item.text }}</div>
+    </div>
+  </div>
+
   <User v-if="showUserPanel" />
 </template>
 
 <script setup>
-import { ref, provide, onMounted } from 'vue'
+import { ref, provide, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import User from './User.vue'
 
@@ -35,6 +55,14 @@ import notlogin from '@/assets/icons/notlogin.png'
 
 // 控制用户面板显示状态
 const showUserPanel = ref(false)
+// 控制移动端菜单显示状态
+const showMobileMenu = ref(false)
+// 控制是否显示为移动端视图
+const isMobileView = ref(false)
+// 引用DOM元素
+const siteMenu = ref(null)
+const menuItems = ref([])
+
 // 接收来自父组件的visible prop
 const props = defineProps({
   visible: {
@@ -68,6 +96,23 @@ const router = useRouter()
 function navigate(route) {
   router.push(route)
 }
+
+// 切换移动端菜单
+const toggleMobileMenu = () => {
+  showMobileMenu.value = !showMobileMenu.value;
+}
+
+// 关闭移动端菜单
+const closeMobileMenu = () => {
+  showMobileMenu.value = false;
+}
+
+// 导航并关闭菜单
+const navigateAndClose = (route) => {
+  navigate(route);
+  closeMobileMenu();
+}
+
 function goHome() {
   router.push('/')
 }
@@ -78,10 +123,30 @@ const toggleUserPanel = () => {
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
+  window.addEventListener('resize', handleResize)
+
+  // 在下一个渲染周期检查菜单是否需要折叠
+  nextTick(() => {
+    checkMenuOverflow();
+  });
 })
 
-const handleClickOutside = (event) => {
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside)
+  window.removeEventListener('resize', handleResize)
+  // 移除对body overflow的控制
+})
 
+// 窗口大小改变时处理
+const handleResize = () => {
+  checkMenuOverflow();
+
+  if (!isMobileView.value && showMobileMenu.value) {
+    closeMobileMenu();
+  }
+}
+
+const handleClickOutside = (event) => {
   const userPanel = document.querySelector('.user');
   const loginAvatar = document.querySelector('.login_avatar');
   const passwordButton = event.target.closest('svg');
@@ -95,6 +160,36 @@ const handleClickOutside = (event) => {
     showUserPanel.value = false;
   }
 };
+
+// 计算菜单需要的宽度和检查是否需要显示移动端视图
+const checkMenuOverflow = () => {
+  if (!siteMenu.value) return;
+
+  // 计算顶部栏可用宽度（排除标题和头像区域）
+  const topBarWidth = window.innerWidth;
+  const siteTitleWidth = document.querySelector('.site_title')?.offsetWidth || 120;
+  const siteTitleMargin = parseInt(getComputedStyle(document.querySelector('.site_title')).marginLeft) || 0;
+  const loginAvatarWidth = document.querySelector('.login_avatar')?.offsetWidth || 70;
+  const loginAvatarMargin = parseInt(getComputedStyle(document.querySelector('.login_avatar')).marginRight) || 0;
+  const mobileButtonWidth = 50; // 为移动菜单按钮预留宽度
+  console.log(topBarWidth);
+  console.log(siteTitleWidth);
+  console.log(siteTitleMargin);
+  console.log(loginAvatarWidth);
+  console.log(loginAvatarMargin);
+  console.log(mobileButtonWidth);
+
+  // 可用于菜单的空间
+  const availableWidth = topBarWidth - siteTitleWidth - loginAvatarWidth - mobileButtonWidth - siteTitleMargin - loginAvatarMargin;
+  console.log(availableWidth);
+
+  //直接获取包含了菜单的site_menu的总宽度
+  const menuWidth = document.querySelector('.site_menu')?.offsetWidth || 815;
+  console.log(menuWidth);
+  // 如果可用宽度小于菜单需要的宽度，切换到移动端视图
+  isMobileView.value = availableWidth < menuWidth;
+
+}
 </script>
 
 <style scoped>
@@ -225,5 +320,150 @@ const handleClickOutside = (event) => {
   cursor: pointer;
   box-shadow: inset 10px 10px 10px rgba(0, 0, 0, 0.05), 15px 25px 10px rgba(0, 0, 0, 0.05), 15px 20px 20px rgba(0, 0, 0, 0.05);
   background-color: #41414144;
+}
+
+/* 移动端菜单按钮样式 - 默认隐藏 */
+.mobile-menu-button {
+  display: none;
+  width: 40px;
+  height: 40px;
+  margin: 5px;
+  float: right;
+  cursor: pointer;
+  z-index: 2;
+  padding: 10px;
+}
+
+.mobile-menu-button.show {
+  display: block;
+}
+
+.menu-icon {
+  position: relative;
+  width: 20px;
+  height: 20px;
+}
+
+.menu-icon span {
+  display: block;
+  position: absolute;
+  height: 2px;
+  width: 100%;
+  background: white;
+  border-radius: 2px;
+  opacity: 1;
+  left: 0;
+  transform: rotate(0deg);
+  transition: .25s ease-in-out;
+}
+
+.menu-icon span:nth-child(1) {
+  top: 0px;
+}
+
+.menu-icon span:nth-child(2) {
+  top: 8px;
+}
+
+.menu-icon span:nth-child(3) {
+  top: 16px;
+}
+
+.menu-icon.active span:nth-child(1) {
+  top: 8px;
+  transform: rotate(135deg);
+}
+
+.menu-icon.active span:nth-child(2) {
+  opacity: 0;
+  left: -30px;
+}
+
+.menu-icon.active span:nth-child(3) {
+  top: 8px;
+  transform: rotate(-135deg);
+}
+
+/* 更新移动端菜单样式 */
+.mobile-menu {
+  position: fixed;
+  top: 50px;
+  left: 0;
+  width: 100%;
+  height: auto;
+  max-height: calc(100vh - 50px);
+  background-color: rgba(65, 65, 65, 0.9);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+  overflow-y: auto;
+  animation: slideDown 0.3s ease-out;
+  z-index: 999;
+}
+
+/* 修改动画为从上到下滑动 */
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* 响应式布局 - 使用类控制而不是媒体查询 */
+.site_menu.hide {
+  display: none;
+}
+
+/* 保留媒体查询做为回退方案 */
+@media (max-width: 768px) {
+  .site_menu {
+    display: none;
+  }
+
+  .mobile-menu-button {
+    display: block;
+  }
+
+  .site_title {
+    margin-left: 5px;
+  }
+
+  .login_avatar {
+    margin-right: 10px;
+  }
+}
+
+/* 移动端菜单项样式 */
+.mobile-menu-item {
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: background-color 0.3s ease;
+}
+
+.mobile-menu-item:last-child {
+  border-bottom: none;
+}
+
+.mobile-menu-item:hover {
+  background-color: rgba(224, 102, 20, 0.2);
+}
+
+.mobile-menu-item-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 15px;
+}
+
+.mobile-menu-item-text {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.mobile-menu-item:active {
+  background-color: rgba(224, 102, 20, 0.4);
 }
 </style>

@@ -1,8 +1,5 @@
 <template>
     <div class="cover" :style="{ height: height }">
-        <!-- 背景图片 -->
-        <!-- <el-image class="bg-image" :src="bg_url_list[bg_index]" :fit="'cover'" draggable="false" /> -->
-        <!-- <el-image class="bg-image" :src="bg_url_list[bg_index]" :fit="'cover'" draggable="false" @click="changeBg" /> -->
         <!-- 封面标题文字 -->
         <div class="cover_text" v-if="isComponentVisible">
             <div class="text1">
@@ -17,12 +14,7 @@
                 <a :class="{ 'cursor-animation': showCursor }">{{ text2 }}</a>
             </div>
         </div>
-        <!-- 在封面的最底部做波浪 -->
-        <!-- <div class="sea">
-            <div class="wave"></div>
-            <div class="wave"></div>
-            <el-image class="roll_icon" :src="roll_icon"></el-image>
-        </div> -->
+
     </div>
 </template>
 
@@ -414,6 +406,8 @@ body {
         transform: translate(-50%, -50%);
         /* 水平居中 */
         text-align: center;
+        width: 90%;
+        /* 限制宽度，防止在小屏幕上过宽 */
 
         .text1 {
             height: 100px;
@@ -450,6 +444,14 @@ body {
             background-color: rgba(0, 0, 0, 0.412);
             color: #fff;
             min-width: 2px;
+            max-width: 100%;
+            /* 确保内容不超过父容器 */
+            overflow: hidden;
+            /* 防止内容溢出 */
+            white-space: nowrap;
+            /* 防止文本换行 */
+            text-overflow: ellipsis;
+            /* 如果文本溢出则显示省略号 */
 
             a {
                 margin: 0 20px;
@@ -566,6 +568,45 @@ body {
 
     50% {
         transform: translate(0, 5px);
+    }
+}
+
+/* 移动端适配 */
+@media screen and (max-width: 768px) {
+    .cover .cover_text {
+        .text1 {
+            font-size: 40px;
+            /* 移动端字体变小 */
+            height: 80px;
+            /* 调整高度 */
+            margin-bottom: 20px;
+            /* 减小间距 */
+        }
+
+        .text2 {
+            font-size: 20px;
+            /* 移动端字体变小 */
+            padding: 10px 0;
+
+            a {
+                margin: 0 10px;
+                /* 减小内边距 */
+            }
+        }
+    }
+}
+
+/* 更小屏幕的适配 */
+@media screen and (max-width: 480px) {
+    .cover .cover_text {
+        .text1 {
+            font-size: 24px;
+            height: 60px;
+        }
+
+        .text2 {
+            font-size: 12px;
+        }
     }
 }
 </style>

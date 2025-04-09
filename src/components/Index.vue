@@ -29,7 +29,7 @@
                     </div>
 
                     <!-- 右下角每日动态格子 -->
-                    <Activity />
+                    <Activity :mobile-mode="isMobile" />
                 </div>
             </div>
         </section>
@@ -55,7 +55,7 @@
                                     <h3 class="article-title">{{ article.title }}</h3>
                                     <div class="article-tags">
                                         <span class="tag" v-for="(tag, index) in article.tags" :key="index">{{ tag
-                                            }}</span>
+                                        }}</span>
                                     </div>
                                     <p class="article-summary">{{ article.summary }}</p>
                                     <!-- 点赞和评论 -->
@@ -84,19 +84,19 @@
                     <div class="section-content">
                         <p class="section-desc">{{ workshopSection.description }}</p>
                         <div class="project-showcase">
-                            <!-- 项目展示区 -->
-                            <div class="project-card" v-for="project in workshopSection.projects" :key="project.id"   @click="goToArticle(project.id)">
+                            <div class="project-card" v-for="project in workshopSection.projects" :key="project.id"
+                                @click="goToArticle(project.id)">
                                 <div class="project-image" :style="`background-image: url('${project.image}')`"></div>
                                 <div class="project-content">
                                     <h3 class="project-title">{{ project.title }}</h3>
                                     <div class="project-tags">
                                         <span class="tag" v-for="(tag, index) in project.tags" :key="index">{{ tag
-                                            }}</span>
+                                        }}</span>
                                     </div>
                                     <p class="project-summary">{{ project.summary }}</p>
                                     <div class="project-meta">
                                         <span class="meta-item"><i :class="project.statusIcon"></i> {{ project.status
-                                            }}</span>
+                                        }}</span>
                                         <span class="meta-item"><i class="fa fa-calendar"></i> {{ project.date }}</span>
                                         <!-- 点赞和评论 -->
                                         <div class="interaction-stats">
@@ -119,34 +119,6 @@
 
             <!-- 右侧次要内容列 -->
             <div class="side-column">
-                <!-- 认知轨迹 -->
-                <section class="section thoughts">
-                    <div class="section-header">
-                        <h2>{{ thoughtsSection.title }}</h2>
-                        <span class="view-all">{{ thoughtsSection.viewAllText }}</span>
-                    </div>
-                    <div class="section-content">
-                        <p class="section-desc">{{ thoughtsSection.description }}</p>
-                        <div class="thought-list">
-                            <!-- 文章列表 -->
-                            <div class="thought-item" v-for="thought in thoughtsSection.thoughts" :key="thought.id"   @click="goToArticle(thought.id)">
-                                <div class="thought-date" :data-date="thought.date">
-                                    <span class="date-month">{{ formatDate(thought.date).month }}</span>
-                                    <span class="date-day">{{ formatDate(thought.date).day }}</span>
-                                    <span class="date-year">{{ formatDate(thought.date).year }}</span>
-                                </div>
-                                <div class="thought-content">
-                                    <h3 class="thought-title">{{ thought.title }}</h3>
-                                    <div class="thought-tags">
-                                        <span class="tag" v-for="(tag, index) in thought.tags" :key="index">{{ tag
-                                            }}</span>
-                                    </div>
-                                    <p class="thought-summary">{{ thought.summary }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
 
                 <!-- 最近更新 - 额外添加的板块 -->
                 <section class="section recent-updates">
@@ -161,6 +133,38 @@
                         </div>
                     </div>
                 </section>
+
+                <!-- 认知轨迹 -->
+                <section class="section thoughts">
+                    <div class="section-header">
+                        <h2>{{ thoughtsSection.title }}</h2>
+                        <span class="view-all">{{ thoughtsSection.viewAllText }}</span>
+                    </div>
+                    <div class="section-content">
+                        <p class="section-desc">{{ thoughtsSection.description }}</p>
+                        <div class="thought-list">
+                            <!-- 文章列表 -->
+                            <div class="thought-item" v-for="thought in thoughtsSection.thoughts" :key="thought.id"
+                                @click="goToArticle(thought.id)">
+                                <div class="thought-date" :data-date="thought.date">
+                                    <span class="date-month">{{ formatDate(thought.date).month }}</span>
+                                    <span class="date-day">{{ formatDate(thought.date).day }}</span>
+                                    <span class="date-year">{{ formatDate(thought.date).year }}</span>
+                                </div>
+                                <div class="thought-content">
+                                    <h3 class="thought-title">{{ thought.title }}</h3>
+                                    <div class="thought-tags">
+                                        <span class="tag" v-for="(tag, index) in thought.tags" :key="index">{{ tag
+                                        }}</span>
+                                    </div>
+                                    <p class="thought-summary">{{ thought.summary }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+
             </div>
         </div>
 
@@ -174,7 +178,8 @@
                 <p class="section-desc">{{ lifeSection.description }}</p>
                 <div class="media-gallery">
                     <!-- 照片/视频网格 -->
-                    <div class="media-item" v-for="media in lifeSection.mediaItems" :key="media.id"   @click="goToArticle(media.id)">
+                    <div class="media-item" v-for="media in lifeSection.mediaItems" :key="media.id"
+                        @click="goToArticle(media.id)">
                         <div class="media-image" :style="`background-image: url('${media.image}')`"></div>
                         <div class="media-overlay">
                             <h3 class="media-title">{{ media.title }}</h3>
@@ -267,11 +272,37 @@
         </div>
     </div>
 </template>
+
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, onBeforeMount, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
 import Activity from '../components/Activity.vue'  // 导入新的Footer组件
 const router = useRouter();
+
+// 添加响应式布局相关的状态
+const isMobile = ref(false);
+const windowWidth = ref(window.innerWidth);
+
+// 检测当前设备窗口大小并设置isMobile状态
+const checkScreenSize = () => {
+    windowWidth.value = window.innerWidth;
+    isMobile.value = windowWidth.value < 768;
+};
+
+// 在组件挂载前检测屏幕尺寸
+onBeforeMount(() => {
+    checkScreenSize();
+});
+
+// 在组件挂载后添加窗口大小变化事件监听
+onMounted(() => {
+    window.addEventListener('resize', checkScreenSize);
+});
+
+// 在组件卸载时移除事件监听器
+onBeforeUnmount(() => {
+    window.removeEventListener('resize', checkScreenSize);
+});
 
 // 个人介绍数据
 const personalInfo = ref({
@@ -524,10 +555,10 @@ const messages = ref([
 
 // 添加跳转函数
 const goToArticle = (articleId) => {
-  router.push({
-    name: 'Article',
-    query: { id: articleId }
-  });
+    router.push({
+        name: 'Article',
+        query: { id: articleId }
+    });
 };
 
 // 计算属性：只显示最新的5条公开留言
@@ -585,13 +616,15 @@ onMounted(() => {
 
 <style scoped>
 .main {
-    width: 1400px;
+    width: 100%;
+    max-width: 1400px;
     background-color: transparent;
     min-height: 1000px;
     margin: 0 auto;
-    padding: 40px;
+    padding: 40px 20px;
     color: white;
     font-family: 'Helvetica Neue', Arial, sans-serif;
+    box-sizing: border-box;
 }
 
 /* 通用板块样式 */
@@ -1040,7 +1073,8 @@ h3 {
     height: 100%;
     display: flex;
     flex-direction: column;
-    cursor: pointer; /* 添加鼠标指针样式 */
+    cursor: pointer;
+    /* 添加鼠标指针样式 */
 }
 
 .article-card:hover {
@@ -1651,5 +1685,175 @@ h3 {
 
 .view-more-btn:hover {
     background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* 响应式布局媒体查询 */
+@media (max-width: 1200px) {
+    .article-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .media-gallery {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .links-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 992px) {
+    .personal-intro .section-content {
+        flex-direction: column;
+    }
+
+    .profile-left {
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+
+    .avatar-container {
+        margin-bottom: 0;
+        margin-right: 20px;
+    }
+
+    .avatar-placeholder {
+        width: 100px;
+        height: 100px;
+    }
+
+    .profile-stats {
+        flex: 1;
+        justify-content: space-around;
+        margin-bottom: 0;
+    }
+
+    .about-btn {
+        margin-top: 15px;
+        width: 100%;
+    }
+
+    .media-gallery {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .main {
+        padding: 20px 15px;
+    }
+
+    .content-columns {
+        flex-direction: column;
+    }
+
+    .article-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .project-showcase {
+        grid-template-columns: 1fr;
+    }
+
+    .interaction .section-content {
+        flex-direction: column;
+    }
+
+    .friends-links,
+    .message-board {
+        width: 100%;
+    }
+
+    .section-header h2 {
+        font-size: 20px;
+    }
+
+    .profile-left {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .avatar-container {
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+
+    .profile-stats {
+        width: 100%;
+        margin-bottom: 15px;
+    }
+
+    .thought-item {
+        flex-direction: column;
+    }
+
+    .thought-date {
+        min-width: 100%;
+        height: auto;
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+
+    .thought-date .date-month,
+    .thought-date .date-day,
+    .thought-date .date-year {
+        display: inline-block;
+        margin: 0 5px;
+    }
+
+    .links-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 576px) {
+    .main {
+        padding: 15px 10px;
+    }
+
+    .article-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .media-gallery {
+        grid-template-columns: 1fr;
+    }
+
+    .tagline {
+        font-size: 16px;
+    }
+
+    .article-title,
+    .project-title,
+    .media-title {
+        font-size: 16px;
+    }
+
+    .article-summary,
+    .project-summary {
+        font-size: 12px;
+    }
+
+    .section {
+        padding: 15px;
+    }
+
+    .section-desc {
+        font-size: 13px;
+    }
+
+    .stat-value {
+        font-size: 20px;
+    }
+
+    .stat-label {
+        font-size: 10px;
+    }
 }
 </style>
