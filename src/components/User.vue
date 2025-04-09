@@ -2,7 +2,7 @@
   <div class="user-container">
     <!-- 遮罩层：仅在移动端显示 -->
     <div class="overlay" v-if="isShow" @click="closePanel"></div>
-    
+
     <div class="user" :class="{ 'show-panel': isShow, 'mobile-view': isMobileView }">
       <!-- 小三角 - 仅在桌面视图显示 -->
       <div class="angle" v-if="!isMobileView"></div>
@@ -77,12 +77,12 @@
                   </el-icon>
                 </el-menu-item>
 
-                <!-- 添加记录按钮，仅当用户auth为1时显示 -->
-                <el-menu-item v-if="user && user.auth === '1'" index="3" @click="navigateToRecord">
+                <!-- 添加管理按钮，仅当用户auth为1时显示 -->
+                <el-menu-item v-if="user && user.auth === '1'" index="3" @click="navigateToManage">
                   <el-icon>
                     <EditPen />
                   </el-icon>
-                  <span>记录</span>
+                  <span>管理</span>
                   <el-icon style="float: right">
                     <ArrowRight />
                   </el-icon>
@@ -205,9 +205,9 @@ const handleRegister = async () => {
     // ElMessage.error(error.message || '注册失败'); // 移除重复的错误提示
   }
 };
-// 添加导航到记录页面的方法
-const navigateToRecord = () => {
-  router.push('/record')
+// 添加导航到管理页面的方法
+const navigateToManage = () => {
+  router.push('/manage')
   showUserPanel.value = false // 点击后关闭面板
 }
 
@@ -231,7 +231,7 @@ onMounted(() => {
 
   // 初始检测窗口大小
   checkWindowSize();
-  
+
   // 添加窗口大小变化的监听器
   window.addEventListener('resize', checkWindowSize);
 });
@@ -290,8 +290,8 @@ onBeforeUnmount(() => {
 }
 
 /* 显示遮罩层 */
-.show-panel + .overlay,
-.show-panel ~ .overlay {
+.show-panel+.overlay,
+.show-panel~.overlay {
   display: block;
 }
 
@@ -415,7 +415,7 @@ onBeforeUnmount(() => {
   .overlay {
     display: block;
   }
-  
+
   .user-panel {
     padding: 20px;
   }

@@ -6,8 +6,8 @@ import Studio from '../views/Studio.vue'
 import Play from '../views/Play.vue'
 import Feel from '../views/Feel.vue'
 import Say from '../views/Say.vue'
-import Record from '../views/Record.vue'
 import Article from '../views/Article.vue'
+import Manage from '../views/Manage.vue'
 
 const routes = [
     {
@@ -67,11 +67,11 @@ const routes = [
         }
     },
     {
-        path: '/record',
-        name: 'Record',
-        component: Record,
+        path: '/manage',
+        name: 'Manage',
+        component: Manage,
         meta: {
-            title: '新建记录'
+            title: '管理'
         }
     },
     {

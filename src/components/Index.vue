@@ -55,7 +55,7 @@
                                     <h3 class="article-title">{{ article.title }}</h3>
                                     <div class="article-tags">
                                         <span class="tag" v-for="(tag, index) in article.tags" :key="index">{{ tag
-                                            }}</span>
+                                        }}</span>
                                     </div>
                                     <p class="article-summary">{{ article.summary }}</p>
                                     <!-- 点赞和评论 -->
@@ -91,12 +91,12 @@
                                     <h3 class="project-title">{{ project.title }}</h3>
                                     <div class="project-tags">
                                         <span class="tag" v-for="(tag, index) in project.tags" :key="index">{{ tag
-                                            }}</span>
+                                        }}</span>
                                     </div>
                                     <p class="project-summary">{{ project.summary }}</p>
                                     <div class="project-meta">
-                                        <span class="meta-item"><i :class="project.statusIcon"></i> {{ project.status
-                                            }}</span>
+                                        <!-- <span class="meta-item"><i :class="project.statusIcon"></i> {{ project.status
+                                            }}</span> -->
                                         <span class="meta-item"><i class="fa fa-calendar"></i> {{ project.date }}</span>
                                         <!-- 点赞和评论 -->
                                         <div class="interaction-stats">
@@ -155,7 +155,7 @@
                                     <h3 class="thought-title">{{ thought.title }}</h3>
                                     <div class="thought-tags">
                                         <span class="tag" v-for="(tag, index) in thought.tags" :key="index">{{ tag
-                                            }}</span>
+                                        }}</span>
                                     </div>
                                     <p class="thought-summary">{{ thought.summary }}</p>
                                 </div>
@@ -366,8 +366,6 @@ const workshopSection = ref({
             image: 'https://picsum.photos/500/300?random=4',
             summary: '基于Python的自动化数据分析工具，支持多种数据源和可视化输出...',
             tags: ['Python', '数据分析', '开源'],
-            status: '进行中',
-            statusIcon: 'fa fa-star',
             date: '2023-09',
             likes: 76,
             comments: 24
@@ -378,8 +376,6 @@ const workshopSection = ref({
             image: 'https://picsum.photos/500/300?random=5',
             summary: '一款轻量级个人知识管理系统，支持笔记整理、标签管理和全文检索...',
             tags: ['Vue.js', 'Node.js', 'MongoDB'],
-            status: '已完成',
-            statusIcon: 'fa fa-check-circle',
             date: '2023-06',
             likes: 76,
             comments: 24
@@ -1686,6 +1682,7 @@ h3 {
 .view-more-btn:hover {
     background-color: rgba(255, 255, 255, 0.15);
 }
+
 
 /* 响应式布局媒体查询 */
 @media (max-width: 1200px) {
