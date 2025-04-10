@@ -18,7 +18,7 @@
                             <div class="stat-label">{{ stat.label }}</div>
                         </div>
                     </div>
-                    <button class="about-btn" @click="handleAboutClick">{{ personalInfo.aboutBtnText }}</button>
+                    <div class="about-btn" @click="handleAboutClick">{{ personalInfo.aboutBtnText }}</div>
                 </div>
 
                 <!-- 右侧内容区域 -->
@@ -612,10 +612,7 @@ const handleAboutClick = () => {
     // console.log('关于我按钮被点击');
     // 这里可以添加导航到关于页面或显示关于信息弹窗的逻辑
 };
-// 在DOM加载后生成格子
-onMounted(() => {
 
-});
 </script>
 
 <style scoped>
@@ -807,10 +804,13 @@ onMounted(() => {
 .about-btn {
     background-color: rgba(255, 255, 255, 0.1);
     border: none;
-    color: white;
+    color: var(--text-primary); /* 修改这一行，从固定的 white 改为使用主题变量 */
     padding: 8px 30px;
     border-radius: 20px;
     font-size: 14px;
+    text-align: center;
+    height: 40px;
+    line-height: 24px;
     cursor: pointer;
     transition: all 0.2s ease;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);

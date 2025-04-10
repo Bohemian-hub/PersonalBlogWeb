@@ -385,6 +385,35 @@ const checkMenuOverflow = () => {
   transition: .25s ease-in-out;
 }
 
+/* 添加三条线的位置定义 */
+.menu-icon span:nth-child(1) {
+  top: 0px;
+}
+
+.menu-icon span:nth-child(2) {
+  top: 9px;
+}
+
+.menu-icon span:nth-child(3) {
+  top: 18px;
+}
+
+/* 添加激活状态下的动画 */
+.menu-icon.active span:nth-child(1) {
+  top: 9px;
+  transform: rotate(45deg);
+}
+
+.menu-icon.active span:nth-child(2) {
+  opacity: 0;
+  width: 0%;
+}
+
+.menu-icon.active span:nth-child(3) {
+  top: 9px;
+  transform: rotate(-45deg);
+}
+
 /* 更新移动端菜单样式 */
 .mobile-menu {
   position: fixed;
