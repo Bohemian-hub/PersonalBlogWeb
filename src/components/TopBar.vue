@@ -1,5 +1,5 @@
 <template>
-  <div class="top-bar" :class="{ 'hidden': !visible }">
+  <div class="top-bar" :class="[{ 'hidden': !visible }, currentTheme]">
     <div class="site_title" @click="goHome">
       <!-- 将文本拆分为单独的字符 -->
       <span v-for="(char, index) in 'HEDONG'" :key="index" class="title-char"
@@ -29,7 +29,7 @@
   </div>
 
   <!-- 直接显示菜单，不用遮罩层 -->
-  <div class="mobile-menu" v-if="showMobileMenu" @click.stop>
+  <div class="mobile-menu" :class="currentTheme" v-if="showMobileMenu" @click.stop>
     <div v-for="(item, index) in menuList" :key="index" class="mobile-menu-item" @click="navigateAndClose(item.route)">
       <el-image class="mobile-menu-item-icon" :src="item.icon"></el-image>
       <div class="mobile-menu-item-text">{{ item.text }}</div>
@@ -43,6 +43,7 @@
 import { ref, provide, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import User from './User.vue'
+import { currentTheme } from '../stores/themeStore'
 
 import icon_ai from '@/assets/icons/ai.png'
 import icon_book from '@/assets/icons/book.png'
@@ -193,6 +194,33 @@ const checkMenuOverflow = () => {
 </script>
 
 <style scoped>
+/* 主题变量定义 */
+.top-bar.dark,
+.mobile-menu.dark {
+  --top-bar-bg: #41414144;
+  --top-bar-hover-bg: #41414188;
+  --text-color: #fff;
+  --text-hover-color: #e06614;
+  --underline-color: #e06614;
+  --menu-bg: rgba(65, 65, 65, 0.9);
+  --menu-border: rgba(255, 255, 255, 0.1);
+  --menu-hover-bg: rgba(224, 102, 20, 0.2);
+  --menu-active-bg: rgba(224, 102, 20, 0.4);
+}
+
+.top-bar.light,
+.mobile-menu.light {
+  --top-bar-bg: rgba(255, 255, 255, 0.7);
+  --top-bar-hover-bg: rgba(255, 255, 255, 0.85);
+  --text-color: #333;
+  --text-hover-color: #e06614;
+  --underline-color: #e06614;
+  --menu-bg: rgba(255, 255, 255, 0.95);
+  --menu-border: rgba(0, 0, 0, 0.1);
+  --menu-hover-bg: rgba(224, 102, 20, 0.1);
+  --menu-active-bg: rgba(224, 102, 20, 0.2);
+}
+
 .top-bar {
   position: fixed;
   top: 0;
@@ -210,7 +238,7 @@ const checkMenuOverflow = () => {
 }
 
 .top-bar:hover {
-  background-color: #41414144;
+  background-color: var(--top-bar-hover-bg);
   transition: background-color 0.3s ease-in-out;
 }
 
@@ -227,7 +255,7 @@ const checkMenuOverflow = () => {
 }
 
 .title-char {
-  color: #fff;
+  color: var(--text-color);
   transition: color 0.3s ease-in-out;
   display: inline-block;
   /* 让每个字符可以独立应用过渡效果 */
@@ -265,7 +293,7 @@ const checkMenuOverflow = () => {
   margin: 15px 5px 10px 5px;
   line-height: 20px;
   font-size: 14px;
-  color: #fff;
+  color: var(--text-color);
   float: left;
 }
 
@@ -273,7 +301,7 @@ const checkMenuOverflow = () => {
   width: 0px;
   float: left;
   height: 5px;
-  background-color: #e06614;
+  background-color: var(--underline-color);
   transition: width 0.3s ease-in-out;
   /* 添加过渡动画 */
 }
@@ -289,7 +317,7 @@ const checkMenuOverflow = () => {
   margin: 15px 5px 10px 5px;
   line-height: 20px;
   font-size: 14px;
-  color: #e06614;
+  color: var(--text-hover-color);
   font-weight: 800;
 }
 
@@ -297,7 +325,7 @@ const checkMenuOverflow = () => {
   width: 100%;
   float: left;
   height: 5px;
-  background-color: #e06614;
+  background-color: var(--underline-color);
 }
 
 .login_avatar {
@@ -319,7 +347,7 @@ const checkMenuOverflow = () => {
 .login_avatar:hover {
   cursor: pointer;
   box-shadow: inset 10px 10px 10px rgba(0, 0, 0, 0.05), 15px 25px 10px rgba(0, 0, 0, 0.05), 15px 20px 20px rgba(0, 0, 0, 0.05);
-  background-color: #41414144;
+  background-color: var(--top-bar-hover-bg);
 }
 
 /* 移动端菜单按钮样式 - 默认隐藏 */
@@ -349,39 +377,12 @@ const checkMenuOverflow = () => {
   position: absolute;
   height: 2px;
   width: 100%;
-  background: white;
+  background: var(--text-color);
   border-radius: 2px;
   opacity: 1;
   left: 0;
   transform: rotate(0deg);
   transition: .25s ease-in-out;
-}
-
-.menu-icon span:nth-child(1) {
-  top: 0px;
-}
-
-.menu-icon span:nth-child(2) {
-  top: 8px;
-}
-
-.menu-icon span:nth-child(3) {
-  top: 16px;
-}
-
-.menu-icon.active span:nth-child(1) {
-  top: 8px;
-  transform: rotate(135deg);
-}
-
-.menu-icon.active span:nth-child(2) {
-  opacity: 0;
-  left: -30px;
-}
-
-.menu-icon.active span:nth-child(3) {
-  top: 8px;
-  transform: rotate(-135deg);
 }
 
 /* 更新移动端菜单样式 */
@@ -392,7 +393,7 @@ const checkMenuOverflow = () => {
   width: 100%;
   height: auto;
   max-height: calc(100vh - 50px);
-  background-color: rgba(65, 65, 65, 0.9);
+  background-color: var(--menu-bg);
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
   overflow-y: auto;
   animation: slideDown 0.3s ease-out;
@@ -439,7 +440,7 @@ const checkMenuOverflow = () => {
   display: flex;
   align-items: center;
   padding: 15px 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--menu-border);
   transition: background-color 0.3s ease;
 }
 
@@ -448,7 +449,7 @@ const checkMenuOverflow = () => {
 }
 
 .mobile-menu-item:hover {
-  background-color: rgba(224, 102, 20, 0.2);
+  background-color: var(--menu-hover-bg);
 }
 
 .mobile-menu-item-icon {
@@ -458,12 +459,12 @@ const checkMenuOverflow = () => {
 }
 
 .mobile-menu-item-text {
-  color: #fff;
+  color: var(--text-color);
   font-size: 16px;
   font-weight: 500;
 }
 
 .mobile-menu-item:active {
-  background-color: rgba(224, 102, 20, 0.4);
+  background-color: var(--menu-active-bg);
 }
 </style>

@@ -12,6 +12,13 @@ export default {
 <style>
 @import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap');
 
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  /* 至少占满视口高度 */
+}
+
 /* 全局滚动条样式 */
 ::-webkit-scrollbar {
   width: 5px;

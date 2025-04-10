@@ -1,5 +1,5 @@
 <template>
-    <div class="main">
+    <div class="main" :class="currentTheme">
         <!-- 个人介绍板块 -->
         <section class="section personal-intro">
             <div class="section-header">
@@ -274,9 +274,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, onBeforeMount, onBeforeUnmount } from 'vue';
+import { ref, onMounted, computed, onBeforeMount, onBeforeUnmount, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import Activity from '../components/Activity.vue'  // 导入新的Footer组件
+import Activity from '../components/Activity.vue'
+import { currentTheme } from '../stores/themeStore'
+
 const router = useRouter();
 
 // 添加响应式布局相关的状态
@@ -297,6 +299,12 @@ onBeforeMount(() => {
 // 在组件挂载后添加窗口大小变化事件监听
 onMounted(() => {
     window.addEventListener('resize', checkScreenSize);
+
+    // 读取sessionStorage中的主题设置
+    const savedTheme = sessionStorage.getItem('theme');
+    if (savedTheme) {
+        currentTheme.value = savedTheme;
+    }
 });
 
 // 在组件卸载时移除事件监听器
@@ -462,42 +470,42 @@ const friendLinks = ref([
         id: 1,
         name: 'Google',
         url: 'https://www.google.com',
-        logo: 'https://www.google.com/s2/favicons?domain=google.com&sz=64',
+        logo: 'https://img0.baidu.com/it/u=1949615176,3216656098&fm=253&fmt=auto&app=138&f=JPEG?w=357&h=365',
         description: '全球最大搜索引擎'
     },
     {
         id: 2,
         name: '百度',
         url: 'https://www.baidu.com',
-        logo: 'https://www.google.com/s2/favicons?domain=baidu.com&sz=64',
+        logo: 'https://www.baidu.com/favicon.ico',
         description: '中文搜索引擎'
     },
     {
         id: 3,
         name: 'Google Scholar',
         url: 'https://scholar.google.com',
-        logo: 'https://www.google.com/s2/favicons?domain=scholar.google.com&sz=64',
+        logo: 'https://img0.baidu.com/it/u=1217823906,428491688&fm=253&fmt=auto&app=138&f=JPEG?w=506&h=285',
         description: '学术文献搜索'
     },
     {
         id: 4,
         name: 'ResearchGate',
         url: 'https://www.researchgate.net',
-        logo: 'https://www.google.com/s2/favicons?domain=researchgate.net&sz=64',
+        logo: 'https://img0.baidu.com/it/u=1030169371,2184594443&fm=253&fmt=auto&app=138&f=JPEG?w=231&h=231',
         description: '科研社交平台'
     },
     {
         id: 5,
         name: '中国知网',
         url: 'https://www.cnki.net',
-        logo: 'https://piccache.cnki.net/kdn/index/kns8s/nimages/logo.png',
+        logo: 'https://pic.rmb.bdstatic.com/bjh/news/2253ad0f3fd8bfa719967c9fed00bb4d.jpeg',
         description: '学术资源平台'
     },
     {
         id: 6,
         name: 'arXiv',
         url: 'https://arxiv.org',
-        logo: 'https://www.google.com/s2/favicons?domain=arxiv.org&sz=64',
+        logo: 'https://img1.baidu.com/it/u=3693130707,297865347&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500',
         description: '开放学术预印本'
     }
 ]);
@@ -611,6 +619,37 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* 主题变量定义 */
+.dark {
+    --bg-primary: rgba(25, 25, 35, 0.55);
+    --bg-secondary: rgba(30, 30, 40, 0.7);
+    --bg-tertiary: rgba(40, 40, 55, 0.4);
+    --text-primary: white;
+    --text-secondary: rgba(255, 255, 255, 0.8);
+    --border-color: rgba(255, 255, 255, 0.1);
+    --shadow-color: rgba(0, 0, 0, 0.2);
+    --gradient-text: linear-gradient(45deg, #ffffff, #b8c6db);
+    --hover-bg: rgba(255, 255, 255, 0.1);
+    --card-bg: rgba(30, 30, 40, 0.7);
+    --input-bg: rgba(255, 255, 255, 0.05);
+}
+
+.light {
+    --bg-primary: rgba(245, 245, 250, 0.85);
+    --bg-secondary: rgba(255, 255, 255, 0.9);
+    --bg-tertiary: rgba(235, 235, 245, 0.7);
+    --text-primary: #333;
+    --text-secondary: #555;
+    --border-color: rgba(0, 0, 0, 0.1);
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --gradient-text: linear-gradient(45deg, #333, #666);
+    --hover-bg: rgba(0, 0, 0, 0.05);
+    --card-bg: rgba(255, 255, 255, 0.85);
+    --input-bg: rgba(0, 0, 0, 0.03);
+}
+
+/* 主题切换按钮样式 */
+
 .main {
     width: 100%;
     max-width: 1400px;
@@ -618,8 +657,8 @@ onMounted(() => {
     min-height: 1000px;
     margin: 0 auto;
     padding: 40px 20px;
-    color: white;
-    font-family: 'Helvetica Neue', Arial, sans-serif;
+    color: var(--text-primary);
+    /* font-family: 'Helvetica Neue', Arial, sans-serif; */
     box-sizing: border-box;
 }
 
@@ -631,26 +670,25 @@ onMounted(() => {
     padding: 24px;
     position: relative;
     backdrop-filter: blur(10px);
-    background-color: rgba(25, 25, 35, 0.55);
-    /* 颜色调浅 */
+    background-color: var(--bg-primary);
     transition: all 0.3s ease;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2),
+    box-shadow: 0 6px 20px var(--shadow-color),
         0 2px 8px rgba(0, 0, 0, 0.15),
-        0 0 1px rgba(255, 255, 255, 0.1);
+        0 0 1px var(--border-color);
 }
 
 .section:hover {
     transform: translateY(-4px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25),
+    box-shadow: 0 10px 30px var(--shadow-color),
         0 4px 10px rgba(0, 0, 0, 0.2),
-        0 0 1px rgba(255, 255, 255, 0.15);
+        0 0 1px var(--border-color);
 }
 
 .section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid var(--border-color);
     padding-bottom: 16px;
     margin-bottom: 24px;
 }
@@ -661,6 +699,7 @@ onMounted(() => {
     margin: 0;
     position: relative;
     letter-spacing: 0.5px;
+    color: var(--text-primary);
 }
 
 .section-header h2::after {
@@ -670,7 +709,7 @@ onMounted(() => {
     left: 0;
     width: 40px;
     height: 2px;
-    background: linear-gradient(90deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
+    background: linear-gradient(90deg, var(--text-primary) 0%, transparent 100%);
 }
 
 .view-all {
@@ -680,19 +719,19 @@ onMounted(() => {
     transition: all 0.2s;
     padding: 4px 10px;
     border-radius: 12px;
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: var(--hover-bg);
 }
-
 
 .view-all:hover {
     opacity: 1;
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: var(--hover-bg);
 }
 
 .section-desc {
     font-size: 15px;
     opacity: 0.8;
     margin-bottom: 20px;
+    color: var (--text-secondary);
 }
 
 /* 个人介绍区域 */
@@ -793,10 +832,10 @@ onMounted(() => {
 
 /* 右侧上部区域 - 介绍 */
 .profile-intro {
-    background-color: rgba(40, 40, 55, 0.4);
+    background-color: var(--bg-tertiary);
     border-radius: 12px;
     padding: 20px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px var(--shadow-color);
 }
 
 .tagline {
@@ -804,11 +843,11 @@ onMounted(() => {
     font-weight: 300;
     margin: 0;
     letter-spacing: 0.5px;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    text-shadow: 0 2px 4px var(--shadow-color);
     line-height: 1.4;
     text-align: center;
     font-style: italic;
-    background: linear-gradient(45deg, #ffffff, #b8c6db);
+    background: var(--gradient-text);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -972,13 +1011,13 @@ onMounted(() => {
 .friend-link {
     display: flex;
     align-items: center;
-    background-color: rgba(40, 40, 55, 0.7);
+    background-color: var(--card-bg);
     border-radius: 10px;
     padding: 10px;
     text-decoration: none;
-    color: white;
+    color: var(--text-primary);
     transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px var(--shadow-color);
     height: 60px;
 }
 
@@ -1063,8 +1102,8 @@ h3 {
     position: relative;
     border-radius: 12px;
     overflow: hidden;
-    background-color: rgba(30, 30, 40, 0.7);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    background-color: var(--card-bg);
+    box-shadow: 0 8px 20px var(--shadow-color);
     transition: all 0.3s ease;
     height: 100%;
     display: flex;
@@ -1075,7 +1114,7 @@ h3 {
 
 .article-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 12px 25px var(--shadow-color);
 }
 
 .article-image {
@@ -1092,7 +1131,7 @@ h3 {
     left: 0;
     right: 0;
     height: 40px;
-    background: linear-gradient(to top, rgba(30, 30, 40, 1), rgba(30, 30, 40, 0));
+    background: linear-gradient(to top, var(--card-bg), transparent);
 }
 
 .article-content {
@@ -1108,7 +1147,7 @@ h3 {
     font-weight: 600;
     line-height: 1.3;
     letter-spacing: 0.3px;
-    background: linear-gradient(45deg, #ffffff, #b8c6db);
+    background: var(--gradient-text);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -1127,6 +1166,7 @@ h3 {
     line-height: 1.5;
     opacity: 0.8;
     flex: 1;
+    color: var(--text-secondary);
 }
 
 /* 实践工坊卡片样式 */
@@ -1134,8 +1174,8 @@ h3 {
     position: relative;
     border-radius: 12px;
     overflow: hidden;
-    background-color: rgba(30, 30, 40, 0.7);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    background-color: var(--card-bg);
+    box-shadow: 0 8px 20px var(--shadow-color);
     transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
@@ -1144,7 +1184,7 @@ h3 {
 
 .project-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 12px 25px var(--shadow-color);
 }
 
 .project-image {
@@ -1161,7 +1201,7 @@ h3 {
     left: 0;
     right: 0;
     height: 50px;
-    background: linear-gradient(to top, rgba(30, 30, 40, 1), rgba(30, 30, 40, 0));
+    background: linear-gradient(to top, var(--card-bg), transparent);
 }
 
 .project-content {
@@ -1176,7 +1216,7 @@ h3 {
     font-size: 20px;
     font-weight: 600;
     line-height: 1.3;
-    background: linear-gradient(45deg, #ffffff, #b8c6db);
+    background: var(--gradient-text);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -1195,6 +1235,7 @@ h3 {
     line-height: 1.5;
     opacity: 0.8;
     flex: 1;
+    color: var(--text-secondary);
 }
 
 /* 项目卡片调整 */
@@ -1204,6 +1245,7 @@ h3 {
     align-items: center;
     font-size: 13px;
     opacity: 0.7;
+    color: var(--text-secondary);
 }
 
 .meta-item {
@@ -1214,12 +1256,12 @@ h3 {
 
 /* 认知轨迹卡片样式 */
 .thought-item {
-    background-color: rgba(30, 30, 40, 0.7);
+    background-color: var(--card-bg);
     border-radius: 12px;
     padding: 16px;
     margin-bottom: 15px;
     position: relative;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 15px var(--shadow-color);
     transition: all 0.3s ease;
     display: flex;
     gap: 15px;
@@ -1234,7 +1276,7 @@ h3 {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background-color: rgba(40, 40, 55, 0.6);
+    background-color: var(--bg-tertiary);
     border-radius: 10px;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15),
         inset 0 0 0 1px rgba(255, 255, 255, 0.05);
@@ -1281,7 +1323,7 @@ h3 {
     font-weight: 600;
     line-height: 1;
     margin: 4px 0;
-    background: linear-gradient(45deg, #ffffff, #b8c6db);
+    background: var(--gradient-text);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -1309,7 +1351,8 @@ h3 {
     font-size: 16px;
     font-weight: 600;
     line-height: 1.3;
-    background: linear-gradient(45deg, #ffffff, #b8c6db);
+    background: var(--gradient-text);
+    color: var(--text-secondary);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -1327,6 +1370,7 @@ h3 {
     font-size: 13px;
     line-height: 1.5;
     opacity: 0.8;
+    color: var(--text-secondary);
 }
 
 /* 游民时代卡片样式 */
@@ -1335,14 +1379,14 @@ h3 {
     border-radius: 12px;
     overflow: hidden;
     height: 200px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 8px 20px var(--shadow-color);
     transition: all 0.3s ease;
     cursor: pointer;
 }
 
 .media-item:hover {
     transform: translateY(-6px) scale(1.02);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 12px 30px var(--shadow-color);
 }
 
 .media-image {
@@ -1365,6 +1409,8 @@ h3 {
     padding: 20px;
     background: linear-gradient(to top, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0));
     transition: all 0.3s ease;
+    /* 确保所有文本是白色的 */
+    color: white !important;
 }
 
 .media-item:hover .media-overlay {
@@ -1376,7 +1422,7 @@ h3 {
     font-size: 18px;
     font-weight: 600;
     line-height: 1.3;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    text-shadow: 0 2px 4px var(--shadow-color);
 }
 
 .media-tags {
@@ -1385,6 +1431,14 @@ h3 {
     gap: 6px;
     margin-bottom: 8px;
 }
+
+/* 确保媒体卡片中的标签文字为白色 */
+.media-tags .tag {
+    color: white !important;
+    background-color: rgba(0, 0, 0, 0.4);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
 
 .media-summary {
     margin: 0;
@@ -1408,7 +1462,8 @@ h3 {
     border-radius: 12px;
     font-size: 11px;
     font-weight: 500;
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: var(--hover-bg);
+    color: var(--text-secondary);
     backdrop-filter: blur(5px);
     transition: all 0.2s ease;
 }
@@ -1516,10 +1571,10 @@ h3 {
 
 /* 留言板样式 */
 .message-board {
-    background-color: rgba(30, 30, 40, 0.7);
+    background-color: var(--card-bg);
     border-radius: 12px;
     padding: 20px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 20px var(--shadow-color);
 }
 
 /* 留言输入区域 */
@@ -1530,11 +1585,11 @@ h3 {
 .message-input {
     width: 100%;
     height: 100px;
-    background-color: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: var(--input-bg);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 12px;
-    color: white;
+    color: var(--text-primary);
     font-size: 14px;
     resize: none;
     margin-bottom: 10px;
@@ -1543,8 +1598,8 @@ h3 {
 
 .message-input:focus {
     outline: none;
-    background-color: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
+    background-color: var(--input-bg);
+    border-color: var(--border-color);
 }
 
 .message-actions {
@@ -1616,7 +1671,7 @@ h3 {
 .message-item {
     display: flex;
     margin-bottom: 15px;
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: var(--input-bg);
     border-radius: 10px;
     padding: 12px;
     transition: all 0.3s ease;
@@ -1651,7 +1706,7 @@ h3 {
 .message-author {
     font-weight: 500;
     font-size: 14px;
-    color: white;
+    color: var(--text-primary);
 }
 
 .message-date {
@@ -1663,16 +1718,16 @@ h3 {
     margin: 0;
     font-size: 14px;
     line-height: 1.5;
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--text-secondary);
 }
 
 /* 查看更多按钮 */
 .view-more-btn {
     width: 100%;
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: var(--hover-bg);
     border: none;
     border-radius: 8px;
-    color: white;
+    color: var(--text-primary);
     padding: 8px;
     font-size: 14px;
     cursor: pointer;

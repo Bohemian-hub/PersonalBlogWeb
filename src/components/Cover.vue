@@ -1,5 +1,5 @@
 <template>
-    <div class="cover" :style="{ height: height }">
+    <div class="cover" :style="{ height: height }" :class="currentTheme">
         <!-- 封面标题文字 -->
         <div class="cover_text" v-if="isComponentVisible">
             <div class="text1">
@@ -20,6 +20,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { currentTheme } from '../stores/themeStore'
 
 // 接收传递的高度参数，默认为300px
 const props = defineProps({
@@ -372,6 +373,27 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+/* 主题变量定义 */
+.cover.dark {
+    --cover-text-color: #ffffff;
+    --cover-text-shadow: 0 0 10px rgba(5, 5, 5, 0.5);
+    --animated-char-reflection: rgba(0, 0, 0, 0.4);
+    --text-bg-color: rgba(0, 0, 0, 0.412);
+    --cursor-color: #fff;
+    --sea-color: #015871;
+    --char-color: white;
+}
+
+.cover.light {
+    --cover-text-color: #333333;
+    --cover-text-shadow: 0 0 10px rgba(200, 200, 200, 0.5);
+    --animated-char-reflection: rgba(100, 100, 100, 0.4);
+    --text-bg-color: rgba(255, 255, 255, 0.7);
+    --cursor-color: #333;
+    --sea-color: #81c4e2;
+    --char-color: #333;
+}
+
 html,
 body {
     overflow-x: hidden;
@@ -413,7 +435,7 @@ body {
             height: 100px;
             /* background-color: red; */
             font-size: 40px;
-            color: #fff;
+            color: var(--cover-text-color);
             margin-bottom: 40px;
             display: flex;
             justify-content: center;
@@ -428,11 +450,11 @@ body {
                 /* 保持文字在一行内不换行 */
                 white-space: nowrap;
                 /* 添加倒影效果 */
-                -webkit-box-reflect: below 0px linear-gradient(to bottom, rgba(225, 0, 0, 0), rgba(0, 0, 0, 0.4));
+                -webkit-box-reflect: below 0px linear-gradient(to bottom, rgba(225, 0, 0, 0), var(--animated-char-reflection));
                 /* 添加一些间距，让倒影更明显 */
                 padding-bottom: 5px;
                 /* 可选：添加文字阴影使主文字更突出 */
-                text-shadow: 0 0 10px rgba(5, 5, 5, 0.5);
+                text-shadow: var(--cover-text-shadow);
             }
         }
 
@@ -441,8 +463,8 @@ body {
             border-radius: 10px;
             display: inline-block;
             padding: 15px 0;
-            background-color: rgba(0, 0, 0, 0.412);
-            color: #fff;
+            background-color: var(--text-bg-color);
+            color: var(--cover-text-color);
             min-width: 2px;
             max-width: 100%;
             /* 确保内容不超过父容器 */
@@ -466,7 +488,7 @@ body {
                 top: 0;
                 width: 2px;
                 height: 100%;
-                background-color: #fff;
+                background-color: var(--cursor-color);
                 animation: cursor-fade 0.4s ease-in-out infinite;
             }
         }
@@ -500,7 +522,7 @@ body {
 .sea {
     width: 100%;
     height: 5%;
-    background-color: #015871;
+    background-color: var(--sea-color);
     /* 绝对定位 底部 */
     position: absolute;
     left: 0;
@@ -608,5 +630,11 @@ body {
             font-size: 12px;
         }
     }
+}
+
+/* 动态生成的角色元素样式 */
+#flying-chars-container span,
+#dropping-chars-container span {
+    color: var(--char-color) !important;
 }
 </style>

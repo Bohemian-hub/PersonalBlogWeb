@@ -3,9 +3,9 @@
     <!-- 遮罩层：仅在移动端显示 -->
     <div class="overlay" v-if="isShow" @click="closePanel"></div>
 
-    <div class="user" :class="{ 'show-panel': isShow, 'mobile-view': isMobileView }">
+    <div class="user" :class="[{ 'show-panel': isShow, 'mobile-view': isMobileView }, currentTheme]">
       <!-- 小三角 - 仅在桌面视图显示 -->
-      <div class="angle" v-if="!isMobileView"></div>
+      <div class="angle" v-if="!isMobileView" :class="currentTheme"></div>
       <!-- 用户面板 -->
       <div class="user-panel">
         <!-- 切换按钮 -->
@@ -109,6 +109,7 @@ import { ElMessage } from 'element-plus'
 import { sendCode, register, login } from '@/api/auth'
 import { Message, Lock, User, Key, ArrowRight, SwitchButton, EditPen } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
+import { currentTheme } from '../stores/themeStore' // 导入主题状态
 
 const router = useRouter()
 const showUserPanel = inject('showUserPanel')
@@ -181,6 +182,7 @@ const handleLogin = async () => {
     // console.log(userData);
     ElMessage.success('登录成功');
     sessionStorage.setItem('user', JSON.stringify(userData.user));
+    // 登录后不再设置固定主题，保持当前主题状态
     user.value = userData.user;
     // console.log(user);
 
@@ -243,6 +245,43 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+/* 主题变量定义 */
+.user.dark {
+  --user-bg: rgba(40, 40, 50, 0.95);
+  --user-text: #ffffff;
+  --user-border: rgba(255, 255, 255, 0.1);
+  --user-shadow: rgba(0, 0, 0, 0.25);
+  --user-switch-bg: rgba(60, 60, 70, 0.7);
+  --user-active-bg: rgba(75, 75, 85, 0.9);
+  --user-hover-bg: rgba(65, 65, 75, 0.8);
+  --user-input-bg: rgba(50, 50, 60, 0.8);
+  --user-input-border: rgba(255, 255, 255, 0.2);
+  --user-btn-primary: #409eff;
+  --user-btn-hover: #66b1ff;
+  --user-divider: rgba(255, 255, 255, 0.1);
+  --user-menu-item-hover: rgba(70, 130, 180, 0.2);
+  --user-angle-color: rgba(40, 40, 50, 0.95);
+  --user-angle-shadow: rgba(0, 0, 0, 0.3);
+}
+
+.user.light {
+  --user-bg: rgba(255, 255, 255, 0.95);
+  --user-text: #333333;
+  --user-border: rgba(0, 0, 0, 0.1);
+  --user-shadow: rgba(0, 0, 0, 0.1);
+  --user-switch-bg: #f5f5f5;
+  --user-active-bg: #ffffff;
+  --user-hover-bg: #f8f8f8;
+  --user-input-bg: #ffffff;
+  --user-input-border: #dcdfe6;
+  --user-btn-primary: #409eff;
+  --user-btn-hover: #66b1ff;
+  --user-divider: rgba(0, 0, 0, 0.1);
+  --user-menu-item-hover: #f5f5f5;
+  --user-angle-color: rgba(255, 255, 255, 0.95);
+  --user-angle-shadow: rgba(0, 0, 0, 0.1);
+}
+
 .user-container {
   position: relative;
 }
@@ -261,17 +300,19 @@ onBeforeUnmount(() => {
 .user {
   width: 280px;
   height: 0;
-  background-color: white;
+  background-color: var(--user-bg);
   position: fixed;
   right: 10px;
   top: 60px;
   border-radius: 10px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 12px 0 var(--user-shadow);
   opacity: 0;
   transition: all 0.3s ease-out;
   z-index: 10;
   max-height: 80vh;
   overflow: hidden;
+  color: var(--user-text);
+  border: 1px solid var(--user-border);
 }
 
 /* 移动端视图样式 */
@@ -312,10 +353,10 @@ onBeforeUnmount(() => {
   height: 0;
   border-left: 8px solid transparent;
   border-right: 8px solid transparent;
-  border-bottom: 8px solid white;
+  border-bottom: 8px solid var(--user-angle-color);
   top: -8px;
   right: 28px;
-  filter: drop-shadow(0 -2px 2px rgba(0, 0, 0, 0.1));
+  filter: drop-shadow(0 -2px 2px var(--user-angle-shadow));
 }
 
 .user-panel {
@@ -337,7 +378,7 @@ onBeforeUnmount(() => {
   justify-content: center;
   margin-bottom: 20px;
   border-radius: 8px;
-  background-color: #f5f5f5;
+  background-color: var(--user-switch-bg);
   padding: 4px;
 }
 
@@ -349,8 +390,8 @@ onBeforeUnmount(() => {
 }
 
 .switch-btn.active {
-  background-color: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background-color: var(--user-active-bg);
+  box-shadow: 0 2px 8px var(--user-shadow);
 }
 
 .form-container {
@@ -370,33 +411,64 @@ onBeforeUnmount(() => {
   width: 100px;
 }
 
+/* 重写 Element Plus 组件在不同主题下的样式 */
+:deep(.el-input__wrapper) {
+  background-color: var(--user-input-bg);
+  box-shadow: 0 0 0 1px var(--user-input-border) inset;
+}
+
+:deep(.el-input__inner) {
+  color: var(--user-text);
+}
+
+:deep(.el-button--primary) {
+  background-color: var(--user-btn-primary);
+}
+
+:deep(.el-button--primary:hover) {
+  background-color: var(--user-btn-hover);
+}
+
 .el-menu-vertical-demo {
+  background-color: transparent !important;
   border-right: none !important;
+}
 
-  .username {
-    text-align: center;
-    margin-bottom: 10px;
-    font-size: 20px;
-    font-weight: 900;
-    padding-bottom: 10px;
-    border-bottom: 1px solid rgba(128, 128, 128, 0.405);
-  }
+.el-menu-vertical-demo .username {
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 20px;
+  font-weight: 900;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--user-divider);
+  color: var(--user-text);
+}
 
-  li {
-    border-radius: 20px;
-    overflow: hidden;
-  }
+.el-menu-vertical-demo li {
+  border-radius: 20px;
+  overflow: hidden;
+  background-color: transparent !important;
 }
 
 /* 鼠标悬停时的背景色变化 */
-.el-menu-item {
+:deep(.el-menu-item) {
   padding: 0 0 0 20px !important;
   /* 移除默认的 padding */
   position: relative;
   /* 添加相对定位 */
+  color: var(--user-text) !important;
+  background-color: transparent !important;
 }
 
-.el-menu-item .el-icon:last-child {
+:deep(.el-menu-item .el-icon) {
+  color: var(--user-text) !important;
+}
+
+:deep(.el-menu-item:hover) {
+  background-color: var(--user-menu-item-hover) !important;
+}
+
+:deep(.el-menu-item .el-icon:last-child) {
   position: absolute;
   /* 使用绝对定位 */
   top: 50%;
@@ -404,10 +476,6 @@ onBeforeUnmount(() => {
   /* 调整右边距 */
   transform: translateY(-50%);
   /* 垂直居中 */
-}
-
-.el-menu-item:hover {
-  background-color: #f5f5f5;
 }
 
 /* 媒体查询 - 移动端显示遮罩层 */
