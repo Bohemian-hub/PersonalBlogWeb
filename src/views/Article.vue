@@ -181,20 +181,17 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { marked } from 'marked';
-import { useRouter } from 'vue-router';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/atom-one-dark.css';
 import TopBar from '../components/TopBar.vue'
 // 添加背景图片URL
 const bgUrl = 'https://picsum.photos/1920/1080?blur=5'; // 使用模糊效果的背景图，也可以导入本地图片
 
-const router = useRouter();
 const newComment = ref('');
 const isLiked = ref(false);
 const inputFocused = ref(false);
 const showBackToTop = ref(false);
 const showShareModal = ref(false);
-const commentsSection = ref(null);
 // 创建一个响应式变量来控制TopBar的显示和隐藏
 const showTopBar = ref(true)
 // 声明一个变量存储添加的meta标签

@@ -8,6 +8,7 @@ import Feel from '../views/Feel.vue'
 import Say from '../views/Say.vue'
 import Article from '../views/Article.vue'
 import Manage from '../views/Manage.vue'
+import NotFound from '../views/NotFound.vue'
 
 const routes = [
     {
@@ -80,6 +81,14 @@ const routes = [
         component: Article,
         meta: {
             title: '文章'
+        }
+    },
+    {
+        path: '/:pathMatch(.*)*',
+        name: 'NotFound',
+        component: NotFound,
+        meta: {
+            title: '页面不存在 - HeDong的博客'
         }
     }
 ]
