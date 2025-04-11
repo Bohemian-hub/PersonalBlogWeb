@@ -197,7 +197,7 @@ const checkMenuOverflow = () => {
 /* 主题变量定义 */
 .top-bar.dark,
 .mobile-menu.dark {
-  --top-bar-bg: #41414144;
+  --top-bar-bg: #4141411d;
   --top-bar-hover-bg: #41414188;
   --text-color: #fff;
   --text-hover-color: #e06614;
@@ -210,7 +210,7 @@ const checkMenuOverflow = () => {
 
 .top-bar.light,
 .mobile-menu.light {
-  --top-bar-bg: rgba(255, 255, 255, 0.7);
+  --top-bar-bg: rgba(255, 255, 255, 0.2);
   --top-bar-hover-bg: rgba(255, 255, 255, 0.85);
   --text-color: #333;
   --text-hover-color: #e06614;
@@ -224,11 +224,15 @@ const checkMenuOverflow = () => {
 .top-bar {
   position: fixed;
   top: 0;
-  z-index: 1;
+  z-index: 100;
+  /* 使用更高的值 */
   width: 100%;
   height: 50px;
   /* 修改为更快的动画 */
   transition: opacity 0.3s ease, transform 0.3s ease;
+  /* 加一点点默认的背景色，没有 hover 时候那么浓 */
+  background-color: var(--top-bar-bg);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
 }
 
 .top-bar.hidden {

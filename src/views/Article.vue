@@ -1,180 +1,174 @@
 <template>
+    <div class="article-page" :class="currentTheme">
+        <TopBar :visible="showTopBar" />
 
-    <TopBar :visible="showTopBar" />
-
-    <div class="article-container">
-        <!-- 顶部封面图 -->
-        <div class="article-cover" :style="{ backgroundImage: `url('${article.coverUrl}')` }">
-            <div class="cover-overlay">
-                <div class="article-meta-floating">
-                    <div class="article-category">{{ article.category }}</div>
-                    <h1 class="article-title-floating">{{ article.title }}</h1>
+        <div class="article-container">
+            <!-- 顶部封面图 -->
+            <div class="article-cover" :style="{ backgroundImage: `url('${article.coverUrl}')` }">
+                <div class="cover-overlay">
+                    <div class="article-meta-floating">
+                        <div class="article-category">{{ article.category }}</div>
+                        <h1 class="article-title-floating">{{ article.title }}</h1>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- 文章主体内容 -->
-        <div class="article-content-wrapper">
-            <div class="article-header">
-                <!-- <h1 class="article-title">{{ article.title }}</h1> -->
+            <!-- 文章主体内容 -->
+            <div class="article-content-wrapper">
+                <div class="article-header">
+                    <!-- <h1 class="article-title">{{ article.title }}</h1> -->
 
-                <div class="article-info">
-                    <div class="author-info">
-                        <img :src="article.author.avatar" alt="作者头像" class="author-avatar">
-                        <div class="author-details">
-                            <div class="author-name">{{ article.author.name }}</div>
-                            <div class="article-date">{{ formatDate(article.publishDate) }}</div>
+                    <div class="article-info">
+                        <div class="author-info">
+                            <img :src="article.author.avatar" alt="作者头像" class="author-avatar">
+                            <div class="author-details">
+                                <div class="author-name">{{ article.author.name }}</div>
+                                <div class="article-date">{{ formatDate(article.publishDate) }}</div>
+                            </div>
+                        </div>
+
+                        <div class="article-stats">
+                            <span class="stat-item"><i class="icon-eye"></i> {{ article.views }}</span>
+                            <span class="stat-item"><i class="icon-heart"></i> {{ article.likes }}</span>
+                            <span class="stat-item"><i class="icon-comment"></i> {{ article.comments.length }}</span>
                         </div>
                     </div>
 
-                    <div class="article-stats">
-                        <span class="stat-item"><i class="icon-eye"></i> {{ article.views }}</span>
-                        <span class="stat-item"><i class="icon-heart"></i> {{ article.likes }}</span>
-                        <span class="stat-item"><i class="icon-comment"></i> {{ article.comments.length }}</span>
+                    <div class="article-tags">
+                        <span class="tag" v-for="(tag, index) in article.tags" :key="index">{{ tag }}</span>
+                    </div>
+
+                    <!-- 添加摘要部分 -->
+                    <div class="article-summary">
+                        <p>{{ article.summary }}</p>
                     </div>
                 </div>
 
-                <div class="article-tags">
-                    <span class="tag" v-for="(tag, index) in article.tags" :key="index">{{ tag }}</span>
+                <!-- 文章正文 (渲染Markdown) -->
+                <div class="article-content" v-html="renderedContent"></div>
+
+                <!-- 分割线 -->
+                <div class="content-divider">
+                    <span class="divider-icon">✦</span>
                 </div>
 
-                <!-- 添加摘要部分 -->
-                <div class="article-summary">
-                    <p>{{ article.summary }}</p>
-                </div>
-            </div>
-
-            <!-- 文章正文 (渲染Markdown) -->
-            <div class="article-content" v-html="renderedContent"></div>
-
-            <!-- 分割线 -->
-            <div class="content-divider">
-                <span class="divider-icon">✦</span>
-            </div>
-
-            <!-- 评论区域 -->
-            <div class="comments-section">
-                <h2 class="section-title">评论区 ({{ article.comments.length }})</h2>
-
-                <!-- 评论输入框 -->
-                <div class="comment-input-container">
-                    <div class="comment-avatar">
-                        <img :src="currentUser.avatar" alt="Your avatar">
-                    </div>
-                    <div class="comment-input-wrapper">
-                        <textarea v-model="newComment" placeholder="写下你的评论..." class="comment-input"
-                            @focus="inputFocused = true" @blur="inputFocused = false"></textarea>
-                        <div class="comment-actions" :class="{ 'active': inputFocused || newComment }">
-                            <button class="cancel-btn" @click="newComment = ''">取消</button>
-                            <button class="submit-btn" @click="addComment" :disabled="!newComment.trim()">发表评论</button>
+                <!-- 操作栏（从底部移至此处） -->
+                <div class="article-actions-bar">
+                    <div class="actions-container">
+                        <div class="action-btn" @click="toggleLike">
+                            <div class="action-icon-wrapper" :class="{ 'liked': isLiked }">
+                                <i class="icon-heart"></i>
+                            </div>
+                            <span>{{ article.likes }}</span>
+                        </div>
+                        <div class="action-btn">
+                            <div class="action-icon-wrapper">
+                                <i class="icon-bookmark"></i>
+                            </div>
+                            <span>收藏</span>
+                        </div>
+                        <div class="action-btn" @click="shareArticle">
+                            <div class="action-icon-wrapper">
+                                <i class="icon-share"></i>
+                            </div>
+                            <span>分享</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- 评论列表 -->
-                <div class="comments-list" v-if="article.comments.length > 0">
-                    <div class="comment-item" v-for="(comment, index) in article.comments" :key="index">
+                <!-- 评论区域 -->
+                <div class="comments-section">
+                    <h2 class="section-title">评论区 ({{ article.comments.length }})</h2>
+
+                    <!-- 评论输入框 -->
+                    <div class="comment-input-container">
                         <div class="comment-avatar">
-                            <img :src="comment.avatar" :alt="`${comment.author} avatar`">
+                            <img :src="currentUser.avatar" alt="Your avatar">
                         </div>
-                        <div class="comment-content">
-                            <div class="comment-header">
-                                <span class="comment-author">{{ comment.author }}</span>
-                                <span class="comment-date">{{ formatDate(comment.date) }}</span>
-                            </div>
-                            <p class="comment-text">{{ comment.content }}</p>
-                            <div class="comment-actions-row">
-                                <div class="comment-action" @click="toggleLikeComment(index)">
-                                    <i :class="['icon-heart', { 'active': comment.isLiked }]"></i>
-                                    <span>{{ comment.likes }}</span>
-                                </div>
-                                <div class="comment-action" @click="replyToComment(comment)">
-                                    <i class="icon-reply"></i>
-                                    <span>回复</span>
-                                </div>
+                        <div class="comment-input-wrapper">
+                            <textarea v-model="newComment" placeholder="写下你的评论..." class="comment-input"
+                                @focus="inputFocused = true" @blur="inputFocused = false"></textarea>
+                            <div class="comment-actions" :class="{ 'active': inputFocused || newComment }">
+                                <button class="cancel-btn" @click="newComment = ''">取消</button>
+                                <button class="submit-btn" @click="addComment"
+                                    :disabled="!newComment.trim()">发表评论</button>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- 暂无评论提示 -->
-                <div class="no-comments" v-else>
-                    <div class="no-comments-icon">💬</div>
-                    <p>暂无评论，成为第一个评论的人吧！</p>
+                    <!-- 评论列表 -->
+                    <div class="comments-list" v-if="article.comments.length > 0">
+                        <div class="comment-item" v-for="(comment, index) in article.comments" :key="index">
+                            <div class="comment-avatar">
+                                <img :src="comment.avatar" :alt="`${comment.author} avatar`">
+                            </div>
+                            <div class="comment-content">
+                                <div class="comment-header">
+                                    <span class="comment-author">{{ comment.author }}</span>
+                                    <span class="comment-date">{{ formatDate(comment.date) }}</span>
+                                </div>
+                                <p class="comment-text">{{ comment.content }}</p>
+                                <div class="comment-actions-row">
+                                    <div class="comment-action" @click="toggleLikeComment(index)">
+                                        <i :class="['icon-heart', { 'active': comment.isLiked }]"></i>
+                                        <span>{{ comment.likes }}</span>
+                                    </div>
+                                    <div class="comment-action" @click="replyToComment(comment)">
+                                        <i class="icon-reply"></i>
+                                        <span>回复</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 暂无评论提示 -->
+                    <div class="no-comments" v-else>
+                        <div class="no-comments-icon">💬</div>
+                        <p>暂无评论，成为第一个评论的人吧！</p>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- 底部固定操作栏 -->
-        <div class="article-actions-bar">
-            <div class="actions-container">
-                <div class="action-btn" @click="toggleLike">
-                    <div class="action-icon-wrapper" :class="{ 'liked': isLiked }">
-                        <i class="icon-heart"></i>
-                    </div>
-                    <span>{{ article.likes }}</span>
-                </div>
-                <div class="action-btn" @click="scrollToComments">
-                    <div class="action-icon-wrapper">
-                        <i class="icon-comment"></i>
-                    </div>
-                    <span>{{ article.comments.length }}</span>
-                </div>
-                <div class="action-btn">
-                    <div class="action-icon-wrapper">
-                        <i class="icon-bookmark"></i>
-                    </div>
-                    <span>收藏</span>
-                </div>
-                <div class="action-btn" @click="shareArticle">
-                    <div class="action-icon-wrapper">
-                        <i class="icon-share"></i>
-                    </div>
-                    <span>分享</span>
-                </div>
-                <!-- 添加回到顶部按钮 -->
-                <!-- <div class="action-btn" @click="scrollToTop">
-                    <div class="action-icon-wrapper">
-                        <i class="icon-arrow-up"></i>
-                    </div>
-                    <span>回到顶部</span>
-                </div> -->
+            <!-- 返回顶部按钮 -->
+            <div class="back-to-top" v-show="showBackToTop" :class="{ 'show': showBackToTop }" @click="scrollToTop">
+                <i class="icon-arrow-up"></i>
             </div>
-        </div>
 
-        <!-- 返回顶部按钮 -->
-        <div class="back-to-top" v-show="showBackToTop" :class="{ 'show': showBackToTop }" @click="scrollToTop">
-            <i class="icon-arrow-up"></i>
-        </div>
-
-        <!-- 分享弹窗 -->
-        <div class="share-modal" v-if="showShareModal" @click.self="showShareModal = false">
-            <div class="share-modal-content">
-                <h3>分享文章</h3>
-                <div class="share-options">
-                    <div class="share-option" @click="shareVia('wechat')">
-                        <div class="share-icon wechat">微信</div>
-                        <span>微信</span>
+            <!-- 分享弹窗 -->
+            <div class="share-modal" v-if="showShareModal" @click.self="showShareModal = false">
+                <div class="share-modal-content">
+                    <h3>分享文章</h3>
+                    <div class="share-options">
+                        <div class="share-option" @click="shareVia('wechat')">
+                            <div class="share-icon wechat">微信</div>
+                            <span>微信</span>
+                        </div>
+                        <div class="share-option" @click="shareVia('weibo')">
+                            <div class="share-icon weibo">微博</div>
+                            <span>微博</span>
+                        </div>
+                        <div class="share-option" @click="shareVia('twitter')">
+                            <div class="share-icon twitter">Twitter</div>
+                            <span>Twitter</span>
+                        </div>
+                        <div class="share-option" @click="copyLink">
+                            <div class="share-icon link">链接</div>
+                            <span>复制链接</span>
+                        </div>
                     </div>
-                    <div class="share-option" @click="shareVia('weibo')">
-                        <div class="share-icon weibo">微博</div>
-                        <span>微博</span>
-                    </div>
-                    <div class="share-option" @click="shareVia('twitter')">
-                        <div class="share-icon twitter">Twitter</div>
-                        <span>Twitter</span>
-                    </div>
-                    <div class="share-option" @click="copyLink">
-                        <div class="share-icon link">链接</div>
-                        <span>复制链接</span>
-                    </div>
+                    <button class="close-modal-btn" @click="showShareModal = false">关闭</button>
                 </div>
-                <button class="close-modal-btn" @click="showShareModal = false">关闭</button>
             </div>
-        </div>
 
-        <!-- 背景图片 -->
-        <el-image class="bg-image" :src="bgUrl" :fit="'cover'" draggable="false" />
+            <!-- 背景图片 -->
+            <el-image class="bg-image" :src="bgUrl" :fit="'cover'" draggable="false"
+                :class="{ 'dim-bg': currentTheme === 'dark' }" />
+        </div>
+        <!-- 添加主题切换按钮 -->
+        <ThemeToggler class="home-theme-toggler" />
+        <!-- 底部版权和备案信息 -->
+        <Footer />
     </div>
 </template>
 
@@ -184,6 +178,9 @@ import { marked } from 'marked';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/atom-one-dark.css';
 import TopBar from '../components/TopBar.vue'
+import ThemeToggler from '../components/ThemeToggler.vue' // 导入主题切换组件
+import Footer from '../components/Footer.vue'  // 导入新的Footer组件
+import { currentTheme } from '../stores/themeStore' // 导入主题变量
 // 添加背景图片URL
 const bgUrl = 'https://picsum.photos/1920/1080?blur=5'; // 使用模糊效果的背景图，也可以导入本地图片
 
@@ -229,7 +226,7 @@ const article = ref({
       scores = torch.matmul(query, key.transpose(-2, -1)) / math.sqrt(d_k)
       
       # 应用mask（如果提供）
-      if mask is not None:
+      if mask is notNone:
           scores = scores.masked_fill(mask == 0, -1e9)
       
       # Softmax归一化
@@ -432,11 +429,6 @@ const formatDate = (dateString) => {
     return `${year}-${month}-${day}`;
 };
 
-// 滚动到评论区
-const scrollToComments = () => {
-    document.querySelector('.comments-section').scrollIntoView({ behavior: 'smooth' });
-};
-
 // 返回顶部
 const scrollToTop = () => {
     window.scrollTo({
@@ -507,14 +499,91 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+.article-page.dark {
+    --article-bg: rgba(25, 25, 35, 0.8);
+    --article-text: #ffffff;
+    --article-secondary: rgba(255, 255, 255, 0.8);
+    --article-tertiary: rgba(255, 255, 255, 0.6);
+    --heading-color: #e1e6fa;
+    --card-bg: rgba(40, 40, 50, 0.8);
+    --card-shadow: rgba(0, 0, 0, 0.25);
+    --card-border: rgba(255, 255, 255, 0.1);
+    --accent-color: #7a92e6;
+    --tag-bg: rgba(40, 40, 60, 0.7);
+    --tag-text: #ffffff;
+    --divider-color: rgba(255, 255, 255, 0.1);
+    --title-gradient: linear-gradient(45deg, #a0b8ff, #7a92e6);
+    --title-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    --btn-primary-bg: #7a92e6;
+    --btn-primary-text: #ffffff;
+    --btn-hover-bg: #8da3f7;
+    --icon-color: rgba(255, 255, 255, 0.7);
+    --code-bg: rgba(30, 30, 40, 0.95);
+    --blockquote-border: #7a92e6;
+    --blockquote-bg: rgba(122, 146, 230, 0.1);
+    --scrollbar-track: rgba(30, 30, 40, 0.8);
+    --scrollbar-thumb: rgba(255, 255, 255, 0.2);
+    --content-wrapper-bg: rgba(30, 30, 45, 0.75);
+    --overlay-gradient: linear-gradient(to bottom, rgba(20, 20, 30, 0.85), rgba(10, 10, 18, 0.9));
+    --comment-bg: rgba(255, 255, 255, 0.05);
+    --comment-border: rgba(255, 255, 255, 0.1);
+    --comment-text: rgba(255, 255, 255, 0.95);
+    --actions-bar-bg: rgba(30, 30, 45, 0.5);
+    --actions-bar-border: rgba(255, 255, 255, 0.12);
+    --summary-bg: rgba(255, 255, 255, 0.05);
+}
+
+.article-page.light {
+    --article-bg: rgba(255, 255, 255, 0.9);
+    --article-text: #333333;
+    --article-secondary: rgba(0, 0, 0, 0.7);
+    --article-tertiary: rgba(0, 0, 0, 0.5);
+    --heading-color: #2c3e50;
+    --card-bg: rgba(255, 255, 255, 0.95);
+    --card-shadow: rgba(0, 0, 0, 0.1);
+    --card-border: rgba(0, 0, 0, 0.1);
+    --accent-color: #4a6cb3;
+    --tag-bg: rgba(240, 240, 255, 0.8);
+    --tag-text: #333333;
+    --divider-color: rgba(0, 0, 0, 0.1);
+    --title-gradient: linear-gradient(45deg, #2c3e50, #4a6cb3);
+    --title-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    --btn-primary-bg: #4a6cb3;
+    --btn-primary-text: #ffffff;
+    --btn-hover-bg: #5d7ec4;
+    --icon-color: rgba(0, 0, 0, 0.6);
+    --code-bg: rgba(245, 245, 250, 0.95);
+    --blockquote-border: #4a6cb3;
+    --blockquote-bg: rgba(74, 108, 179, 0.05);
+    --scrollbar-track: rgba(240, 240, 245, 0.8);
+    --scrollbar-thumb: rgba(0, 0, 0, 0.15);
+    --content-wrapper-bg: rgba(255, 255, 255, 0.85);
+    --overlay-gradient: linear-gradient(to bottom, rgba(245, 245, 250, 0.5), rgba(235, 235, 240, 0.8));
+    --comment-bg: rgba(0, 0, 0, 0.03);
+    --comment-border: rgba(0, 0, 0, 0.1);
+    --comment-text: rgba(0, 0, 0, 0.8);
+    --actions-bar-bg: rgba(240, 240, 245, 0.7);
+    --actions-bar-border: rgba(0, 0, 0, 0.08);
+    --summary-bg: rgba(0, 0, 0, 0.03);
+}
+
+/* 让背景图片在深色模式下变暗 */
+.dim-bg {
+    filter: brightness(0.5);
+}
+
+.article-page {
+    position: relative;
+    min-height: 100vh;
+    color: var(--article-text);
+}
+
 .article-container {
     width: 100%;
     min-height: 100vh;
-    color: white;
+    color: var(--article-text);
     font-family: 'Helvetica Neue', Arial, sans-serif;
     position: relative;
-    padding-bottom: 80px;
-    /* 为底部操作栏留出空间 */
 }
 
 /* 添加背景图片样式 */
@@ -529,7 +598,7 @@ onUnmounted(() => {
     z-index: -2;
 }
 
-/* 为页面添加深色蒙层以增加文字与背景的对比度 */
+/* 为页面添加蒙层以增加文字与背景的对比度 */
 .article-container::before {
     content: '';
     position: fixed;
@@ -537,7 +606,7 @@ onUnmounted(() => {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(to bottom, rgba(20, 20, 30, 0.85), rgba(10, 10, 18, 0.9));
+    background: var(--overlay-gradient);
     z-index: -1;
 }
 
@@ -589,6 +658,7 @@ onUnmounted(() => {
     transform: translateY(20px);
     opacity: 0;
     animation: fadeInUp 0.6s forwards;
+    color: white;
 }
 
 .article-title-floating {
@@ -601,15 +671,15 @@ onUnmounted(() => {
     transform: translateY(20px);
     opacity: 0;
     animation: fadeInUp 0.8s forwards 0.3s;
+    color: white;
 }
 
 /* 文章内容区域 - 添加半透明背景 */
 .article-content-wrapper {
     max-width: 1200px;
-    /* 增加宽度与Index页面一致 */
     width: 90%;
     margin: 0 auto;
-    background-color: rgba(30, 30, 45, 0.75);
+    background-color: var(--content-wrapper-bg);
     backdrop-filter: blur(10px);
     border-radius: 16px;
     padding: 50px;
@@ -619,13 +689,13 @@ onUnmounted(() => {
     transform: translateY(20px);
     opacity: 0;
     animation: fadeInUp 1s forwards 0.6s;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--card-border);
 }
 
 .article-header {
     margin-bottom: 30px;
     padding-bottom: 30px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    border-bottom: 1px solid var(--divider-color);
 }
 
 .article-title {
@@ -633,11 +703,11 @@ onUnmounted(() => {
     font-weight: 700;
     margin: 0 0 25px 0;
     line-height: 1.3;
-    background: linear-gradient(45deg, #ffffff, #a0b8e0);
+    background: var(--title-gradient);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    text-shadow: var(--title-shadow);
 }
 
 .article-info {
@@ -657,7 +727,7 @@ onUnmounted(() => {
     height: 48px;
     border-radius: 50%;
     margin-right: 15px;
-    border: 2px solid rgba(255, 255, 255, 0.1);
+    border: 2px solid var(--card-border);
 }
 
 .author-details {
@@ -669,11 +739,13 @@ onUnmounted(() => {
     font-size: 16px;
     font-weight: 600;
     margin-bottom: 5px;
+    color: var(--article-text);
 }
 
 .article-date {
     font-size: 14px;
     opacity: 0.7;
+    color: var(--article-tertiary);
 }
 
 .article-stats {
@@ -686,11 +758,13 @@ onUnmounted(() => {
     align-items: center;
     font-size: 14px;
     opacity: 0.8;
+    color: var(--article-secondary);
 }
 
 .stat-item i {
     margin-right: 6px;
     font-size: 16px;
+    color: var(--icon-color);
 }
 
 .article-tags {
@@ -704,12 +778,14 @@ onUnmounted(() => {
     border-radius: 20px;
     font-size: 12px;
     font-weight: 500;
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: var(--tag-bg);
+    color: var(--tag-text);
     transition: all 0.3s ease;
 }
 
 .tag:hover {
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: var(--accent-color);
+    color: white;
     transform: translateY(-2px);
 }
 
@@ -717,8 +793,7 @@ onUnmounted(() => {
 .article-content {
     font-size: 16px;
     line-height: 1.8;
-    color: rgba(255, 255, 255, 0.95);
-    /* 更亮一些，提高可读性 */
+    color: var(--article-text);
 }
 
 /* 覆盖 Markdown 样式 */
@@ -726,24 +801,22 @@ onUnmounted(() => {
     font-size: 2rem;
     margin: 1.5em 0 0.8em;
     position: relative;
-    color: white;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    color: var(--heading-color);
+    text-shadow: var(--title-shadow);
 }
 
 :deep(h2) {
     font-size: 1.6rem;
     margin: 1.4em 0 0.8em;
     position: relative;
-    color: #e0e6f9;
-    /* 略微带蓝的白色，增加层次感 */
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    color: var(--heading-color);
+    text-shadow: var(--title-shadow);
 }
 
 :deep(h3) {
     font-size: 1.3rem;
     margin: 1.3em 0 0.7em;
-    color: #d0d9f9;
-    /* 比h2更暗一些 */
+    color: var(--heading-color);
 }
 
 :deep(h1::after),
@@ -754,17 +827,19 @@ onUnmounted(() => {
     left: 0;
     width: 40px;
     height: 2px;
-    background: linear-gradient(90deg, rgba(84, 112, 198, 0.7), rgba(255, 255, 255, 0));
+    background: linear-gradient(90deg, var(--accent-color), transparent);
 }
 
 :deep(p) {
     margin: 1.2em 0;
+    color: var(--article-text);
 }
 
 :deep(ul),
 :deep(ol) {
     margin: 1em 0;
     padding-left: 1.5em;
+    color: var(--article-text);
 }
 
 :deep(li) {
@@ -772,23 +847,22 @@ onUnmounted(() => {
 }
 
 :deep(code) {
-    background-color: rgba(30, 34, 42, 0.9);
+    background-color: var(--code-bg);
     padding: 0.2em 0.4em;
     border-radius: 3px;
     font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
     font-size: 0.9em;
-    color: #e3e8ff;
-    /* 确保代码文本清晰可见 */
+    color: var(--article-secondary);
 }
 
 :deep(pre) {
-    background-color: rgba(30, 34, 42, 0.9);
+    background-color: var(--code-bg);
     padding: 1em;
     border-radius: 8px;
     overflow-x: auto;
     margin: 1.5em 0;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--card-border);
+    box-shadow: 0 4px 15px var(--card-shadow);
 }
 
 :deep(pre code) {
@@ -797,14 +871,16 @@ onUnmounted(() => {
     border-radius: 0;
     font-size: 0.9em;
     line-height: 1.5;
+    color: var(--article-text);
 }
 
 :deep(blockquote) {
     margin: 1.5em 0;
     padding: 0.8em 1em 0.8em 1.5em;
-    border-left: 4px solid rgba(84, 112, 198, 0.7);
-    background-color: rgba(255, 255, 255, 0.05);
+    border-left: 4px solid var(--blockquote-border);
+    background-color: var(--blockquote-bg);
     border-radius: 0 8px 8px 0;
+    color: var(--article-secondary);
 }
 
 :deep(table) {
@@ -813,40 +889,40 @@ onUnmounted(() => {
     margin: 1.5em 0;
     overflow: hidden;
     border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--card-border);
 }
 
 :deep(th),
 :deep(td) {
     padding: 0.75em 1em;
     text-align: left;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid var(--card-border);
 }
 
 :deep(th) {
-    background-color: rgba(40, 44, 52, 0.8);
+    background-color: var(--tag-bg);
     font-weight: 600;
+    color: var(--article-text);
 }
 
 :deep(tr:nth-child(even)) {
-    background-color: rgba(255, 255, 255, 0.03);
+    background-color: var(--blockquote-bg);
 }
 
 :deep(a) {
-    color: #7a92e6;
-    /* 更亮的链接颜色 */
+    color: var(--accent-color);
     text-decoration: none;
     transition: all 0.2s;
     border-bottom: 1px dashed rgba(122, 146, 230, 0.5);
 }
 
 :deep(a:hover) {
-    color: #a0b8ff;
-    /* 悬停时更亮 */
-    border-bottom: 1px solid rgba(160, 184, 255, 0.8);
+    color: var(--btn-hover-bg);
+    border-bottom: 1px solid var(--btn-hover-bg);
 }
 
-:deep(img) {
+/* 修改后 */
+.article-content :deep(img) {
     max-width: 100%;
     border-radius: 8px;
     margin: 1.5em 0;
@@ -864,13 +940,13 @@ onUnmounted(() => {
     content: '';
     flex-grow: 1;
     height: 1px;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--divider-color);
 }
 
 .divider-icon {
     margin: 0 15px;
     font-size: 16px;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--article-tertiary);
 }
 
 /* 评论区域 */
@@ -883,6 +959,7 @@ onUnmounted(() => {
     margin-bottom: 30px;
     position: relative;
     display: inline-block;
+    color: var(--heading-color);
 }
 
 .section-title::after {
@@ -892,7 +969,7 @@ onUnmounted(() => {
     left: 0;
     width: 50%;
     height: 2px;
-    background: linear-gradient(90deg, rgba(84, 112, 198, 0.7), rgba(255, 255, 255, 0));
+    background: linear-gradient(90deg, var(--accent-color), transparent);
 }
 
 .comment-input-container {
@@ -912,6 +989,7 @@ onUnmounted(() => {
     height: 100%;
     border-radius: 50%;
     object-fit: cover;
+    border: 1px solid var(--card-border);
 }
 
 .comment-input-wrapper {
@@ -924,10 +1002,10 @@ onUnmounted(() => {
     width: 100%;
     min-height: 100px;
     padding: 15px;
-    background-color: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: var(--comment-bg);
+    border: 1px solid var(--comment-border);
     border-radius: 8px;
-    color: white;
+    color: var(--article-text);
     font-size: 15px;
     resize: none;
     transition: all 0.3s ease;
@@ -936,8 +1014,8 @@ onUnmounted(() => {
 
 .comment-input:focus {
     outline: none;
-    background-color: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
+    background-color: var(--comment-bg);
+    border-color: var(--accent-color);
     box-shadow: 0 0 0 2px rgba(84, 112, 198, 0.3);
 }
 
@@ -969,28 +1047,29 @@ onUnmounted(() => {
 
 .cancel-btn {
     background-color: transparent;
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--article-tertiary);
 }
 
 .cancel-btn:hover {
-    color: white;
-    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--article-text);
+    background-color: var(--comment-bg);
 }
 
 .submit-btn {
-    background-color: rgba(84, 112, 198, 0.6);
-    color: white;
+    background-color: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
 }
 
 .submit-btn:hover {
-    background-color: rgba(84, 112, 198, 0.8);
+    background-color: var(--btn-hover-bg);
     transform: translateY(-2px);
 }
 
 .submit-btn:disabled {
-    background-color: rgba(84, 112, 198, 0.3);
+    background-color: var(--comment-border);
     cursor: not-allowed;
     transform: none;
+    opacity: 0.5;
 }
 
 .comments-list {
@@ -1002,7 +1081,7 @@ onUnmounted(() => {
     gap: 15px;
     margin-bottom: 25px;
     padding-bottom: 25px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid var(--divider-color);
     transition: all 0.3s ease;
 }
 
@@ -1023,17 +1102,20 @@ onUnmounted(() => {
 .comment-author {
     font-weight: 600;
     font-size: 15px;
+    color: var(--article-text);
 }
 
 .comment-date {
     font-size: 13px;
     opacity: 0.7;
+    color: var(--article-tertiary);
 }
 
 .comment-text {
     margin: 0;
     line-height: 1.6;
     font-size: 15px;
+    color: var(--comment-text);
 }
 
 .comment-actions-row {
@@ -1048,12 +1130,12 @@ onUnmounted(() => {
     gap: 6px;
     cursor: pointer;
     font-size: 13px;
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--article-tertiary);
     transition: all 0.2s ease;
 }
 
 .comment-action:hover {
-    color: white;
+    color: var(--accent-color);
     transform: translateY(-2px);
 }
 
@@ -1072,7 +1154,7 @@ onUnmounted(() => {
     align-items: center;
     justify-content: center;
     padding: 50px 0;
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--article-tertiary);
     text-align: center;
 }
 
@@ -1082,100 +1164,115 @@ onUnmounted(() => {
     opacity: 0.5;
 }
 
-/* 底部操作栏 - 减小高度并增强视觉效果 */
+/* 修改操作栏样式 */
 .article-actions-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
+    position: relative;
     width: 100%;
-    background-color: rgba(25, 25, 40, 0.9);
-    backdrop-filter: blur(12px);
-    border-top: 1px solid rgba(255, 255, 255, 0.15);
-    z-index: 100;
-    transition: transform 0.3s ease;
-    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);
+    background-color: var(--actions-bar-bg);
+    backdrop-filter: blur(8px);
+    border-radius: 12px;
+    border: 1px solid var(--actions-bar-border);
+    margin: 30px 0;
+    padding: 15px 0;
+    box-shadow: 0 4px 15px var(--card-shadow);
 }
 
-/* 调整底部操作栏与文章宽度保持一致 */
-.actions-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-around;
-    padding: 8px 0;
-}
-
-/* 修改按钮为左图标右文字布局 */
+/* 操作栏按钮 */
 .action-btn {
     display: flex;
-    flex-direction: row;
-    /* 改为水平布局 */
+    flex-direction: column;
     align-items: center;
     gap: 8px;
-    /* 图标和文字的间距 */
     cursor: pointer;
     transition: all 0.3s ease;
-    padding: 5px 10px;
-    /* 按钮内边距 */
+    color: var(--article-text);
 }
 
 .action-btn:hover {
     transform: translateY(-3px);
-    /* 略微减小悬停效果 */
 }
 
 .action-icon-wrapper {
-    width: 32px;
-    /* 减小图标容器尺寸 */
-    height: 32px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.15);
     display: flex;
     align-items: center;
     justify-content: center;
+    background-color: var(--comment-bg);
+    border: 1px solid var(--comment-border);
     transition: all 0.3s ease;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.action-icon-wrapper:hover {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    color: white;
 }
 
 .action-icon-wrapper.liked {
-    background-color: rgba(233, 30, 99, 0.3);
-    color: #ff6090;
-    box-shadow: 0 0 10px rgba(233, 30, 99, 0.4);
+    background-color: rgba(233, 30, 99, 0.2);
+    border-color: rgba(233, 30, 99, 0.5);
+    color: #e91e63;
 }
 
-.action-btn span {
-    font-size: 14px;
-    /* 略微增大文字尺寸 */
-    color: rgba(255, 255, 255, 0.8);
+/* 调整底部操作栏与文章宽度保持一致 */
+.actions-container {
+    max-width: 100%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    gap: 40px;
 }
 
-/* 图标 */
-.icon-heart::before {
-    content: '♥';
+/* 图标 - 使用背景图片替代文本符号 */
+.icon-heart,
+.icon-comment,
+.icon-bookmark,
+.icon-share,
+.icon-eye,
+.icon-reply,
+.icon-arrow-up {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    vertical-align: middle;
 }
 
-.icon-comment::before {
-    content: '💬';
+.icon-heart {
+    background-image: url('@/assets/icons/heart.png');
 }
 
-.icon-bookmark::before {
-    content: '🔖';
+.icon-comment {
+    background-image: url('@/assets/icons/comment.png');
 }
 
-.icon-share::before {
-    content: '🔗';
+.icon-bookmark {
+    background-image: url('@/assets/icons/bookmark.png');
 }
 
-.icon-eye::before {
-    content: '👁️';
+.icon-share {
+    background-image: url('@/assets/icons/share.png');
 }
 
-.icon-reply::before {
-    content: '↩️';
+.icon-eye {
+    background-image: url('@/assets/icons/eye.png');
 }
 
-.icon-arrow-up::before {
-    content: '↑';
+.icon-reply {
+    background-image: url('@/assets/icons/reply.png');
+}
+
+.icon-arrow-up {
+    background-image: url('@/assets/icons/arrow-up.png');
+}
+
+/* 点赞状态的心形图标 */
+.icon-heart.active {
+    background-image: url('@/assets/icons/heart-filled.png');
 }
 
 /* 返回顶部按钮 */
@@ -1185,7 +1282,7 @@ onUnmounted(() => {
     right: 30px;
     width: 50px;
     height: 50px;
-    background-color: rgba(84, 112, 198, 0.7);
+    background-color: var(--accent-color);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -1195,12 +1292,13 @@ onUnmounted(() => {
     transform: translateY(20px);
     transition: all 0.3s ease;
     z-index: 90;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 5px 15px var(--card-shadow);
+    border: 1px solid var(--card-border);
+    color: white;
 }
 
 .back-to-top:hover {
-    background-color: rgba(84, 112, 198, 0.8);
+    background-color: var(--btn-hover-bg);
     transform: translateY(-5px);
 }
 
@@ -1227,14 +1325,15 @@ onUnmounted(() => {
 }
 
 .share-modal-content {
-    background-color: rgba(30, 30, 40, 0.95);
+    background-color: var(--card-bg);
     border-radius: 12px;
     padding: 30px;
     width: 90%;
     max-width: 500px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 30px var(--card-shadow);
     transform: scale(0.9);
     animation: scaleIn 0.3s forwards;
+    color: var(--article-text);
 }
 
 .share-modal h3 {
@@ -1242,6 +1341,7 @@ onUnmounted(() => {
     margin-bottom: 20px;
     font-size: 1.5rem;
     text-align: center;
+    color: var(--heading-color);
 }
 
 .share-options {
@@ -1293,6 +1393,7 @@ onUnmounted(() => {
 
 .share-option span {
     font-size: 13px;
+    color: var(--article-text);
 }
 
 .close-modal-btn {
@@ -1300,8 +1401,8 @@ onUnmounted(() => {
     width: 100%;
     padding: 12px;
     border: none;
-    background-color: rgba(255, 255, 255, 0.1);
-    color: white;
+    background-color: var(--comment-bg);
+    color: var(--article-text);
     border-radius: 8px;
     font-size: 15px;
     cursor: pointer;
@@ -1309,7 +1410,32 @@ onUnmounted(() => {
 }
 
 .close-modal-btn:hover {
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: var(--accent-color);
+    color: white;
+}
+
+.home-theme-toggler {
+    position: fixed;
+    bottom: 30px;
+    left: 30px;
+    z-index: 1000;
+}
+
+/* 添加摘要样式 */
+.article-summary {
+    margin: 20px 0;
+    padding: 15px 20px;
+    background-color: var(--summary-bg);
+    border-left: 4px solid var(--accent-color);
+    border-radius: 0 8px 8px 0;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--article-text);
+    font-style: italic;
+}
+
+.article-summary p {
+    margin: 0;
 }
 
 /* 动画 */
@@ -1349,6 +1475,7 @@ onUnmounted(() => {
 @media (max-width: 960px) {
     .article-content-wrapper {
         padding: 30px;
+        max-width: 95%;
     }
 
     .article-title,
@@ -1392,40 +1519,23 @@ onUnmounted(() => {
 
     .actions-container {
         padding: 6px 0;
-        /* 移动端减小内边距 */
+        gap: 25px;
+        /* 在小屏幕上减小间距 */
     }
 
     .action-icon-wrapper {
         width: 28px;
-        /* 移动端减小图标尺寸 */
         height: 28px;
     }
-}
 
-/* 添加摘要样式 */
-.article-summary {
-    margin: 20px 0;
-    padding: 15px 20px;
-    background-color: rgba(255, 255, 255, 0.05);
-    border-left: 4px solid rgba(84, 112, 198, 0.7);
-    border-radius: 0 8px 8px 0;
-    font-size: 16px;
-    line-height: 1.6;
-    color: rgba(255, 255, 255, 0.9);
-    font-style: italic;
-}
-
-.article-summary p {
-    margin: 0;
-}
-
-/* 响应式调整 */
-@media (max-width: 960px) {
-    .article-content-wrapper {
-        padding: 30px;
-        max-width: 95%;
+    .home-theme-toggler {
+        bottom: 20px;
+        left: 20px;
     }
 
-    /* 其他响应式调整保持不变 */
+    .article-actions-bar {
+        padding: 12px 0;
+        margin: 20px 0;
+    }
 }
 </style>

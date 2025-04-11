@@ -92,7 +92,8 @@ const dropChar = (char) => {
     charElement.innerText = char
     charElement.style.position = 'absolute'
     charElement.style.zIndex = '999'
-    charElement.style.color = 'white'
+    //文字颜色根据主题
+    charElement.style.color = currentTheme.value === 'dark' ? '#fff' : '#333'
     charElement.style.fontSize = '20px'
 
     // 添加到固定容器中
@@ -237,8 +238,6 @@ const flyText = (char, i, callback) => {
         flyingContainer.style.overflow = 'hidden'
         flyingContainer.style.pointerEvents = 'none'
         flyingContainer.style.zIndex = '999'
-        //color
-        flyingContainer.style.color = 'white'
         coverElement.appendChild(flyingContainer)
     }
 
@@ -248,6 +247,7 @@ const flyText = (char, i, callback) => {
     charElement.innerText = char
     charElement.style.position = 'absolute'
     charElement.style.zIndex = '999'
+    charElement.style.color = currentTheme.value === 'dark' ? '#fff' : '#333'
 
     // 添加到固定容器中
     flyingContainer.appendChild(charElement)
@@ -279,8 +279,8 @@ const flyText = (char, i, callback) => {
             break
     }
 
-    // 样式设置
-    charElement.style.color = 'white'
+    // 文字颜色根据主题
+    charElement.style.color = currentTheme.value === 'dark' ? '#fff' : '#333'
     charElement.style.fontSize = '20px'
     charElement.style.transition = 'all 0.8s ease-in-out'
 
@@ -591,50 +591,5 @@ body {
     50% {
         transform: translate(0, 5px);
     }
-}
-
-/* 移动端适配 */
-@media screen and (max-width: 768px) {
-    .cover .cover_text {
-        .text1 {
-            font-size: 40px;
-            /* 移动端字体变小 */
-            height: 80px;
-            /* 调整高度 */
-            margin-bottom: 20px;
-            /* 减小间距 */
-        }
-
-        .text2 {
-            font-size: 20px;
-            /* 移动端字体变小 */
-            padding: 10px 0;
-
-            a {
-                margin: 0 10px;
-                /* 减小内边距 */
-            }
-        }
-    }
-}
-
-/* 更小屏幕的适配 */
-@media screen and (max-width: 480px) {
-    .cover .cover_text {
-        .text1 {
-            font-size: 24px;
-            height: 60px;
-        }
-
-        .text2 {
-            font-size: 12px;
-        }
-    }
-}
-
-/* 动态生成的角色元素样式 */
-#flying-chars-container span,
-#dropping-chars-container span {
-    color: var(--char-color) !important;
 }
 </style>
