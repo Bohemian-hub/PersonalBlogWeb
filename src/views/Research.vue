@@ -26,7 +26,7 @@
                             </div>
                             <div class="profile-info">
                                 <h3>{{ profileData.name }}</h3>
-                                <p>{{ profileData.title }}</p>
+                                <p>{{ profileData.info }}</p>
                             </div>
                         </div>
                         <div class="profile-stats">
@@ -176,7 +176,7 @@
                             </div>
                             <div class="profile-info">
                                 <h3>{{ profileData.name }}</h3>
-                                <p>{{ profileData.title }}</p>
+                                <p>{{ profileData.info }}</p>
                             </div>
                         </div>
                         <div class="profile-stats">
@@ -309,13 +309,13 @@ import {
     Timer
 } from '@element-plus/icons-vue'
 import TopBar from '../components/TopBar.vue'
-import bg7Url from '@/assets/images/bg7.png'
+import bg5Url from '@/assets/images/bg5.png'
 import Footer from '../components/Footer.vue'
 import ThemeToggler from '../components/ThemeToggler.vue'
 import { currentTheme } from '../stores/themeStore'
 
 // 背景图片
-const bgUrl = bg7Url
+const bgUrl = bg5Url
 
 // 创建一个响应式变量来控制TopBar的显示和隐藏
 const showTopBar = ref(true)
@@ -343,7 +343,7 @@ onUnmounted(() => {
 // 个人资料数据
 const profileData = ref({
     name: '何东',
-    title: '人工智能与社会伦理研究者',
+    info: '人工智能与社会伦理研究者人工智能与社会伦理研究者人工智能与社会伦理研究者人工智能与社会伦理研究者人工智能与社会伦理研究者人工智能与社会伦理研究者人工智能与社会伦理研究者人工智能与社会伦理研究者',
     avatarUrl: 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png',
     stats: [
         { value: 12, label: '发表论文' },
@@ -612,14 +612,16 @@ const conferences = ref([
 <style scoped>
 /* 主题变量定义 */
 .page-wrapper.dark {
-    --bg-overlay: rgba(20, 20, 30, 0.7);
+    --bg-primary: rgba(25, 25, 35, 0.173);
+    --bg-secondary: rgba(30, 30, 40, 0.416);
+    --bg-tertiary: rgba(96, 96, 106, 0.4);
     --text-color: #ffffff;
     --text-secondary: rgba(255, 255, 255, 0.8);
     --title-gradient: linear-gradient(45deg, #ffffff, #b8c6db);
     --title-shadow: 0 2px 4px rgba(216, 216, 216, 0.5);
     --divider-color: rgba(255, 255, 255, 0.5);
-    --card-bg: rgba(40, 40, 50, 0.85);
-    --card-bg-hover: rgba(50, 50, 65, 0.9);
+    --card-bg: rgba(30, 30, 40, 0.7);
+    --card-bg-hover: rgba(40, 40, 55, 0.8);
     --card-border: rgba(255, 255, 255, 0.1);
     --card-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
     --accent-color: #5a9eff;
@@ -638,14 +640,16 @@ const conferences = ref([
 }
 
 .page-wrapper.light {
-    --bg-overlay: rgba(245, 245, 250, 0.6);
+    --bg-primary: rgba(245, 245, 250, 0.85);
+    --bg-secondary: rgba(255, 255, 255, 0.9);
+    --bg-tertiary: rgba(235, 235, 245, 0.7);
     --text-color: #333333;
     --text-secondary: rgba(0, 0, 0, 0.7);
     --title-gradient: linear-gradient(45deg, #333333, #555555);
     --title-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     --divider-color: rgba(0, 0, 0, 0.2);
-    --card-bg: rgba(255, 255, 255, 0.9);
-    --card-bg-hover: rgba(255, 255, 255, 1);
+    --card-bg: rgba(255, 255, 255, 0.85);
+    --card-bg-hover: rgba(255, 255, 255, 0.95);
     --card-border: rgba(0, 0, 0, 0.1);
     --card-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
     --accent-color: #3a7bd5;
@@ -676,7 +680,7 @@ const conferences = ref([
 }
 
 .bg-image.dim-bg {
-    filter: brightness(0.4) saturate(0.8);
+    filter: brightness(0.9) saturate(0.8);
 }
 
 .page-wrapper {
@@ -694,7 +698,7 @@ const conferences = ref([
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: var(--bg-overlay);
+    /* background-color: var(--bg-overlay); */
     z-index: -1;
 }
 
@@ -783,9 +787,9 @@ const conferences = ref([
     display: block;
 }
 
-/* 内容容器样式更新为浅色半透明 */
+/* 内容容器样式更新为与Index页面一致 */
 .section-container {
-    background-color: var(--card-bg);
+    background-color: var(--bg-primary);
     border-radius: 12px;
     padding: 25px;
     margin-bottom: 30px;
@@ -797,30 +801,16 @@ const conferences = ref([
 }
 
 .section-container:hover {
-    background-color: var(--card-bg-hover);
+    background-color: var(--bg-secondary);
     transform: var(--card-hover-transform);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-}
-
-.section-title {
-    font-size: 22px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 20px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid var(--card-border);
-    color: var(--heading-color);
-}
-
-.section-title .el-icon {
-    color: var(--accent-color);
 }
 
 /* 文章列表 */
 .filter-bar {
     display: flex;
     justify-content: space-between;
+    margin-top: 20px;
     margin-bottom: 20px;
     align-items: center;
 }
@@ -969,6 +959,7 @@ const conferences = ref([
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
     /* 与文章卡片保持一致 */
+    margin-top: 20px;
     gap: 20px;
 }
 
@@ -1075,6 +1066,7 @@ const conferences = ref([
 .academic-resources-compact .resources-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
+    margin-top: 20px;
     gap: 16px;
 }
 
@@ -1127,7 +1119,7 @@ const conferences = ref([
 
 /* 侧边栏卡片 */
 .side-card {
-    background-color: var(--card-bg);
+    background-color: var(--bg-primary);
     border-radius: 12px;
     padding: 20px;
     margin-bottom: 24px;
@@ -1139,7 +1131,7 @@ const conferences = ref([
 }
 
 .side-card:hover {
-    background-color: var(--card-bg-hover);
+    background-color: var(--bg-secondary);
     transform: translateY(-3px);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
@@ -1166,7 +1158,7 @@ const conferences = ref([
 
 .profile-header {
     display: flex;
-    align-items: center;
+    /* align-items: center; */
     margin-bottom: 16px;
 }
 
