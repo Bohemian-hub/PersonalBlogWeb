@@ -25,8 +25,8 @@ import { ref, onMounted, onUnmounted, computed } from 'vue'
 // import bg8Url from '@/assets/images/bg8.png'
 // import bg9Url from '@/assets/images/bg9.png'
 // import bg10Url from '@/assets/images/bg10.png'
-import bg7Url from '@/assets/images/bg7.png'
-const bgUrl = bg7Url
+import bgFile from '@/assets/images/bg7.png'
+const bgUrl = bgFile
 
 // 导入顶部栏组件和封装的Cover组件
 import TopBar from '../components/TopBar.vue'

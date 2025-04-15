@@ -216,7 +216,7 @@ import TopBar from '../components/TopBar.vue'
 import Footer from '../components/Footer.vue'
 import ThemeToggler from '../components/ThemeToggler.vue'
 import { currentTheme } from '../stores/themeStore'
-import bgPlayUrl from '@/assets/images/bg5.png'
+import bgFile from '@/assets/images/bg4.png'
 import { ElMessage } from 'element-plus'
 import PhotoGallery from '../components/PhotoGallery.vue';
 
@@ -230,7 +230,7 @@ const heartIcon = heartFilledIcon
 const commentIcon = commentIconFile
 
 // 背景图片
-const bgUrl = bgPlayUrl
+const bgUrl = bgFile
 
 // 创建一个响应式变量来控制TopBar的显示和隐藏
 const showTopBar = ref(true)

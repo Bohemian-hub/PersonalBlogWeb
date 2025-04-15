@@ -309,13 +309,13 @@ import {
     Timer
 } from '@element-plus/icons-vue'
 import TopBar from '../components/TopBar.vue'
-import bg5Url from '@/assets/images/bg5.png'
+import bgFile from '@/assets/images/bg6.png'
 import Footer from '../components/Footer.vue'
 import ThemeToggler from '../components/ThemeToggler.vue'
 import { currentTheme } from '../stores/themeStore'
 
 // 背景图片
-const bgUrl = bg5Url
+const bgUrl = bgFile
 
 // 创建一个响应式变量来控制TopBar的显示和隐藏
 const showTopBar = ref(true)

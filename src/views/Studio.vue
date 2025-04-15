@@ -268,10 +268,10 @@ import Footer from '../components/Footer.vue'
 import ThemeToggler from '../components/ThemeToggler.vue'
 import { currentTheme } from '../stores/themeStore'
 // 导入背景图片，使用与Research不同的背景
-import bg8Url from '@/assets/images/bg8.png' // 假设有这个图片，如果没有请替换为实际存在的图片
+import bgFile from '@/assets/images/bg5.png' // 假设有这个图片，如果没有请替换为实际存在的图片
 
 // 背景图片
-const bgUrl = bg8Url
+const bgUrl = bgFile
 
 // 筛选和搜索
 const articleFilter = ref('all')
