@@ -23,71 +23,42 @@
 
                 <!-- 照片瀑布流布局 -->
                 <div class="masonry-grid">
-                    <div v-for="(photo, index) in photos" :key="photo.id" class="masonry-item"
+                    <div v-for="(photoGroup, index) in photos" :key="photoGroup.id" class="masonry-item"
                         :class="getMasonryClass(index)" @click="showPhotoGallery(index)">
                         <div class="photo-inner">
-                            <img :src="photo.url" :alt="photo.title" />
+                            <img :src="photoGroup.images[0].url" :alt="photoGroup.title" />
+                            <div class="photo-count" v-if="photoGroup.images.length > 1">
+                                {{ photoGroup.images.length }}
+                            </div>
                             <div class="photo-overlay">
-                                <h4>{{ photo.title }}</h4>
-                                <p>{{ photo.location }}</p>
+                                <h4>{{ photoGroup.title }}</h4>
+                                <!-- //循环显示一下tags -->
+                                <div class="tags"> <!-- 标签之间的间隙 -->
+                                    <el-tag size="small" v-for="tag in photoGroup.tags" :key="tag" class="tag-item">
+                                        {{ tag }}
+                                    </el-tag>
+                                </div>
+                                <p>{{ photoGroup.location }}</p>
+                                <!-- 将照片统计信息移到这里 -->
+                                <div class="photo-stats">
+                                    <div class="stat-item">
+                                        <img :src="heartIcon" alt="likes" class="stat-icon" />
+                                        <span>{{ photoGroup.likes }}</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <img :src="commentIcon" alt="comments" class="stat-icon" />
+                                        <span>{{ photoGroup.comments.length }}</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 照片画廊弹窗 -->
-                <el-dialog v-model="showPhotoDialog" width="85%" class="gallery-dialog" :append-to-body="true">
-                    <div class="gallery-container" v-if="photos.length > 0">
-                        <div class="gallery-slider">
-                            <div class="current-photo">
-                                <img :src="photos[currentPhotoIndex].url" :alt="photos[currentPhotoIndex].title" />
-                            </div>
-                            <div class="photo-controls">
-                                <el-button circle @click="prevPhoto" :disabled="currentPhotoIndex === 0">
-                                    <el-icon>
-                                        <ArrowLeft />
-                                    </el-icon>
-                                </el-button>
-                                <span class="photo-counter">{{ currentPhotoIndex + 1 }} / {{ photos.length }}</span>
-                                <el-button circle @click="nextPhoto"
-                                    :disabled="currentPhotoIndex === photos.length - 1">
-                                    <el-icon>
-                                        <ArrowRight />
-                                    </el-icon>
-                                </el-button>
-                            </div>
-                            <div class="photo-thumbnails">
-                                <div v-for="(photo, idx) in photos" :key="idx" class="thumbnail"
-                                    :class="{ active: idx === currentPhotoIndex }" @click="currentPhotoIndex = idx">
-                                    <img :src="photo.url" :alt="photo.title" />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="gallery-info">
-                            <h3>{{ photos[currentPhotoIndex].title }}</h3>
-                            <div class="info-meta">
-                                <p class="location">
-                                    <el-icon>
-                                        <Location />
-                                    </el-icon>
-                                    {{ photos[currentPhotoIndex].location }}
-                                </p>
-                                <p class="date">
-                                    <el-icon>
-                                        <Calendar />
-                                    </el-icon>
-                                    {{ photos[currentPhotoIndex].date }}
-                                </p>
-                            </div>
-                            <p class="photo-description">{{ photos[currentPhotoIndex].description }}</p>
-                            <div class="photo-tags">
-                                <el-tag size="small" v-for="tag in photos[currentPhotoIndex].tags" :key="tag">
-                                    {{ tag }}
-                                </el-tag>
-                            </div>
-                        </div>
-                    </div>
-                </el-dialog>
+                <!-- 将原来的照片画廊弹窗代码替换为: -->
+                <PhotoGallery v-model:visible="showPhotoDialog" :photos="photos" :initialPhotoIndex="currentPhotoIndex"
+                    :heartFilledIcon="heartIcon" :heartOutlineIcon="heartOutlineIcon" :commentIcon="commentIcon"
+                    :likedPhotoIds="likedPhotos" @like="handlePhotoLike" @comment="handlePhotoComment" />
             </section>
 
             <!-- 主内容区 - 日常生活和音乐收藏左右布局 -->
@@ -247,6 +218,16 @@ import ThemeToggler from '../components/ThemeToggler.vue'
 import { currentTheme } from '../stores/themeStore'
 import bgPlayUrl from '@/assets/images/bg5.png'
 import { ElMessage } from 'element-plus'
+import PhotoGallery from '../components/PhotoGallery.vue';
+
+// 引入点赞和评论图标
+import heartFilledIcon from '@/assets/icons/heart-filled.png'
+import commentIconFile from '@/assets/icons/comment.png'
+import heartOutlineIcon from '@/assets/icons/heart.png' // 假设有一个空心心形图标
+
+// 图标引用
+const heartIcon = heartFilledIcon
+const commentIcon = commentIconFile
 
 // 背景图片
 const bgUrl = bgPlayUrl
@@ -270,70 +251,229 @@ onUnmounted(() => {
     window.removeEventListener('scroll', handleScroll)
 })
 
-// 照片墙数据
+// 照片墙数据 - 添加点赞和评论
 const photos = ref([
     {
         id: 1,
-        url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
         title: '山水之间',
         location: '瑞士阿尔卑斯山',
         date: '2023年7月15日',
-        description: '阿尔卑斯山脉的壮丽景色，湛蓝的天空下，雪山与湖泊构成了一幅完美的自然画卷。',
-        tags: ['旅行', '自然', '山脉']
+        description: '<h1>阿尔卑斯山脉</h1><p>湛蓝的天空下，雪山与湖泊构成了一幅完美的自然画卷。</p><h2>拍摄体验</h2><p>在海拔3000米的山顶，寒冷但壮观的景色让人屏息。</p>',
+        tags: ['旅行', '自然', '山脉'],
+        likes: 128,
+        comments: [
+            {
+                author: '旅行者小李',
+                avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
+                text: '太美了！我也去过这里，景色确实令人震撼',
+                time: '2小时前'
+            },
+            {
+                author: '摄影师大卫',
+                avatar: 'https://randomuser.me/api/portraits/men/75.jpg',
+                text: '构图非常棒，请问用的什么镜头拍摄的？',
+                time: '1天前'
+            }
+        ],
+        images: [
+            {
+                url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '阿尔卑斯山全景'
+            },
+            {
+                url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '山顶日出'
+            },
+            {
+                url: 'https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '山间小屋'
+            }
+        ]
     },
     {
         id: 2,
-        url: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
         title: '晨光早餐',
         location: '巴黎咖啡馆',
         date: '2023年8月3日',
-        description: '在巴黎街头的小咖啡馆享用的丰盛早餐，阳光透过窗户撒在桌上，温暖而惬意。',
-        tags: ['美食', '旅行', '早餐']
+        description: '<h1>巴黎的早晨</h1><p>在巴黎街头的小咖啡馆享用的丰盛早餐，阳光透过窗户撒在桌上，温暖而惬意。</p><p>这是我在欧洲旅行中最喜欢的一餐。</p>',
+        tags: ['美食', '旅行', '早餐'],
+        likes: 85,
+        comments: [
+            {
+                author: '美食博主',
+                avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
+                text: '看起来太美味了！巴黎的早餐真的很精致',
+                time: '5小时前'
+            }
+        ],
+        images: [
+            {
+                url: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '法式早餐'
+            },
+            {
+                url: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '咖啡和可颂'
+            }
+        ]
     },
     {
         id: 3,
-        url: 'https://images.unsplash.com/photo-1493246507139-91e8fad9978e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
         title: '傍晚海滩',
         location: '巴厘岛库塔海滩',
         date: '2023年9月20日',
-        description: '夕阳西下，海浪轻拍沙滩，天空被染成金色和紫色，这是一天中最美的时刻。',
-        tags: ['旅行', '海滩', '夕阳']
+        description: '<h1>巴厘岛落日</h1><p>夕阳西下，海浪轻拍沙滩，天空被染成金色和紫色，这是一天中最美的时刻。</p><h2>摄影笔记</h2><p>使用了长曝光技术捕捉海浪的柔和线条。</p>',
+        tags: ['旅行', '海滩', '夕阳'],
+        likes: 216,
+        comments: [
+            {
+                author: '岛主小王',
+                avatar: 'https://randomuser.me/api/portraits/men/22.jpg',
+                text: '巴厘岛是我最爱的度假胜地，这张照片拍得太棒了',
+                time: '3天前'
+            },
+            {
+                author: '摄影爱好者',
+                avatar: 'https://randomuser.me/api/portraits/women/90.jpg',
+                text: '长曝光效果很赞，水面看起来如丝绸般顺滑',
+                time: '5天前'
+            },
+            {
+                author: '旅行达人',
+                avatar: 'https://randomuser.me/api/portraits/men/45.jpg',
+                text: '我也计划这个月去巴厘岛，有什么好的建议吗？',
+                time: '1周前'
+            }
+        ],
+        images: [
+            {
+                url: 'https://images.unsplash.com/photo-1493246507139-91e8fad9978e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '夕阳海滩'
+            },
+            {
+                url: 'https://images.unsplash.com/photo-1519046904884-53103b34b206?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '海滩冲浪'
+            },
+            {
+                url: 'https://images.unsplash.com/photo-1519882189396-71b93cb121af?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '沙滩漫步'
+            },
+            {
+                url: 'https://images.unsplash.com/photo-1484821582734-6692f7b1c954?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '热带风情'
+            }
+        ]
     },
     {
         id: 4,
-        url: 'https://images.unsplash.com/photo-1549880338-65ddcdfd017b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
         title: '冰川湖泊',
         location: '新西兰',
         date: '2022年12月10日',
-        description: '澄澈的湖水映照着雪山，宛如一面巨大的镜子，反射出大自然的壮丽景色。',
-        tags: ['自然', '湖泊', '雪山']
+        description: '<h1>新西兰的纯净之美</h1><p>澄澈的湖水映照着雪山，宛如一面巨大的镜子，反射出大自然的壮丽景色。</p><p>这是我见过最纯净的湖水。</p>',
+        tags: ['自然', '湖泊', '雪山'],
+        likes: 143,
+        comments: [],
+        images: [
+            {
+                url: 'https://images.unsplash.com/photo-1549880338-65ddcdfd017b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '冰川湖全景'
+            }
+        ]
     },
     {
         id: 5,
-        url: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
         title: '精致晚餐',
         location: '东京米其林餐厅',
         date: '2023年5月7日',
-        description: '米其林三星餐厅的招牌料理，不仅美味而且摆盘精致，是一场视觉与味觉的盛宴。',
-        tags: ['美食', '晚餐', '日料']
+        description: '<h1>料理艺术</h1><p>米其林三星餐厅的招牌料理，不仅美味而且摆盘精致，是一场视觉与味觉的盛宴。</p><h2>菜品介绍</h2><p>主厨特制的和牛配松露，采用特殊的低温烹饪技术。</p>',
+        tags: ['美食', '晚餐', '日料'],
+        likes: 92,
+        comments: [
+            {
+                author: '美食评论家',
+                avatar: 'https://randomuser.me/api/portraits/women/68.jpg',
+                text: '这家餐厅我也去过，主厨的手艺确实令人惊叹',
+                time: '2天前'
+            }
+        ],
+        images: [
+            {
+                url: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '精致前菜'
+            },
+            {
+                url: 'https://images.unsplash.com/photo-1502364271109-0a9a75a2a9df?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '主菜'
+            },
+            {
+                url: 'https://images.unsplash.com/photo-1554318046-bedf6e46ec48?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '甜点'
+            }
+        ]
     },
     {
         id: 6,
-        url: 'https://images.unsplash.com/photo-1517331156700-3c241d2b4d83?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
         title: '书房一隅',
         location: '家',
         date: '2023年10月5日',
-        description: '周末午后，阳光洒进书房，一本书，一杯茶，构成了最惬意的时光。',
-        tags: ['日常', '读书', '生活']
+        description: '<h1>阅读时光</h1><p>周末午后，阳光洒进书房，一本书，一杯茶，构成了最惬意的时光。</p><p>这是我的私人阅读空间，每个周末都会在这里度过几小时。</p>',
+        tags: ['日常', '读书', '生活'],
+        likes: 76,
+        comments: [
+            {
+                author: '书虫一枚',
+                avatar: 'https://randomuser.me/api/portraits/women/33.jpg',
+                text: '好温馨的阅读角落！请问书架上是什么书呢？',
+                time: '1天前'
+            },
+            {
+                author: '设计师小刘',
+                avatar: 'https://randomuser.me/api/portraits/men/91.jpg',
+                text: '空间布置得很舒适，阳光角度也刚刚好',
+                time: '3天前'
+            }
+        ],
+        images: [
+            {
+                url: 'https://images.unsplash.com/photo-1517331156700-3c241d2b4d83?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '书架'
+            },
+            {
+                url: 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '阅读角落'
+            }
+        ]
     },
     {
         id: 7,
-        url: 'https://images.unsplash.com/photo-1528702748617-c64d49f918af?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
         title: '老城街景',
         location: '布拉格老城区',
         date: '2022年9月18日',
-        description: '历史悠久的老城区，石板路和古老建筑诉说着几个世纪的故事，漫步其中如同穿越时光。',
-        tags: ['旅行', '城市', '历史']
+        description: '<h1>走进历史</h1><p>历史悠久的老城区，石板路和古老建筑诉说着几个世纪的故事，漫步其中如同穿越时光。</p><h2>布拉格印象</h2><p>红色的屋顶，狭窄的巷道，每一个转角都是一幅画。</p>',
+        tags: ['旅行', '城市', '历史'],
+        likes: 105,
+        comments: [
+            {
+                author: '历史爱好者',
+                avatar: 'https://randomuser.me/api/portraits/men/52.jpg',
+                text: '布拉格是欧洲最美的城市之一，充满了历史感',
+                time: '4天前'
+            }
+        ],
+        images: [
+            {
+                url: 'https://images.unsplash.com/photo-1528702748617-c64d49f918af?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '老城广场'
+            },
+            {
+                url: 'https://images.unsplash.com/photo-1541849546-216549ae216d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '查理大桥'
+            },
+            {
+                url: 'https://images.unsplash.com/photo-1458150945447-7fb764c11a92?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '天文钟'
+            }
+        ]
     }
 ])
 
@@ -352,22 +492,66 @@ const getMasonryClass = (index) => {
 // 照片详情弹窗
 const showPhotoDialog = ref(false)
 const currentPhotoIndex = ref(0)
+const currentImageIndex = ref(0)
+const newComment = ref('')
+const likedPhotos = ref([]) // 存储已点赞的照片ID
+
+// 当前照片组
+const currentPhotoGroup = computed(() => photos.value[currentPhotoIndex.value])
+
+// 当前显示的照片URL
+const currentPhotoUrl = computed(() => {
+    const group = currentPhotoGroup.value
+    if (group && group.images && group.images.length > currentImageIndex.value) {
+        return group.images[currentImageIndex.value].url
+    }
+    return ''
+})
 
 const showPhotoGallery = (index) => {
     currentPhotoIndex.value = index
+    currentImageIndex.value = 0
     showPhotoDialog.value = true
 }
 
 const nextPhoto = () => {
-    if (currentPhotoIndex.value < photos.value.length - 1) {
-        currentPhotoIndex.value++
+    if (currentImageIndex.value < currentPhotoGroup.value.images.length - 1) {
+        currentImageIndex.value++
     }
 }
 
 const prevPhoto = () => {
-    if (currentPhotoIndex.value > 0) {
-        currentPhotoIndex.value--
+    if (currentImageIndex.value > 0) {
+        currentImageIndex.value--
     }
+}
+
+// 检查当前照片是否已点赞
+const isLiked = computed(() => {
+    return likedPhotos.value.includes(currentPhotoGroup.value.id)
+})
+
+// 替换原来的 toggleLike 和 addComment 方法
+const handlePhotoLike = (photoId) => {
+  const photoIndex = photos.value.findIndex(photo => photo.id === photoId);
+  if (photoIndex === -1) return;
+  
+  if (likedPhotos.value.includes(photoId)) {
+    // 取消点赞
+    likedPhotos.value = likedPhotos.value.filter(id => id !== photoId);
+    photos.value[photoIndex].likes--;
+  } else {
+    // 添加点赞
+    likedPhotos.value.push(photoId);
+    photos.value[photoIndex].likes++;
+  }
+}
+
+const handlePhotoComment = ({ photoId, comment }) => {
+  const photoIndex = photos.value.findIndex(photo => photo.id === photoId);
+  if (photoIndex === -1) return;
+  
+  photos.value[photoIndex].comments.unshift(comment);
 }
 
 // 日常生活文章数据 - 合并了旅行日记、兴趣爱好和书影推荐
@@ -455,15 +639,25 @@ const allArticles = ref([
     }
 ])
 
-// 分页控制 - 确保每页只有3个文章
-const articlesPerPage = 3
+// 分页控制 - 修改每页文章数量，适配不同设备
+const getArticlesPerPage = () => {
+    // 根据屏幕宽度返回不同的文章数
+    return window.innerWidth <= 768 ? 4 : 3
+}
+
+const articlesPerPage = ref(getArticlesPerPage())
 const currentPage = ref(1)
-const totalPages = computed(() => Math.ceil(allArticles.value.length / articlesPerPage))
+const totalPages = computed(() => Math.ceil(allArticles.value.length / articlesPerPage.value))
+
+// 更新每页文章数量
+const updateArticlesPerPage = () => {
+    articlesPerPage.value = getArticlesPerPage()
+}
 
 // 当前页显示的文章
 const lifeArticles = computed(() => {
-    const start = (currentPage.value - 1) * articlesPerPage
-    const end = start + articlesPerPage
+    const start = (currentPage.value - 1) * articlesPerPage.value
+    const end = start + articlesPerPage.value
     return allArticles.value.slice(start, end)
 })
 
@@ -637,7 +831,15 @@ watch(currentTrackIndex, () => {
 
 // 组件挂载时加载第一首曲目
 onMounted(() => {
-    loadTrack();
+    window.addEventListener('resize', updateArticlesPerPage)
+    updateArticlesPerPage() // 初始化设置
+    loadTrack() // 音乐播放器初始化
+})
+
+// 组件卸载时移除监听
+onUnmounted(() => {
+    window.removeEventListener('scroll', handleScroll)
+    window.removeEventListener('resize', updateArticlesPerPage)
 })
 </script>
 
@@ -900,6 +1102,23 @@ onMounted(() => {
     transition: transform 0.3s ease;
 }
 
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.tag-item {
+    background: var(--tag-bg);
+    color: var(--tag-text);
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    margin-right: 5px;
+}
+
 .masonry-item:hover .photo-overlay {
     transform: translateY(0);
 }
@@ -913,6 +1132,52 @@ onMounted(() => {
     margin: 0;
     font-size: 14px;
     opacity: 0.9;
+}
+
+/* 添加照片数量标签样式 */
+.photo-count {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 8px;
+    border-radius: 12px;
+    z-index: 2;
+}
+
+/* 照片点赞和评论数量样式 */
+.photo-stats {
+    /* 删除旧的绝对定位样式 */
+    position: static;
+    display: flex;
+    gap: 10px;
+    opacity: 1;
+    /* 改为始终可见 */
+    margin-top: 10px;
+    /* 添加上边距，与位置信息分开 */
+}
+
+/* 修改照片统计项目的样式，使其更协调 */
+.stat-item {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.2);
+    /* 稍微调亮背景色 */
+    color: white;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+
+.stat-icon {
+    width: 16px !important;
+    height: 16px !important;
+    /* background-color: red; */
+    margin-right: 4px;
 }
 
 /* 照片画廊弹窗样式 */
@@ -1039,6 +1304,156 @@ onMounted(() => {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+}
+
+/* 照片画廊弹窗样式增强 */
+.group-indicator {
+    font-size: 12px;
+    opacity: 0.7;
+    margin-left: 5px;
+}
+
+.photo-description {
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.photo-description h1 {
+    font-size: 1.5em;
+    margin: 0.5em 0;
+}
+
+.photo-description h2 {
+    font-size: 1.2em;
+    margin: 0.5em 0;
+}
+
+.photo-description p {
+    margin: 0.75em 0;
+}
+
+/* 照片画廊弹窗新增样式 */
+.photo-interaction {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 0;
+    padding-top: 15px;
+    border-top: 1px solid var(--divider-color);
+}
+
+.like-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 6px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.like-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.like-button.liked {
+    background: rgba(255, 99, 97, 0.2);
+    color: #ff6361;
+}
+
+.like-icon {
+    width: 20px;
+    height: 20px;
+}
+
+/* 评论区样式 */
+.comments-section {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid var(--divider-color);
+}
+
+.comments-title {
+    display: flex;
+    align-items: center;
+    font-size: 18px;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.comment-title-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+}
+
+.comment-list {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+}
+
+.comment-item {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.comment-avatar img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.comment-content {
+    flex: 1;
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.comment-author {
+    font-weight: 600;
+}
+
+.comment-time {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.comment-text {
+    margin: 0;
+    line-height: 1.5;
+}
+
+.no-comments {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.add-comment {
+    margin-top: 15px;
+    margin-bottom: 20px;
+}
+
+.add-comment :deep(.el-textarea__inner) {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--divider-color);
+    color: var(--text-color);
+}
+
+.add-comment .el-button {
+    margin-top: 10px;
+    float: right;
 }
 
 /* 左右布局 */
@@ -1178,19 +1593,26 @@ onMounted(() => {
 .current-album {
     position: relative;
     display: flex;
-    flex-direction: row; /* 改为水平排列 */
-    align-items: center; /* 垂直居中对齐 */
+    flex-direction: row;
+    /* 改为水平排列 */
+    align-items: center;
+    /* 垂直居中对齐 */
     gap: 20px;
 }
 
 /* 调整封面尺寸 */
 .album-cover {
     position: relative;
-    width: 120px; /* 固定宽度 */
-    height: 120px; /* 固定高度，保持正方形 */
-    flex-shrink: 0; /* 防止缩小 */
-    padding-top: 0; /* 移除之前的padding-top百分比设置 */
-    margin: 0; /* 移除自动居中 */
+    width: 120px;
+    /* 固定宽度 */
+    height: 120px;
+    /* 固定高度，保持正方形 */
+    flex-shrink: 0;
+    /* 防止缩小 */
+    padding-top: 0;
+    /* 移除之前的padding-top百分比设置 */
+    margin: 0;
+    /* 移除自动居中 */
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
@@ -1246,11 +1668,13 @@ onMounted(() => {
 .player-info-controls {
     display: flex;
     flex-direction: column;
-    flex-grow: 1; /* 占据剩余空间 */
+    flex-grow: 1;
+    /* 占据剩余空间 */
 }
 
 .album-info {
-    text-align: left; /* 左对齐 */
+    text-align: left;
+    /* 左对齐 */
     margin-bottom: 15px;
 }
 
@@ -1450,6 +1874,17 @@ onMounted(() => {
 
     .current-photo {
         height: 300px;
+    }
+
+    .photo-interaction {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .comment-header {
+        flex-direction: column;
+        align-items: flex-start;
     }
 }
 

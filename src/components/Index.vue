@@ -55,7 +55,7 @@
                                     <h3 class="article-title">{{ article.title }}</h3>
                                     <div class="article-tags">
                                         <span class="tag" v-for="(tag, index) in article.tags" :key="index">{{ tag
-                                        }}</span>
+                                            }}</span>
                                     </div>
                                     <p class="article-summary">{{ article.summary }}</p>
                                     <!-- 点赞和评论 -->
@@ -91,7 +91,7 @@
                                     <h3 class="project-title">{{ project.title }}</h3>
                                     <div class="project-tags">
                                         <span class="tag" v-for="(tag, index) in project.tags" :key="index">{{ tag
-                                        }}</span>
+                                            }}</span>
                                     </div>
                                     <p class="project-summary">{{ project.summary }}</p>
                                     <div class="project-meta">
@@ -155,7 +155,7 @@
                                     <h3 class="thought-title">{{ thought.title }}</h3>
                                     <div class="thought-tags">
                                         <span class="tag" v-for="(tag, index) in thought.tags" :key="index">{{ tag
-                                        }}</span>
+                                            }}</span>
                                     </div>
                                     <p class="thought-summary">{{ thought.summary }}</p>
                                 </div>
@@ -179,14 +179,14 @@
                 <div class="media-gallery">
                     <!-- 照片/视频网格 -->
                     <div class="media-item" v-for="media in lifeSection.mediaItems" :key="media.id"
-                        @click="goToArticle(media.id)">
-                        <div class="media-image" :style="`background-image: url('${media.image}')`"></div>
+                        @click="showPhotoGallery(index)">
+                        <div class="media-image" :style="`background-image: url('${media.images[0].url}')`"></div>
                         <div class="media-overlay">
                             <h3 class="media-title">{{ media.title }}</h3>
                             <div class="media-tags">
                                 <span class="tag" v-for="(tag, index) in media.tags" :key="index">{{ tag }}</span>
                             </div>
-                            <p class="media-summary">{{ media.summary }}</p>
+                            <p class="media-summary">{{ media.location }}</p>
                             <!-- 点赞和评论 -->
                             <div class="interaction-stats media-stats">
                                 <div class="stat-action">
@@ -195,13 +195,18 @@
                                 </div>
                                 <div class="stat-action">
                                     <i class="icon-comment"></i>
-                                    <span>{{ media.comments }}</span>
+                                    <span>{{ media.comments.length }}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            <!-- 添加照片画廊组件 -->
+            <PhotoGallery v-model:visible="showPhotoDialog" :photos="lifeSection.mediaItems"
+                :initialPhotoIndex="currentPhotoIndex" :heartFilledIcon="heartFilledIcon"
+                :heartOutlineIcon="heartOutlineIcon" :commentIcon="commentIcon" :likedPhotoIds="likedPhotoIds"
+                @like="handlePhotoLike" @comment="handlePhotoComment" />
         </section>
 
         <!-- 底部区域 -->
@@ -278,12 +283,51 @@ import { ref, onMounted, computed, onBeforeMount, onBeforeUnmount, watch } from 
 import { useRouter } from 'vue-router';
 import Activity from '../components/Activity.vue'
 import { currentTheme } from '../stores/themeStore'
+import PhotoGallery from './PhotoGallery.vue';
+// 导入需要的图标
+import heartFilledIcon from '@/assets/icons/heart-filled.png';
+import heartOutlineIcon from '@/assets/icons/heart.png';
+import commentIcon from '@/assets/icons/comment.png';
+
 
 const router = useRouter();
 
 // 添加响应式布局相关的状态
 const isMobile = ref(false);
 const windowWidth = ref(window.innerWidth);
+// 添加照片画廊相关状态
+const showPhotoDialog = ref(false);
+const currentPhotoIndex = ref(0);
+const likedPhotoIds = ref([]);
+// 显示照片画廊
+const showPhotoGallery = (index) => {
+    currentPhotoIndex.value = index;
+    showPhotoDialog.value = true;
+};
+
+// 处理照片点赞
+const handlePhotoLike = (photoId) => {
+    const mediaIndex = lifeSection.value.mediaItems.findIndex(media => media.id === photoId);
+    if (mediaIndex === -1) return;
+
+    if (likedPhotoIds.value.includes(photoId)) {
+        // 取消点赞
+        likedPhotoIds.value = likedPhotoIds.value.filter(id => id !== photoId);
+        lifeSection.value.mediaItems[mediaIndex].likes--;
+    } else {
+        // 添加点赞
+        likedPhotoIds.value.push(photoId);
+        lifeSection.value.mediaItems[mediaIndex].likes++;
+    }
+};
+
+// 处理照片评论
+const handlePhotoComment = ({ photoId, comment }) => {
+    const mediaIndex = lifeSection.value.mediaItems.findIndex(media => media.id === photoId);
+    if (mediaIndex === -1) return;
+
+    lifeSection.value.mediaItems[mediaIndex].comments.unshift(comment);
+};
 
 // 检测当前设备窗口大小并设置isMobile状态
 const checkScreenSize = () => {
@@ -427,39 +471,130 @@ const lifeSection = ref({
     mediaItems: [
         {
             id: 1,
-            title: '京都古寺之旅',
-            image: 'https://picsum.photos/600/400?random=6',
-            summary: '漫步京都古寺，感受千年文化底蕴...',
-            tags: ['旅行', '日本', '摄影'],
-            likes: 123,
-            comments: 36
+            title: '山水之间',
+            location: '瑞士阿尔卑斯山',
+            date: '2023年7月15日',
+            description: '<h1>阿尔卑斯山脉</h1><p>湛蓝的天空下，雪山与湖泊构成了一幅完美的自然画卷。</p><h2>拍摄体验</h2><p>在海拔3000米的山顶，寒冷但壮观的景色让人屏息。</p>',
+            tags: ['旅行', '自然', '山脉'],
+            likes: 128,
+            comments: [
+                {
+                    author: '旅行者小李',
+                    avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
+                    text: '太美了！我也去过这里，景色确实令人震撼',
+                    time: '2小时前'
+                },
+                {
+                    author: '摄影师大卫',
+                    avatar: 'https://randomuser.me/api/portraits/men/75.jpg',
+                    text: '构图非常棒，请问用的什么镜头拍摄的？',
+                    time: '1天前'
+                }
+            ],
+            images: [
+                {
+                    url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                    caption: '阿尔卑斯山全景'
+                },
+                {
+                    url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                    caption: '山顶日出'
+                },
+                {
+                    url: 'https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                    caption: '山间小屋'
+                }
+            ]
         },
         {
             id: 2,
-            title: '阿尔卑斯山脉徒步',
-            image: 'https://picsum.photos/600/400?random=7',
-            summary: '在阿尔卑斯山脉的壮丽景色中徒步探险...',
-            tags: ['户外', '瑞士', '徒步'],
-            likes: 128,
-            comments: 36
+            title: '晨光早餐',
+            location: '巴黎咖啡馆',
+            date: '2023年8月3日',
+            description: '<h1>巴黎的早晨</h1><p>在巴黎街头的小咖啡馆享用的丰盛早餐，阳光透过窗户撒在桌上，温暖而惬意。</p><p>这是我在欧洲旅行中最喜欢的一餐。</p>',
+            tags: ['美食', '旅行', '早餐'],
+            likes: 85,
+            comments: [
+                {
+                    author: '美食博主',
+                    avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
+                    text: '看起来太美味了！巴黎的早餐真的很精致',
+                    time: '5小时前'
+                }
+            ],
+            images: [
+                {
+                    url: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                    caption: '法式早餐'
+                },
+                {
+                    url: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                    caption: '咖啡和可颂'
+                }
+            ]
         },
         {
             id: 3,
-            title: '咖啡馆的午后时光',
-            image: 'https://picsum.photos/600/400?random=8',
-            summary: '在城市角落的咖啡馆，与一本好书度过宁静午后...',
-            tags: ['日常', '咖啡', '阅读'],
-            likes: 128,
-            comments: 36
+            title: '傍晚海滩',
+            location: '巴厘岛库塔海滩',
+            date: '2023年9月20日',
+            description: '<h1>巴厘岛落日</h1><p>夕阳西下，海浪轻拍沙滩，天空被染成金色和紫色，这是一天中最美的时刻。</p><h2>摄影笔记</h2><p>使用了长曝光技术捕捉海浪的柔和线条。</p>',
+            tags: ['旅行', '海滩', '夕阳'],
+            likes: 216,
+            comments: [
+                {
+                    author: '岛主小王',
+                    avatar: 'https://randomuser.me/api/portraits/men/22.jpg',
+                    text: '巴厘岛是我最爱的度假胜地，这张照片拍得太棒了',
+                    time: '3天前'
+                },
+                {
+                    author: '摄影爱好者',
+                    avatar: 'https://randomuser.me/api/portraits/women/90.jpg',
+                    text: '长曝光效果很赞，水面看起来如丝绸般顺滑',
+                    time: '5天前'
+                },
+                {
+                    author: '旅行达人',
+                    avatar: 'https://randomuser.me/api/portraits/men/45.jpg',
+                    text: '我也计划这个月去巴厘岛，有什么好的建议吗？',
+                    time: '1周前'
+                }
+            ],
+            images: [
+                {
+                    url: 'https://images.unsplash.com/photo-1493246507139-91e8fad9978e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                    caption: '夕阳海滩'
+                },
+                {
+                    url: 'https://images.unsplash.com/photo-1519046904884-53103b34b206?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                    caption: '海滩冲浪'
+                },
+                {
+                    url: 'https://images.unsplash.com/photo-1519882189396-71b93cb121af?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                    caption: '沙滩漫步'
+                },
+                {
+                    url: 'https://images.unsplash.com/photo-1484821582734-6692f7b1c954?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                    caption: '热带风情'
+                }
+            ]
         },
         {
             id: 4,
-            title: '城市夜景探索',
-            image: 'https://picsum.photos/600/400?random=9',
-            summary: '探索城市的夜晚面貌，捕捉光影交织的瞬间...',
-            tags: ['城市', '夜景', '摄影'],
-            likes: 128,
-            comments: 36
+            title: '冰川湖泊',
+            location: '新西兰',
+            date: '2022年12月10日',
+            description: '<h1>新西兰的纯净之美</h1><p>澄澈的湖水映照着雪山，宛如一面巨大的镜子，反射出大自然的壮丽景色。</p><p>这是我见过最纯净的湖水。</p>',
+            tags: ['自然', '湖泊', '雪山'],
+            likes: 143,
+            comments: [],
+            images: [
+                {
+                    url: 'https://images.unsplash.com/photo-1549880338-65ddcdfd017b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                    caption: '冰川湖全景'
+                }
+            ]
         }
     ]
 });
@@ -804,7 +939,8 @@ const handleAboutClick = () => {
 .about-btn {
     background-color: rgba(255, 255, 255, 0.1);
     border: none;
-    color: var(--text-primary); /* 修改这一行，从固定的 white 改为使用主题变量 */
+    color: var(--text-primary);
+    /* 修改这一行，从固定的 white 改为使用主题变量 */
     padding: 8px 30px;
     border-radius: 20px;
     font-size: 14px;
