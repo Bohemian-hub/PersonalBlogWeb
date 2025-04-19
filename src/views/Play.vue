@@ -3,14 +3,8 @@
     <ThemeToggler class="home-theme-toggler" />
     <div class="page-wrapper" :class="currentTheme">
         <div class="page-content">
-            <!-- 页面标题区 -->
-            <header class="page-header">
-                <h1 class="page-title">游民时代</h1>
-                <p class="description">记录生活点滴，分享旅行见闻与个人兴趣爱好</p>
-                <div class="divider">
-                    <span class="divider-icon">🌈</span>
-                </div>
-            </header>
+            <!-- 使用封装的页面标题组件 -->
+            <PageHeader title="游民时代" description="记录生活点滴，分享旅行见闻与个人兴趣爱好" icon="🌈" />
 
             <!-- 照片墙 - 瀑布流照片墙 -->
             <section class="section-container photo-gallery">
@@ -215,6 +209,7 @@ import {
 import TopBar from '../components/TopBar.vue'
 import Footer from '../components/Footer.vue'
 import ThemeToggler from '../components/ThemeToggler.vue'
+import PageHeader from '../components/PageHeader.vue'
 import { currentTheme } from '../stores/themeStore'
 import bgFile from '@/assets/images/bg4.png'
 import { ElMessage } from 'element-plus'
@@ -533,25 +528,25 @@ const isLiked = computed(() => {
 
 // 替换原来的 toggleLike 和 addComment 方法
 const handlePhotoLike = (photoId) => {
-  const photoIndex = photos.value.findIndex(photo => photo.id === photoId);
-  if (photoIndex === -1) return;
-  
-  if (likedPhotos.value.includes(photoId)) {
-    // 取消点赞
-    likedPhotos.value = likedPhotos.value.filter(id => id !== photoId);
-    photos.value[photoIndex].likes--;
-  } else {
-    // 添加点赞
-    likedPhotos.value.push(photoId);
-    photos.value[photoIndex].likes++;
-  }
+    const photoIndex = photos.value.findIndex(photo => photo.id === photoId);
+    if (photoIndex === -1) return;
+
+    if (likedPhotos.value.includes(photoId)) {
+        // 取消点赞
+        likedPhotos.value = likedPhotos.value.filter(id => id !== photoId);
+        photos.value[photoIndex].likes--;
+    } else {
+        // 添加点赞
+        likedPhotos.value.push(photoId);
+        photos.value[photoIndex].likes++;
+    }
 }
 
 const handlePhotoComment = ({ photoId, comment }) => {
-  const photoIndex = photos.value.findIndex(photo => photo.id === photoId);
-  if (photoIndex === -1) return;
-  
-  photos.value[photoIndex].comments.unshift(comment);
+    const photoIndex = photos.value.findIndex(photo => photo.id === photoId);
+    if (photoIndex === -1) return;
+
+    photos.value[photoIndex].comments.unshift(comment);
 }
 
 // 日常生活文章数据 - 合并了旅行日记、兴趣爱好和书影推荐

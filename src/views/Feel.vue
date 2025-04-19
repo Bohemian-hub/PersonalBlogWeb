@@ -4,14 +4,8 @@
     <ThemeToggler class="home-theme-toggler" />
     <div class="page-wrapper" :class="currentTheme">
         <div class="page-content">
-            <!-- 页面标题区 -->
-            <header class="page-header">
-                <h1 class="page-title">认知轨迹</h1>
-                <p class="description">生活思考与心灵沉淀的分享空间</p>
-                <div class="divider">
-                    <span class="divider-icon">🧠</span>
-                </div>
-            </header>
+            <!-- 使用封装的页面标题组件 -->
+            <PageHeader title="认知轨迹" description="生活思考与心灵沉淀的分享空间" icon="🧠" />
 
             <!-- 内容布局区 -->
             <div class="content-layout">
@@ -22,7 +16,9 @@
                         <div class="featured-content">
                             <div class="featured-meta">
                                 <div class="featured-label">
-                                    <el-icon><Star /></el-icon>
+                                    <el-icon>
+                                        <Star />
+                                    </el-icon>
                                     置顶思考
                                 </div>
                                 <div class="featured-date">2024年4月20日</div>
@@ -42,31 +38,37 @@
                             </div>
                             <el-button class="read-more" type="primary" plain>
                                 阅读全文
-                                <el-icon><ArrowRight /></el-icon>
+                                <el-icon>
+                                    <ArrowRight />
+                                </el-icon>
                             </el-button>
                         </div>
                         <div class="featured-image">
-                            <img src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="持续学习" />
+                            <img src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80"
+                                alt="持续学习" />
                         </div>
                     </section>
 
                     <!-- 思考随笔列表 -->
                     <section class="thoughts-section section-container">
                         <h2 class="section-title">
-                            <el-icon><Edit /></el-icon>
+                            <el-icon>
+                                <Edit />
+                            </el-icon>
                             思考随笔
                         </h2>
-                        
+
                         <div class="filter-bar">
                             <el-radio-group v-model="thoughtFilter" size="small">
-                                <el-radio-button v-for="filter in thoughtFilters" :key="filter.value" :label="filter.value">
+                                <el-radio-button v-for="filter in thoughtFilters" :key="filter.value"
+                                    :label="filter.value">
                                     {{ filter.label }}
                                 </el-radio-button>
                             </el-radio-group>
-                            <el-input v-model="searchQuery" placeholder="搜索随笔..." prefix-icon="Search" size="small" 
+                            <el-input v-model="searchQuery" placeholder="搜索随笔..." prefix-icon="Search" size="small"
                                 class="search-input" />
                         </div>
-                        
+
                         <div class="thoughts-grid">
                             <div class="thought-card" v-for="thought in thoughts" :key="thought.id">
                                 <div class="thought-header">
@@ -77,20 +79,23 @@
                                 <p class="thought-excerpt">{{ thought.excerpt }}</p>
                                 <div class="thought-footer">
                                     <div class="thought-tags">
-                                        <el-tag size="small" v-for="tag in thought.tags" :key="tag" :type="getTagType(tag)">
+                                        <el-tag size="small" v-for="tag in thought.tags" :key="tag"
+                                            :type="getTagType(tag)">
                                             {{ tag }}
                                         </el-tag>
                                     </div>
                                     <el-button link type="primary">
                                         继续阅读
-                                        <el-icon><ArrowRight /></el-icon>
+                                        <el-icon>
+                                            <ArrowRight />
+                                        </el-icon>
                                     </el-button>
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="pagination-container">
-                            <el-pagination background layout="prev, pager, next" :total="paginationData.total" 
+                            <el-pagination background layout="prev, pager, next" :total="paginationData.total"
                                 :page-size="paginationData.pageSize" />
                         </div>
                     </section>
@@ -98,10 +103,12 @@
                     <!-- 生活格言 -->
                     <section class="quotes-section section-container">
                         <h2 class="section-title">
-                            <el-icon><ChatDotRound /></el-icon>
+                            <el-icon>
+                                <ChatDotRound />
+                            </el-icon>
                             生活箴言
                         </h2>
-                        
+
                         <el-carousel :interval="5000" type="card" height="200px">
                             <el-carousel-item v-for="quote in lifeQuotes" :key="quote.id">
                                 <div class="quote-slide" :style="{ backgroundColor: quote.bgColor }">
@@ -121,13 +128,17 @@
                     <!-- 个人思考状态 -->
                     <div class="thinking-status side-card">
                         <h3 class="side-card-title">
-                            <el-icon><MagicStick /></el-icon>
+                            <el-icon>
+                                <MagicStick />
+                            </el-icon>
                             思考状态
                         </h3>
                         <div class="status-content">
                             <div class="status-item">
                                 <span class="status-icon reading">
-                                    <el-icon><Reading /></el-icon>
+                                    <el-icon>
+                                        <Reading />
+                                    </el-icon>
                                 </span>
                                 <div class="status-detail">
                                     <h4>正在阅读</h4>
@@ -136,7 +147,9 @@
                             </div>
                             <div class="status-item">
                                 <span class="status-icon thinking">
-                                    <el-icon><Lightbulb /></el-icon>
+                                    <el-icon>
+                                        <Lightbulb />
+                                    </el-icon>
                                 </span>
                                 <div class="status-detail">
                                     <h4>近期思考</h4>
@@ -145,7 +158,9 @@
                             </div>
                             <div class="status-item">
                                 <span class="status-icon writing">
-                                    <el-icon><EditPen /></el-icon>
+                                    <el-icon>
+                                        <EditPen />
+                                    </el-icon>
                                 </span>
                                 <div class="status-detail">
                                     <h4>创作中</h4>
@@ -158,7 +173,9 @@
                     <!-- 思考主题分类 -->
                     <div class="thought-categories side-card">
                         <h3 class="side-card-title">
-                            <el-icon><Menu /></el-icon>
+                            <el-icon>
+                                <Menu />
+                            </el-icon>
                             思考主题
                         </h3>
                         <div class="category-list">
@@ -177,7 +194,9 @@
                     <!-- 阅读与思考 -->
                     <div class="reading-notes side-card">
                         <h3 class="side-card-title">
-                            <el-icon><Collection /></el-icon>
+                            <el-icon>
+                                <Collection />
+                            </el-icon>
                             阅读心得
                         </h3>
                         <div class="book-notes">
@@ -200,11 +219,13 @@
                     <!-- 标签云 -->
                     <div class="tag-cloud side-card">
                         <h3 class="side-card-title">
-                            <el-icon><PriceTag /></el-icon>
+                            <el-icon>
+                                <PriceTag />
+                            </el-icon>
                             标签云
                         </h3>
                         <div class="tags-container">
-                            <span class="cloud-tag" v-for="tag in tagCloud" :key="tag.name" 
+                            <span class="cloud-tag" v-for="tag in tagCloud" :key="tag.name"
                                 :style="{ fontSize: tag.size + 'px', color: tag.color }">
                                 {{ tag.name }}
                             </span>
@@ -216,19 +237,20 @@
     </div>
     <!-- 底部版权和备案信息 -->
     <Footer />
-    <el-image class="bg-image" :src="bgUrl" :fit="'cover'" draggable="false" 
+    <el-image class="bg-image" :src="bgUrl" :fit="'cover'" draggable="false"
         :class="{ 'dim-bg': currentTheme === 'dark' }" />
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import {
-    Edit, Star, ChatDotRound, ArrowRight, Reading, 
+    Edit, Star, ChatDotRound, ArrowRight, Reading,
     Search, Menu, Collection, PriceTag, MagicStick, Lightbulb, EditPen
 } from '@element-plus/icons-vue'
 import TopBar from '../components/TopBar.vue'
 import Footer from '../components/Footer.vue'
 import ThemeToggler from '../components/ThemeToggler.vue'
+import PageHeader from '../components/PageHeader.vue'
 import { currentTheme } from '../stores/themeStore'
 import bgFile from '@/assets/images/bg8.png' // 请确保图片存在，否则替换为实际存在的图片
 
@@ -404,10 +426,10 @@ const getTagType = (tag) => {
         '注意力': 'warning',
         '极简主义': 'info'
     }
-    
+
     // 为部分常见标签返回固定类型，其他随机分配
     if (types[tag]) return types[tag]
-    
+
     // 为其他标签随机分配类型
     const typeOptions = ['', 'success', 'warning', 'info', 'danger']
     const hashCode = tag.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
@@ -1060,7 +1082,7 @@ const getTagType = (tag) => {
     .side-column>div {
         margin-bottom: 0;
     }
-    
+
     /* 占据整行的元素 */
     .side-column .thinking-status {
         grid-column: span 2;

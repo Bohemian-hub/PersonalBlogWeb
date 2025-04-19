@@ -4,14 +4,8 @@
     <ThemeToggler class="home-theme-toggler" />
     <div class="page-wrapper" :class="currentTheme">
         <div class="page-content">
-            <!-- 页面标题区 -->
-            <header class="page-header">
-                <h1 class="page-title">实践工坊</h1>
-                <p class="description">展示个人项目、技术积累与开发心得</p>
-                <div class="divider">
-                    <span class="divider-icon">🛠️</span>
-                </div>
-            </header>
+            <!-- 使用封装的页面标题组件 -->
+            <PageHeader title="实践工坊" description="展示个人项目、技术积累与开发心得" icon="🛠️" />
 
             <!-- 主体内容区 - 两列布局 -->
             <div class="content-layout">
@@ -27,7 +21,8 @@
                         </h2>
                         <div class="filter-bar">
                             <el-radio-group v-model="articleFilter" size="small">
-                                <el-radio-button v-for="filter in articleFilters" :key="filter.value" :label="filter.value">
+                                <el-radio-button v-for="filter in articleFilters" :key="filter.value"
+                                    :label="filter.value">
                                     {{ filter.label }}
                                 </el-radio-button>
                             </el-radio-group>
@@ -87,19 +82,28 @@
                                     <h3 class="project-title">{{ project.title }}</h3>
                                     <p class="project-description">{{ project.description }}</p>
                                     <div class="project-tech">
-                                        <el-tag size="small" v-for="tech in project.technologies" :key="tech" :type="getTagType(tech)">
+                                        <el-tag size="small" v-for="tech in project.technologies" :key="tech"
+                                            :type="getTagType(tech)">
                                             {{ tech }}
                                         </el-tag>
                                     </div>
                                     <div class="project-links">
-                                        <el-button v-if="project.demoUrl" size="small" type="success" :href="project.demoUrl" target="_blank">
-                                            <el-icon><View /></el-icon> 演示
+                                        <el-button v-if="project.demoUrl" size="small" type="success"
+                                            :href="project.demoUrl" target="_blank">
+                                            <el-icon>
+                                                <View />
+                                            </el-icon> 演示
                                         </el-button>
-                                        <el-button v-if="project.codeUrl" size="small" type="primary" :href="project.codeUrl" target="_blank">
-                                            <el-icon><Link /></el-icon> 源码
+                                        <el-button v-if="project.codeUrl" size="small" type="primary"
+                                            :href="project.codeUrl" target="_blank">
+                                            <el-icon>
+                                                <Link />
+                                            </el-icon> 源码
                                         </el-button>
                                         <el-button size="small" type="info">
-                                            <el-icon><InfoFilled /></el-icon> 详情
+                                            <el-icon>
+                                                <InfoFilled />
+                                            </el-icon> 详情
                                         </el-button>
                                     </div>
                                 </div>
@@ -126,13 +130,16 @@
                                     <h3 class="tool-name">{{ tool.name }}</h3>
                                     <p class="tool-description">{{ tool.description }}</p>
                                     <div class="tool-categories">
-                                        <el-tag size="small" v-for="cat in tool.categories" :key="cat" :type="getTagType(cat)">
+                                        <el-tag size="small" v-for="cat in tool.categories" :key="cat"
+                                            :type="getTagType(cat)">
                                             {{ cat }}
                                         </el-tag>
                                     </div>
                                 </div>
                                 <el-button class="tool-link" type="primary" :href="tool.url" target="_blank">
-                                    <el-icon><Link /></el-icon> 访问
+                                    <el-icon>
+                                        <Link />
+                                    </el-icon> 访问
                                 </el-button>
                             </div>
                         </div>
@@ -194,8 +201,9 @@
                                             <span class="skill-name">{{ skill.name }}</span>
                                             <span class="skill-level">{{ skill.level }}</span>
                                         </div>
-                                        <el-progress :percentage="skill.percentage" :color="getProgressColor(skill.percentage)" 
-                                            :stroke-width="12" :show-text="false" />
+                                        <el-progress :percentage="skill.percentage"
+                                            :color="getProgressColor(skill.percentage)" :stroke-width="12"
+                                            :show-text="false" />
                                     </div>
                                 </div>
                             </div>
@@ -213,8 +221,8 @@
                         <div class="learning-items">
                             <div class="learning-item" v-for="item in currentlyLearning" :key="item.id">
                                 <div class="learning-progress">
-                                    <el-progress type="circle" :percentage="item.progress" :width="50" 
-                                        :stroke-width="6" :color="getProgressColor(item.progress)" />
+                                    <el-progress type="circle" :percentage="item.progress" :width="50" :stroke-width="6"
+                                        :color="getProgressColor(item.progress)" />
                                 </div>
                                 <div class="learning-content">
                                     <h4>{{ item.title }}</h4>
@@ -252,7 +260,7 @@
     </div>
     <!-- 底部版权和备案信息 -->
     <Footer />
-    <el-image class="bg-image" :src="bgUrl" :fit="'cover'" draggable="false" 
+    <el-image class="bg-image" :src="bgUrl" :fit="'cover'" draggable="false"
         :class="{ 'dim-bg': currentTheme === 'dark' }" />
 </template>
 
@@ -266,6 +274,7 @@ import {
 import TopBar from '../components/TopBar.vue'
 import Footer from '../components/Footer.vue'
 import ThemeToggler from '../components/ThemeToggler.vue'
+import PageHeader from '../components/PageHeader.vue'
 import { currentTheme } from '../stores/themeStore'
 // 导入背景图片，使用与Research不同的背景
 import bgFile from '@/assets/images/bg5.png' // 假设有这个图片，如果没有请替换为实际存在的图片
@@ -553,10 +562,10 @@ const getTagType = (tag) => {
         '设计': 'warning',
         'DevOps': 'info'
     }
-    
+
     // 为部分常见标签返回固定类型，其他随机分配
     if (types[tag]) return types[tag]
-    
+
     // 为其他标签随机分配类型
     const typeOptions = ['', 'success', 'warning', 'info', 'danger']
     const hashCode = tag.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
@@ -1311,7 +1320,7 @@ const getProgressColor = (percentage) => {
     .side-column>div {
         margin-bottom: 0;
     }
-    
+
     /* 占据整行的元素 */
     .side-column .tech-profile {
         grid-column: span 2;

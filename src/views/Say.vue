@@ -5,26 +5,17 @@
     <div class="page-wrapper" :class="currentTheme">
         <!-- 页面内容区域 -->
         <div class="page-content">
-            <!-- 页面标题区 -->
-            <header class="page-header">
-                <h1 class="page-title">互动集市</h1>
-                <p class="description">在这里留下你的想法，与其他访客交流互动</p>
-                <div class="divider">
-                    <span class="divider-icon">💬</span>
-                </div>
-            </header>
+            <!-- 使用封装的页面标题组件 -->
+            <PageHeader title="互动集市" description="在这里留下你的想法，与其他访客交流互动" icon="💬" />
 
             <!-- 弹幕墙区域 -->
             <div class="danmaku-wall">
                 <div class="danmaku-container">
-                    <div v-for="message in visibleMessages" 
-                         :key="message.id" 
-                         class="danmaku-item"
-                         :style="{ 
-                             top: `${message.trackIndex * 60 + 20}px`,
-                             animationDuration: `${message.speed}s`,
-                             '--danmaku-width': message.width + 'px'
-                         }">
+                    <div v-for="message in visibleMessages" :key="message.id" class="danmaku-item" :style="{
+                        top: `${message.trackIndex * 60 + 20}px`,
+                        animationDuration: `${message.speed}s`,
+                        '--danmaku-width': message.width + 'px'
+                    }">
                         <div class="danmaku-avatar">
                             <img :src="message.avatar" :alt="message.username">
                         </div>
@@ -42,18 +33,9 @@
                     <div class="avatar-preview">
                         <img :src="userAvatar" alt="Your avatar">
                     </div>
-                    <input
-                        v-model="newMessage"
-                        type="text"
-                        class="message-input"
-                        placeholder="在此输入你想说的话..."
-                        @keyup.enter="sendMessage"
-                    />
-                    <el-button 
-                        type="primary" 
-                        class="send-button" 
-                        :disabled="!newMessage.trim()" 
-                        @click="sendMessage">
+                    <input v-model="newMessage" type="text" class="message-input" placeholder="在此输入你想说的话..."
+                        @keyup.enter="sendMessage" />
+                    <el-button type="primary" class="send-button" :disabled="!newMessage.trim()" @click="sendMessage">
                         发送
                     </el-button>
                 </div>
@@ -62,7 +44,7 @@
     </div>
     <!-- 底部版权和备案信息 -->
     <Footer />
-    <el-image class="bg-image" :src="bgUrl" :fit="'cover'" draggable="false" 
+    <el-image class="bg-image" :src="bgUrl" :fit="'cover'" draggable="false"
         :class="{ 'dim-bg': currentTheme === 'dark' }" />
 </template>
 
@@ -71,6 +53,7 @@ import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import TopBar from '../components/TopBar.vue'
 import Footer from '../components/Footer.vue'
 import ThemeToggler from '../components/ThemeToggler.vue'
+import PageHeader from '../components/PageHeader.vue'
 import { currentTheme } from '../stores/themeStore'
 import { ElMessage } from 'element-plus'
 import bgFile from '@/assets/images/bg3.png' // 确保这个图片存在，否则请替换
@@ -95,52 +78,37 @@ const messages = ref([
         username: '旅行爱好者',
         avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
         text: '风景真美啊，下次我也要去这个地方！',
-        trackIndex: 0,
-        width: 0,
-        speed: 0
     },
     {
         id: 2,
         username: '科技迷',
         avatar: 'https://randomuser.me/api/portraits/men/41.jpg',
         text: '这篇文章讲解得很清晰，学到了很多知识',
-        trackIndex: 1,
-        width: 0,
-        speed: 0
     },
     {
         id: 3,
         username: '读书人',
         avatar: 'https://randomuser.me/api/portraits/women/33.jpg',
         text: '最近在看《思考，快与慢》，很推荐大家阅读',
-        trackIndex: 2,
-        width: 0,
-        speed: 0
     },
     {
         id: 4,
         username: '摄影师',
         avatar: 'https://randomuser.me/api/portraits/men/45.jpg',
         text: '请问博主用的什么相机拍摄的？画质太棒了',
-        trackIndex: 3,
-        width: 0,
-        speed: 0
     },
     {
         id: 5,
         username: '美食家',
         avatar: 'https://randomuser.me/api/portraits/women/22.jpg',
         text: '这家餐厅我也去过，味道确实不错！推荐大家尝试',
-        trackIndex: 4,
-        width: 0,
-        speed: 0
     }
 ])
 
 // 为每条消息分配轨道和速度
 const initializeMessages = () => {
     const assignedTracks = [];
-    
+
     messages.value.forEach((message, index) => {
         // 分配轨道 (0 到 maxTracks-1)
         let trackIndex = index % maxTracks;
@@ -148,15 +116,15 @@ const initializeMessages = () => {
             trackIndex = (trackIndex + 1) % maxTracks;
         }
         assignedTracks.push(trackIndex);
-        
+
         // 分配动画持续时间 (25-35秒)
         const speed = 25 + Math.random() * 10;
-        
+
         // 更新消息对象
         message.trackIndex = trackIndex;
         message.speed = speed;
     });
-    
+
     // 在下一个DOM更新周期后测量每条消息宽度
     nextTick(() => {
         const danmakuItems = document.querySelectorAll('.danmaku-item');
@@ -173,20 +141,11 @@ const visibleMessages = computed(() => {
     return messages.value.slice(0, maxVisibleMessages);
 })
 
-// 获取随机的轨道编号 (0 到 maxTracks-1)
-const getRandomTrack = () => {
-    return Math.floor(Math.random() * maxTracks);
-}
-
-// 获取随机的动画速度 (10-20秒)
-const getRandomSpeed = () => {
-    return 25 + Math.random() * 10;
-}
 
 // 发送新消息
 const sendMessage = () => {
     if (!newMessage.value.trim()) return;
-    
+
     // 创建临时消息对象用于尺寸计算
     const tempMessage = document.createElement('div');
     tempMessage.className = 'danmaku-item temp-measure';
@@ -202,31 +161,31 @@ const sendMessage = () => {
     document.body.appendChild(tempMessage);
     const messageWidth = tempMessage.offsetWidth;
     document.body.removeChild(tempMessage);
-    
+
     // 创建新消息对象
     const newMsg = {
         id: Date.now(), // 使用时间戳作为ID
         username: '访客', // 实际应用中可能从用户信息获取
         avatar: userAvatar.value,
         text: newMessage.value,
-        trackIndex: getRandomTrack(),
-        speed: getRandomSpeed(),
+        trackIndex: Math.floor(Math.random() * maxTracks),
+        speed: 25 + Math.random() * 10,
         width: messageWidth
     };
-    
+
     // 1秒后添加到消息列表
     setTimeout(() => {
         messages.value.push(newMsg);
-        
+
         // 保持消息数量在可控范围内
         if (messages.value.length > maxVisibleMessages) {
             messages.value = messages.value.slice(messages.value.length - maxVisibleMessages);
         }
     }, 1000);
-    
+
     // 清空输入框
     newMessage.value = '';
-    
+
     // 提示用户
     ElMessage({
         message: '弹幕发送成功！',
@@ -241,73 +200,7 @@ let autoMessageInterval;
 onMounted(() => {
     // 初始化消息轨道和速度
     initializeMessages();
-    
-    // 每15秒添加一个随机消息
-    autoMessageInterval = setInterval(() => {
-        const randomMessages = [
-            '这个博客设计得真漂亮！',
-            '分享的内容很有深度，期待更多更新',
-            '最近天气真好，适合出去走走',
-            '有人可以推荐一些好看的电影吗？',
-            '刚发现这个网站，内容很丰富啊',
-            '支持博主继续创作高质量内容！',
-            '这篇文章写得太好了，收藏了',
-            '请问有人知道下一篇文章什么时候更新吗？'
-        ];
-        
-        const randomAvatars = [
-            'https://randomuser.me/api/portraits/men/32.jpg',
-            'https://randomuser.me/api/portraits/women/44.jpg',
-            'https://randomuser.me/api/portraits/men/45.jpg',
-            'https://randomuser.me/api/portraits/women/22.jpg',
-            'https://randomuser.me/api/portraits/men/54.jpg',
-            'https://randomuser.me/api/portraits/women/67.jpg'
-        ];
-        
-        const randomUsernames = [
-            '热心网友',
-            '路过的风',
-            '阳光明媚',
-            '知识探索者',
-            '午后阳光',
-            '书中自有黄金屋',
-            '数字游民'
-        ];
-        
-        // 创建临时消息对象用于尺寸计算
-        const randomText = randomMessages[Math.floor(Math.random() * randomMessages.length)];
-        const tempMessage = document.createElement('div');
-        tempMessage.className = 'danmaku-item temp-measure';
-        tempMessage.innerHTML = `
-            <div class="danmaku-avatar">
-                <img src="${randomAvatars[Math.floor(Math.random() * randomAvatars.length)]}" alt="avatar">
-            </div>
-            <div class="danmaku-content">
-                <span class="danmaku-username">${randomUsernames[Math.floor(Math.random() * randomUsernames.length)]}:</span>
-                <span class="danmaku-text">${randomText}</span>
-            </div>
-        `;
-        document.body.appendChild(tempMessage);
-        const messageWidth = tempMessage.offsetWidth;
-        document.body.removeChild(tempMessage);
-        
-        const randomMsg = {
-            id: Date.now(),
-            username: randomUsernames[Math.floor(Math.random() * randomUsernames.length)],
-            avatar: randomAvatars[Math.floor(Math.random() * randomAvatars.length)],
-            text: randomText,
-            trackIndex: getRandomTrack(),
-            speed: getRandomSpeed(),
-            width: messageWidth
-        };
-        
-        messages.value.push(randomMsg);
-        
-        // 保持消息数量在可控范围内
-        if (messages.value.length > maxVisibleMessages) {
-            messages.value = messages.value.slice(messages.value.length - maxVisibleMessages);
-        }
-    }, 5000);
+
 });
 
 onUnmounted(() => {
@@ -522,6 +415,8 @@ onUnmounted(() => {
     border-color: var(--danmaku-hover-border);
     transform: translateY(-3px);
     z-index: 10;
+    animation-play-state: paused;
+    /* 鼠标悬停时暂停动画 */
 }
 
 .danmaku-item:hover .danmaku-text {
@@ -637,6 +532,7 @@ onUnmounted(() => {
     0% {
         transform: translateX(0);
     }
+
     100% {
         transform: translateX(calc(-100% - var(--danmaku-width) - 100vw));
     }

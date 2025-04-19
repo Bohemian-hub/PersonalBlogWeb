@@ -4,15 +4,8 @@
     <ThemeToggler class="home-theme-toggler" />
     <div class="page-wrapper" :class="currentTheme">
         <div class="page-content">
-            <!-- 页面标题区 -->
-            <header class="page-header">
-                <h1 class="page-title">学术札记</h1>
-                <p class="description">分享科研心得、学术观点与专业探索</p>
-                <div class="divider">
-                    <span class="divider-icon">📚</span>
-                </div>
-
-            </header>
+            <!-- 使用封装的页面标题组件 -->
+            <PageHeader title="学术札记" description="分享科研心得、学术观点与专业探索" icon="📚" />
 
             <!-- 主体内容区 - 两列布局 -->
             <div class="content-layout">
@@ -222,7 +215,7 @@
                                         </el-tag>
                                     </div>
                                     <el-button v-if="item.isButton" text type="primary" size="small">{{ item.buttonText
-                                        }}</el-button>
+                                    }}</el-button>
                                 </div>
                             </li>
                         </ul>
@@ -312,6 +305,7 @@ import TopBar from '../components/TopBar.vue'
 import bgFile from '@/assets/images/bg6.png'
 import Footer from '../components/Footer.vue'
 import ThemeToggler from '../components/ThemeToggler.vue'
+import PageHeader from '../components/PageHeader.vue'
 import { currentTheme } from '../stores/themeStore'
 
 // 背景图片
