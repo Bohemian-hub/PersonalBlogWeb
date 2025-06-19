@@ -123,6 +123,36 @@
                     </div>
                 </div>
 
+                <!-- 个人照片墙 - 调整位置到中间 -->
+                <h3 class="section-title">
+                    <el-icon>
+                        <Picture />
+                    </el-icon>
+                    个人照片墙
+                </h3>
+
+                <!-- 照片瀑布流布局 -->
+                <div class="masonry-grid">
+                    <div v-for="(photo, index) in personalPhotos" :key="photo.id" class="masonry-item"
+                        :class="getMasonryClass(index)" @click="showPhotoDetails(index)">
+                        <div class="photo-inner">
+                            <img :src="photo.images[0].url" :alt="photo.title" />
+                            <div class="photo-count" v-if="photo.images.length > 1">
+                                {{ photo.images.length }}
+                            </div>
+                            <div class="photo-overlay">
+                                <h4>{{ photo.title }}</h4>
+                                <p>{{ photo.location }} · {{ photo.date }}</p>
+                                <div class="photo-tags">
+                                    <el-tag size="small" v-for="tag in photo.tags" :key="tag" class="tag-item">
+                                        {{ tag }}
+                                    </el-tag>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- 座右铭和联系方式 -->
                 <div class="motto-contact">
                     <div class="motto">
@@ -133,26 +163,84 @@
                     </div>
 
                     <div class="contact-links">
-                        <a v-for="(contact, index) in contacts" :key="index" :href="contact.link" class="contact-link"
-                            :title="contact.title">
+                        <a v-for="(contact, index) in contacts" :key="index" :href="contact.link" class="contact-link">
                             <el-icon>
                                 <component :is="contact.icon" />
                             </el-icon>
+                            <span class="contact-tooltip">{{ contact.title }}</span>
                         </a>
                     </div>
                 </div>
             </section>
+
+            <!-- 照片详情弹窗 - 修改支持多张图片 -->
+            <el-dialog v-model="showPhotoDialog" class="photo-dialog" :show-close="true" width="70%" destroy-on-close>
+                <div class="photo-details">
+                    <div class="gallery-slider">
+                        <div class="current-photo">
+                            <img :src="currentImage?.url" :alt="currentImage?.caption" />
+                        </div>
+                        <div class="photo-controls" v-if="currentPhoto?.images.length > 1">
+                            <el-button type="primary" circle @click="prevImage" :disabled="currentImageIndex === 0">
+                                <el-icon>
+                                    <ArrowLeft />
+                                </el-icon>
+                            </el-button>
+                            <span class="photo-counter">{{ currentImageIndex + 1 }} / {{ currentPhoto?.images.length
+                            }}</span>
+                            <el-button type="primary" circle @click="nextImage"
+                                :disabled="currentImageIndex === (currentPhoto?.images.length - 1)">
+                                <el-icon>
+                                    <ArrowRight />
+                                </el-icon>
+                            </el-button>
+                        </div>
+                        <div class="photo-thumbnails" v-if="currentPhoto?.images.length > 1">
+                            <div v-for="(image, index) in currentPhoto?.images" :key="index" class="thumbnail"
+                                :class="{ 'active': currentImageIndex === index }" @click="currentImageIndex = index">
+                                <img :src="image.url" :alt="image.caption" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="photo-info">
+                        <h3>{{ currentPhoto?.title }}</h3>
+                        <div class="photo-meta">
+                            <div class="location">
+                                <el-icon>
+                                    <Location />
+                                </el-icon>
+                                {{ currentPhoto?.location }}
+                            </div>
+                            <div class="date">
+                                <el-icon>
+                                    <Calendar />
+                                </el-icon>
+                                {{ currentPhoto?.date }}
+                            </div>
+                        </div>
+                        <div class="photo-description" v-html="currentPhoto?.description"></div>
+                        <div class="image-caption" v-if="currentImage?.caption">
+                            <strong>当前图片:</strong> {{ currentImage?.caption }}
+                        </div>
+                        <div class="photo-tags">
+                            <el-tag v-for="tag in currentPhoto?.tags" :key="tag" class="tag-item">
+                                {{ tag }}
+                            </el-tag>
+                        </div>
+                    </div>
+                </div>
+            </el-dialog>
+
+            <!-- 底部版权 -->
+            <Footer />
+            <el-image class="bg-image" :src="bgUrl" :fit="'cover'" draggable="false"
+                :class="{ 'dim-bg': currentTheme === 'dark' }" />
         </div>
     </div>
-
-    <!-- 底部版权 -->
-    <Footer />
-    <el-image class="bg-image" :src="bgUrl" :fit="'cover'" draggable="false"
-        :class="{ 'dim-bg': currentTheme === 'dark' }" />
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import TopBar from '../components/TopBar.vue'
 import Footer from '../components/Footer.vue'
 import ThemeToggler from '../components/ThemeToggler.vue'
@@ -161,7 +249,8 @@ import { currentTheme } from '../stores/themeStore'
 import {
     Calendar, Location, Star, User, School, Connection,
     Message, ElementPlus, ChatDotRound, DataAnalysis,
-    Headset, Film, Suitcase, Reading, Brush
+    Headset, Film, Suitcase, Reading, Brush, Picture,
+    ArrowLeft, ArrowRight
 } from '@element-plus/icons-vue'
 
 // 恢复使用原始背景图片
@@ -274,16 +363,207 @@ const motto = reactive({
 
 // 联系方式
 const contacts = reactive([
-    { icon: 'Message', title: '电子邮箱', link: '#' },
-    { icon: 'ElementPlus', title: 'GitHub', link: '#' },
-    { icon: 'ChatDotRound', title: '微信', link: '#' },
-    { icon: 'Connection', title: 'LinkedIn', link: '#' }
+    { icon: Message, title: '电子邮箱', link: '#' },
+    { icon: ElementPlus, title: 'GitHub', link: '#' },
+    { icon: ChatDotRound, title: '微信', link: '#' },
+    { icon: Connection, title: 'LinkedIn', link: '#' }
+])
+
+// 个人照片墙数据 - 修改结构以支持多图并更新"实验室研究"为"工作出差"
+const personalPhotos = ref([
+    {
+        id: 1,
+        title: '研究生入学季',
+        location: '昆明理工大学',
+        date: '2022年9月',
+        description: '硕士研究生入学的第一天，开始了新的学术旅程。校园环境优美，充满学术氛围。',
+        images: [
+            {
+                url: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '校园主楼'
+            },
+            {
+                url: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '图书馆内景'
+            },
+            {
+                url: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '研究生开学典礼'
+            }
+        ],
+        tags: ['校园', '学术', '新起点']
+    },
+    {
+        id: 2,
+        title: '工作出差',
+        location: '上海人工智能大会',
+        date: '2023年4月',
+        description: '代表公司参加上海人工智能大会，了解行业最新动态，与各大企业技术专家进行交流。期间拜访了多家AI企业，为后续合作奠定基础。',
+        images: [
+            {
+                url: 'https://images.unsplash.com/photo-1483389127117-b6a2102724ae?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '技术交流会'
+            },
+            {
+                url: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '企业参观'
+            },
+            {
+                url: 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '上海夜景'
+            }
+        ],
+        tags: ['出差', '会议', '人工智能']
+    },
+    {
+        id: 3,
+        title: '第一篇论文发表',
+        location: '办公室',
+        date: '2023年7月',
+        description: '第一篇SCI论文被接收的喜悦时刻，经过数月的努力终于有了成果。',
+        images: [
+            {
+                url: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '论文成稿'
+            },
+            {
+                url: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '收到录用通知'
+            }
+        ],
+        tags: ['论文', '科研', '成就']
+    },
+    {
+        id: 4,
+        title: '技术沙龙',
+        location: '创新中心',
+        date: '2023年10月',
+        description: '参加校内技术沙龙，分享最新的AI技术发展趋势，与其他研究者交流学习。',
+        images: [
+            {
+                url: 'https://images.unsplash.com/photo-1556761175-b413da4baf72?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '演讲现场'
+            }
+        ],
+        tags: ['分享', '交流', '技术']
+    },
+    {
+        id: 5,
+        title: '周末徒步',
+        location: '云南石林',
+        date: '2023年11月',
+        description: '与实验室同学一起去石林徒步，呼吸新鲜空气，放松身心。大自然的鬼斧神工令人惊叹。',
+        images: [
+            {
+                url: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '石林全景'
+            },
+            {
+                url: 'https://images.unsplash.com/photo-1527856263669-12c3a0af2aa6?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '徒步小队'
+            },
+            {
+                url: 'https://images.unsplash.com/photo-1530521954074-e64f6810b32d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '奇特石景'
+            }
+        ],
+        tags: ['户外', '放松', '自然']
+    },
+    {
+        id: 6,
+        title: '项目演示日',
+        location: '科技园',
+        date: '2024年1月',
+        description: '向学院领导和企业代表展示我们的智能医疗辅助诊断系统，获得了积极反馈。',
+        images: [
+            {
+                url: 'https://images.unsplash.com/photo-1558403194-611308249627?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '项目展示'
+            },
+            {
+                url: 'https://images.unsplash.com/photo-1576267423445-b2e0074d68a4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '系统演示'
+            }
+        ],
+        tags: ['项目', '演示', '成果']
+    },
+    {
+        id: 7,
+        title: '学术会议',
+        location: '北京国际会议中心',
+        date: '2024年3月',
+        description: '参加全国人工智能学术会议，与领域内专家学者交流，开拓视野。',
+        images: [
+            {
+                url: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '会议现场'
+            },
+            {
+                url: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '专家报告'
+            },
+            {
+                url: 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '与同行交流'
+            }
+        ],
+        tags: ['会议', '学术', '交流']
+    }
 ])
 
 // 标签颜色辅助函数
 const getTagType = (index) => {
     const types = ['', 'success', 'warning', 'danger', 'info'];
     return types[index % types.length];
+}
+
+// 照片墙布局类名分配函数
+const getMasonryClass = (index) => {
+    const pattern = index % 8;
+    switch (pattern) {
+        case 0: return 'wide';
+        case 3: return 'tall';
+        case 5: return 'big';
+        default: return '';
+    }
+}
+
+// 照片详情弹窗控制 - 更新以支持多图浏览
+const showPhotoDialog = ref(false)
+const currentPhotoIndex = ref(0)
+const currentImageIndex = ref(0)
+
+// 当前照片组
+const currentPhoto = computed(() => personalPhotos.value[currentPhotoIndex.value])
+
+// 当前显示的照片
+const currentImage = computed(() => {
+    const photo = currentPhoto.value
+    if (photo && photo.images && photo.images.length > currentImageIndex.value) {
+        return photo.images[currentImageIndex.value]
+    }
+    return null
+})
+
+// 显示照片详情
+const showPhotoDetails = (index) => {
+    currentPhotoIndex.value = index
+    currentImageIndex.value = 0
+    showPhotoDialog.value = true
+}
+
+// 下一张图片
+const nextImage = () => {
+    if (currentImageIndex.value < currentPhoto.value.images.length - 1) {
+        currentImageIndex.value++
+    }
+}
+
+// 上一张图片
+const prevImage = () => {
+    if (currentImageIndex.value > 0) {
+        currentImageIndex.value--
+    }
 }
 </script>
 
@@ -360,16 +640,16 @@ const getTagType = (index) => {
 }
 
 .bg-image.dim-bg {
-    filter: brightness(0.6) saturate(0.8);
+    filter: brightness(0.9) saturate(0.8);
+    /* 只调整亮度和饱和度，不添加模糊 */
 }
 
-/* 全局布局 */
+/* 全局布局 - 调整与 Play 页面一致 */
 .about-wrapper {
     min-height: calc(100vh - 50px);
     display: flex;
     flex-direction: column;
     padding-bottom: 40px;
-    /* 减少底部padding */
     position: relative;
 }
 
@@ -384,10 +664,9 @@ const getTagType = (index) => {
 }
 
 .about-content {
-    padding: 60px 40px 30px;
-    /* 减少顶部和底部padding */
+    padding: 80px 40px 40px;
+    /* 调整顶部padding与Play页面一致 */
     max-width: 1400px;
-    /* 将最大宽度调整为1400px */
     margin: 0 auto;
     width: 100%;
     color: var(--text-color);
@@ -400,20 +679,21 @@ const getTagType = (index) => {
     z-index: 1000;
 }
 
-/* 页面标题 */
+/* 页面标题 - 调整与 Play 页面一致 */
 .page-header {
     text-align: center;
-    margin-bottom: 30px;
-    /* 减少底部margin */
+    margin-bottom: 40px;
+    /* 调整与Play页面一致 */
     position: relative;
 }
 
 .page-title {
-    font-size: 38px;
-    /* 稍微减小字体 */
-    margin-bottom: 10px;
-    /* 减少底部margin */
-    font-weight: 700;
+    font-size: 40px;
+    /* 调整与Play页面一致 */
+    margin-bottom: 16px;
+    /* 调整与Play页面一致 */
+    font-weight: 600;
+    /* 调整与Play页面一致 */
     background: var(--title-gradient);
     -webkit-background-clip: text;
     background-clip: text;
@@ -429,7 +709,8 @@ const getTagType = (index) => {
     margin-bottom: 20px;
     font-style: italic;
     max-width: 800px;
-    margin: 0 auto 20px;
+    margin: 0 auto 30px;
+    /* 调整与Play页面一致 */
     color: var(--text-secondary);
 }
 
@@ -458,13 +739,13 @@ const getTagType = (index) => {
     background-color: var(--bg-primary);
     border-radius: 16px;
     padding: 25px;
-    /* 减少内边距 */
-    backdrop-filter: blur(10px);
     box-shadow: var(--card-shadow);
     border: 1px solid var(--card-border);
     color: var(--text-color);
     transition: all 0.3s ease;
     animation: fadeInUp 0.6s ease-out;
+    margin-bottom: 30px;
+    /* 添加底部间距，使各部分有所区分 */
 }
 
 .profile-header {
@@ -869,11 +1150,9 @@ blockquote cite {
 .contact-links {
     display: flex;
     flex-direction: row;
-    /* 修改为水平排列 */
     gap: 12px;
     margin-top: 0;
     flex-wrap: wrap;
-    /* 允许在小屏幕上换行 */
 }
 
 .contact-link {
@@ -888,6 +1167,8 @@ blockquote cite {
     text-decoration: none;
     transition: all 0.3s ease;
     font-size: 18px;
+    position: relative;
+    /* 为tooltip定位做准备 */
 }
 
 .contact-link:hover {
@@ -896,64 +1177,296 @@ blockquote cite {
     color: var(--highlight);
 }
 
-/* 动画效果 */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
+/* 新增: 联系方式悬浮提示效果 */
+.contact-tooltip {
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    pointer-events: none;
+    /* 防止tooltip影响鼠标事件 */
+    border: 1px solid var(--card-border);
+    z-index: 10;
 }
 
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.contact-tooltip::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 0 5px 5px 5px;
+    border-style: solid;
+    border-color: transparent transparent var(--card-bg) transparent;
 }
 
-/* 添加一个桌面优化媒体查询 */
-@media (min-width: 1200px) {
-
-    .education-research,
-    .tech-interests {
-        display: grid;
-        grid-template-columns: 3fr 2fr;
-        /* 使用网格布局优化比例 */
-        gap: 20px;
-    }
-
-    /* 在大屏下优化研究标签和技能标签的布局 */
-    .research-tags,
-    .skill-tags {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        align-content: flex-start;
-    }
-
-    /* 优化兴趣爱好网格在大屏下的布局 */
-    .interests-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 15px;
-    }
-
-    .interest-image {
-        height: 120px;
-        /* 在网格布局中稍微缩小图片高度 */
-    }
+.contact-link:hover .contact-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+    animation: tooltipPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* 响应式设计 */
-@media (max-width: 900px) {
+/* 照片墙部分样式 - 完善与Play页面一致的样式 */
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 20px;
+    margin-bottom: 20px;
+    margin-top: 30px;
+    color: var(--heading-color);
+    font-weight: 600;
+}
+
+.section-title .el-icon {
+    color: var(--accent-color);
+}
+
+/* 瀑布流照片墙样式 - 补充完整样式 */
+.masonry-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: 200px;
+    grid-auto-flow: dense;
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.masonry-item {
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    grid-column: span 1;
+    grid-row: span 1;
+}
+
+.masonry-item.wide {
+    grid-column: span 2;
+}
+
+.masonry-item.tall {
+    grid-row: span 2;
+}
+
+.masonry-item.big {
+    grid-column: span 2;
+    grid-row: span 2;
+}
+
+.masonry-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.photo-inner {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.photo-inner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.masonry-item:hover .photo-inner img {
+    transform: scale(1.05);
+}
+
+/* 照片覆盖层样式 - 确保与Play页面一致 */
+.photo-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+}
+
+.about-wrapper.light .photo-overlay {
+    background: rgba(0, 0, 0, 0.6);
+    /* 确保在浅色主题下照片覆盖层文字清晰可见 */
+    color: white;
+}
+
+.masonry-item:hover .photo-overlay {
+    transform: translateY(0);
+}
+
+.photo-overlay h4 {
+    margin: 0 0 5px;
+    font-size: 16px;
+}
+
+.photo-overlay p {
+    margin: 0 0 8px;
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+/* 照片数量标签样式 - 补充样式 */
+.photo-count {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 8px;
+    border-radius: 12px;
+    z-index: 2;
+}
+
+/* 补充照片标签样式 - 与Play页面保持一致 */
+.photo-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 8px;
+}
+
+.tag-item {
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+/* 照片详情弹窗样式增强 - 支持多张图片浏览 */
+.photo-dialog :deep(.el-dialog__header) {
+    padding: 15px;
+    text-align: right;
+}
+
+.photo-dialog :deep(.el-dialog__body) {
+    padding: 0;
+}
+
+.photo-details {
+    display: flex;
+    height: 70vh;
+    max-height: 600px;
+}
+
+.gallery-slider {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+    padding-right: 20px;
+    overflow: hidden;
+}
+
+.current-photo {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 15px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.current-photo img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.photo-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.photo-counter {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.photo-thumbnails {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 10px 0;
+}
+
+.thumbnail {
+    width: 80px;
+    height: 60px;
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.thumbnail.active {
+    opacity: 1;
+    box-shadow: 0 0 0 3px var(--accent-color);
+}
+
+.thumbnail:hover {
+    opacity: 0.9;
+}
+
+.photo-info {
+    flex: 2;
+    padding: 25px;
+    overflow-y: auto;
+    background-color: var(--bg-secondary);
+    color: var(--text-color);
+}
+
+.image-caption {
+    margin-bottom: 15px;
+    padding: 8px 12px;
+    background: var(--bg-tertiary);
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+/* 响应式设计调整 */
+@media (max-width: 768px) {
+    .about-content {
+        padding: 60px 20px 20px;
+        /* 响应式布局下与Play页面保持一致 */
+    }
+
+    .page-title {
+        font-size: 32px;
+        /* 响应式布局下与Play页面保持一致 */
+    }
+
     .profile-header {
         flex-direction: column;
     }
@@ -995,6 +1508,24 @@ blockquote cite {
         width: 100%;
         justify-content: flex-start;
     }
+
+    .masonry-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .photo-details {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .gallery-slider {
+        padding-right: 0;
+        margin-bottom: 20px;
+    }
+
+    .current-photo {
+        height: 300px;
+    }
 }
 
 @media (max-width: 600px) {
@@ -1023,6 +1554,16 @@ blockquote cite {
     .about-theme-toggler {
         bottom: 20px;
         left: 20px;
+    }
+
+    /* 联系方式tooltip在小屏幕上的调整 */
+    .contact-tooltip {
+        font-size: 11px;
+        padding: 4px 8px;
+    }
+
+    .masonry-grid {
+        grid-template-columns: 1fr;
     }
 }
 </style>
