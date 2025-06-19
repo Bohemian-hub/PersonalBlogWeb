@@ -16,15 +16,6 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue'
-// import bg1Url from '@/assets/images/bg1.png'
-// import bg2Url from '@/assets/images/bg2.png'
-// import bg3Url from '@/assets/images/bg3.png'
-// import bg4Url from '@/assets/images/bg4.png'
-// import bg5Url from '@/assets/images/bg5.png'
-// import bg6Url from '@/assets/images/bg6.png'
-// import bg8Url from '@/assets/images/bg8.png'
-// import bg9Url from '@/assets/images/bg9.png'
-// import bg10Url from '@/assets/images/bg10.png'
 import bgFile from '@/assets/images/bg7.png'
 const bgUrl = bgFile
 

@@ -6,15 +6,15 @@
     <div class="about-wrapper" :class="currentTheme">
         <div class="about-content">
             <!-- 使用封装的页面标题组件 -->
-            <PageHeader title="关于我" description="人工智能研究者 / 全栈开发工程师 / 未来教育者" icon="✨" />
+            <PageHeader :title="pageHeader.title" :description="pageHeader.description" :icon="pageHeader.icon" />
 
             <!-- 简介和信息展示区 -->
             <section class="profile-section">
                 <div class="profile-header">
                     <div class="profile-image-container">
                         <div class="profile-image">
-                            <!-- <img src="@/assets/images/avatar.jpg" alt="个人照片" 
-                                 onerror="this.src='https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'" /> -->
+                            <img :src="profile.avatar" alt="个人照片"
+                                onerror="this.src='https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'" />
                         </div>
                         <div class="profile-decorations">
                             <div class="decoration-item" v-for="i in 5" :key="i"></div>
@@ -22,39 +22,28 @@
                     </div>
 
                     <div class="profile-intro">
-                        <h2>嗨，我是<span class="highlight-text">何东</span></h2>
+                        <h2>{{ profile.greeting }}<span class="highlight-text">{{ profile.name }}</span></h2>
                         <p class="intro-text">
-                            一位充满热情的技术爱好者和教育者，专注于人工智能、全栈开发与知识传递。
-                            现年25岁，即将成为一名大学教师，期待在教学与研究中探索更多可能性。
+                            {{ profile.introduction }}
                         </p>
 
                         <div class="basic-info">
                             <div class="info-row">
-                                <div class="info-item">
+                                <div class="info-item" v-for="(info, index) in profile.basicInfo.slice(0, 2)"
+                                    :key="index">
                                     <el-icon>
-                                        <Calendar />
+                                        <component :is="info.icon" />
                                     </el-icon>
-                                    <span>2000年5月20日</span>
-                                </div>
-                                <div class="info-item">
-                                    <el-icon>
-                                        <Location />
-                                    </el-icon>
-                                    <span>四川绵阳</span>
+                                    <span>{{ info.value }}</span>
                                 </div>
                             </div>
                             <div class="info-row">
-                                <div class="info-item">
+                                <div class="info-item" v-for="(info, index) in profile.basicInfo.slice(2)"
+                                    :key="index + 2">
                                     <el-icon>
-                                        <Star />
+                                        <component :is="info.icon" />
                                     </el-icon>
-                                    <span>金牛座</span>
-                                </div>
-                                <div class="info-item">
-                                    <el-icon>
-                                        <User />
-                                    </el-icon>
-                                    <span>180cm / 76kg</span>
+                                    <span>{{ info.value }}</span>
                                 </div>
                             </div>
                         </div>
@@ -66,22 +55,14 @@
                     <div class="section-block education">
                         <h3 class="block-title"><el-icon>
                                 <School />
-                            </el-icon> 教育背景</h3>
+                            </el-icon> {{ sectionTitles.education }}</h3>
                         <div class="timeline">
-                            <div class="timeline-item">
+                            <div class="timeline-item" v-for="(edu, index) in education" :key="index">
                                 <div class="timeline-dot"></div>
                                 <div class="timeline-content">
-                                    <h4>昆明理工大学</h4>
-                                    <p class="timeline-meta">人工智能专业 · 硕士</p>
-                                    <p class="timeline-period">2022 - 2025</p>
-                                </div>
-                            </div>
-                            <div class="timeline-item">
-                                <div class="timeline-dot"></div>
-                                <div class="timeline-content">
-                                    <h4>本科院校</h4>
-                                    <p class="timeline-meta">计算机科学与技术专业 · 学士</p>
-                                    <p class="timeline-period">2018 - 2022</p>
+                                    <h4>{{ edu.school }}</h4>
+                                    <p class="timeline-meta">{{ edu.major }} · {{ edu.degree }}</p>
+                                    <p class="timeline-period">{{ edu.period }}</p>
                                 </div>
                             </div>
                         </div>
@@ -90,7 +71,7 @@
                     <div class="section-block research">
                         <h3 class="block-title"><el-icon>
                                 <Connection />
-                            </el-icon> 研究方向</h3>
+                            </el-icon> {{ sectionTitles.research }}</h3>
                         <div class="research-tags">
                             <div class="research-tag" v-for="(research, index) in researchAreas" :key="index">
                                 {{ research }}
@@ -102,9 +83,12 @@
                 <!-- 技术栈和兴趣 -->
                 <div class="tech-interests">
                     <div class="section-block tech">
-                        <h3 class="block-title"><el-icon>
+                        <h3 class="block-title">
+                            <el-icon>
                                 <DataAnalysis />
-                            </el-icon> 技术栈</h3>
+                            </el-icon>
+                            {{ sectionTitles.tech }}
+                        </h3>
                         <div class="skill-categories">
                             <div class="skill-category" v-for="(category, idx) in techStack" :key="idx">
                                 <h4 class="category-name">{{ category.name }}</h4>
@@ -119,15 +103,16 @@
                     </div>
 
                     <div class="section-block interests">
-                        <h3 class="block-title"><el-icon>
+                        <h3 class="block-title">
+                            <el-icon>
                                 <Star />
-                            </el-icon> 兴趣爱好</h3>
+                            </el-icon>
+                            {{ sectionTitles.interests }}
+                        </h3>
                         <div class="interests-grid">
                             <div class="interest-item" v-for="(interest, index) in interests" :key="index">
                                 <div class="interest-icon">
-                                    <el-icon>
-                                        <component :is="interest.icon" />
-                                    </el-icon>
+                                    <img :src="interest.iconImage" :alt="interest.title">
                                 </div>
                                 <div class="interest-content">
                                     <h4>{{ interest.title }}</h4>
@@ -142,30 +127,16 @@
                 <div class="motto-contact">
                     <div class="motto">
                         <blockquote>
-                            技术改变世界，教育塑造未来。保持好奇，持续学习，让知识照亮前行的道路。
-                            <cite>- 人生观：随缘而行，不忘初心</cite>
+                            {{ motto.text }}
+                            <cite>{{ motto.cite }}</cite>
                         </blockquote>
                     </div>
 
                     <div class="contact-links">
-                        <a href="#" class="contact-link" title="电子邮箱">
+                        <a v-for="(contact, index) in contacts" :key="index" :href="contact.link" class="contact-link"
+                            :title="contact.title">
                             <el-icon>
-                                <Message />
-                            </el-icon>
-                        </a>
-                        <a href="#" class="contact-link" title="GitHub">
-                            <el-icon>
-                                <ElementPlus />
-                            </el-icon>
-                        </a>
-                        <a href="#" class="contact-link" title="微信">
-                            <el-icon>
-                                <ChatDotRound />
-                            </el-icon>
-                        </a>
-                        <a href="#" class="contact-link" title="LinkedIn">
-                            <el-icon>
-                                <Connection />
+                                <component :is="contact.icon" />
                             </el-icon>
                         </a>
                     </div>
@@ -181,7 +152,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
 import TopBar from '../components/TopBar.vue'
 import Footer from '../components/Footer.vue'
 import ThemeToggler from '../components/ThemeToggler.vue'
@@ -193,23 +164,66 @@ import {
     Headset, Film, Suitcase, Reading, Brush
 } from '@element-plus/icons-vue'
 
-// 导入背景图片
-import bgFile from '@/assets/images/bg7.png' // 假设有这个图片，如果没有请替换为实际存在的图片
-
-// 背景图片
+// 恢复使用原始背景图片
+import bgFile from '@/assets/images/bg7.png'
 const bgUrl = bgFile
 
+// 页面头部信息
+const pageHeader = reactive({
+    title: "关于我",
+    description: "人工智能研究者 / 全栈开发工程师 / 未来教育者",
+    icon: "✨"
+})
+
+// 个人资料信息
+const profile = reactive({
+    avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=80",
+    greeting: "嗨，我是",
+    name: "何东",
+    introduction: "一位充满热情的技术爱好者和教育者，专注于人工智能、全栈开发与知识传递。现年25岁，即将成为一名大学教师，期待在教学与研究中探索更多可能性。",
+    basicInfo: [
+        { icon: 'Calendar', value: '2000年5月20日' },
+        { icon: 'Location', value: '四川绵阳' },
+        { icon: 'Star', value: '金牛座' },
+        { icon: 'User', value: '180cm / 76kg' }
+    ]
+})
+
+// 区段标题
+const sectionTitles = reactive({
+    education: "教育背景",
+    research: "研究方向",
+    tech: "技术栈",
+    interests: "兴趣爱好"
+})
+
+// 教育背景
+const education = reactive([
+    {
+        school: "昆明理工大学",
+        major: "人工智能专业",
+        degree: "硕士",
+        period: "2022 - 2025"
+    },
+    {
+        school: "本科院校",
+        major: "计算机科学与技术专业",
+        degree: "学士",
+        period: "2018 - 2022"
+    }
+])
+
 // 研究方向
-const researchAreas = [
+const researchAreas = reactive([
     '生物医学工程',
     '自然语言处理',
     '信息抽取',
     '知识图谱',
     '大模型应用'
-]
+])
 
 // 技术栈
-const techStack = [
+const techStack = reactive([
     {
         name: '前端开发',
         skills: ['Vue.js', 'HTML5/CSS3', 'JavaScript', 'TypeScript', '微信小程序']
@@ -226,31 +240,45 @@ const techStack = [
         name: '人工智能',
         skills: ['PyTorch', 'TensorFlow', 'NLP', '大型语言模型', '知识图谱']
     }
-]
+])
 
 // 兴趣爱好
-const interests = [
+const interests = reactive([
     {
-        icon: 'Suitcase',
+        iconImage: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80",
         title: '旅游探索',
-        description: '喜欢探索不同的城市和自然风光，体验多元文化，收集各地的独特记忆。'
+        description: '喜欢探索不同的城市和自然风光，体验多元文化，收集各地的独特记忆。',
     },
     {
-        icon: 'Brush',
+        iconImage: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80",
         title: '软硬件开发',
-        description: '业余时间喜欢动手做一些创意硬件项目，结合软件开发创造实用工具。'
+        description: '业余时间喜欢动手做一些创意硬件项目，结合软件开发创造实用工具。',
     },
     {
-        icon: 'Headset',
+        iconImage: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80",
         title: '音乐欣赏',
-        description: '热爱民谣音乐，尤其喜欢回春丹、福绿寿等歌手的作品，享受音乐带来的情感共鸣。'
+        description: '热爱民谣音乐，尤其喜欢回春丹、福绿寿等歌手的作品，享受音乐带来的情感共鸣。',
     },
     {
-        icon: 'Film',
+        iconImage: "https://images.unsplash.com/photo-1478720568477-152d9b164e26?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80",
         title: '影视作品',
-        description: '科幻电影和古装玄幻剧是闲暇时最爱的放松方式，享受想象力与视觉盛宴。'
+        description: '科幻电影和古装玄幻剧是闲暇时最爱的放松方式，享受想象力与视觉盛宴。',
     }
-]
+])
+
+// 座右铭
+const motto = reactive({
+    text: "技术改变世界，教育塑造未来。保持好奇，持续学习，让知识照亮前行的道路。",
+    cite: "- 人生观：随缘而行，不忘初心"
+})
+
+// 联系方式
+const contacts = reactive([
+    { icon: 'Message', title: '电子邮箱', link: '#' },
+    { icon: 'ElementPlus', title: 'GitHub', link: '#' },
+    { icon: 'ChatDotRound', title: '微信', link: '#' },
+    { icon: 'Connection', title: 'LinkedIn', link: '#' }
+])
 
 // 标签颜色辅助函数
 const getTagType = (index) => {
@@ -340,7 +368,8 @@ const getTagType = (index) => {
     min-height: calc(100vh - 50px);
     display: flex;
     flex-direction: column;
-    padding-bottom: 40px; /* 减少底部padding */
+    padding-bottom: 40px;
+    /* 减少底部padding */
     position: relative;
 }
 
@@ -355,8 +384,10 @@ const getTagType = (index) => {
 }
 
 .about-content {
-    padding: 60px 40px 30px; /* 减少顶部和底部padding */
-    max-width: 1400px; /* 将最大宽度调整为1400px */
+    padding: 60px 40px 30px;
+    /* 减少顶部和底部padding */
+    max-width: 1400px;
+    /* 将最大宽度调整为1400px */
     margin: 0 auto;
     width: 100%;
     color: var(--text-color);
@@ -372,13 +403,16 @@ const getTagType = (index) => {
 /* 页面标题 */
 .page-header {
     text-align: center;
-    margin-bottom: 30px; /* 减少底部margin */
+    margin-bottom: 30px;
+    /* 减少底部margin */
     position: relative;
 }
 
 .page-title {
-    font-size: 38px; /* 稍微减小字体 */
-    margin-bottom: 10px; /* 减少底部margin */
+    font-size: 38px;
+    /* 稍微减小字体 */
+    margin-bottom: 10px;
+    /* 减少底部margin */
     font-weight: 700;
     background: var(--title-gradient);
     -webkit-background-clip: text;
@@ -423,7 +457,8 @@ const getTagType = (index) => {
 .profile-section {
     background-color: var(--bg-primary);
     border-radius: 16px;
-    padding: 25px; /* 减少内边距 */
+    padding: 25px;
+    /* 减少内边距 */
     backdrop-filter: blur(10px);
     box-shadow: var(--card-shadow);
     border: 1px solid var(--card-border);
@@ -434,8 +469,10 @@ const getTagType = (index) => {
 
 .profile-header {
     display: flex;
-    gap: 20px; /* 减少间距 */
-    margin-bottom: 25px; /* 减少底部margin */
+    gap: 20px;
+    /* 减少间距 */
+    margin-bottom: 25px;
+    /* 减少底部margin */
     align-items: center;
 }
 
@@ -445,7 +482,8 @@ const getTagType = (index) => {
 }
 
 .profile-image {
-    width: 160px; /* 稍微减小图片尺寸 */
+    width: 160px;
+    /* 稍微减小图片尺寸 */
     height: 160px;
     border-radius: 16px;
     overflow: hidden;
@@ -531,17 +569,23 @@ const getTagType = (index) => {
 }
 
 .intro-text {
-    font-size: 15px; /* 稍微减小字体 */
-    line-height: 1.6; /* 减小行高 */
-    margin-bottom: 15px; /* 减少底部margin */
+    font-size: 15px;
+    /* 稍微减小字体 */
+    line-height: 1.6;
+    /* 减小行高 */
+    margin-bottom: 15px;
+    /* 减少底部margin */
     color: var(--text-secondary);
 }
 
 .basic-info {
     display: flex;
-    flex-direction: row; /* 改为水平排列 */
-    gap: 20px; /* 调整间距 */
-    flex-wrap: wrap; /* 允许换行 */
+    flex-direction: row;
+    /* 改为水平排列 */
+    gap: 20px;
+    /* 调整间距 */
+    flex-wrap: wrap;
+    /* 允许换行 */
 }
 
 .info-row {
@@ -564,14 +608,17 @@ const getTagType = (index) => {
 /* 教育和研究区域 */
 .education-research {
     display: flex;
-    gap: 20px; /* 减少间距 */
-    margin-bottom: 25px; /* 减少底部margin */
+    gap: 20px;
+    /* 减少间距 */
+    margin-bottom: 25px;
+    /* 减少底部margin */
 }
 
 .section-block {
     background-color: var(--bg-secondary);
     border-radius: 12px;
-    padding: 18px; /* 减少内边距 */
+    padding: 18px;
+    /* 减少内边距 */
     box-shadow: var(--card-shadow);
     transition: transform 0.3s ease;
 }
@@ -589,8 +636,10 @@ const getTagType = (index) => {
 }
 
 .block-title {
-    font-size: 17px; /* 稍微减小字体 */
-    margin-bottom: 12px; /* 减少底部margin */
+    font-size: 17px;
+    /* 稍微减小字体 */
+    margin-bottom: 12px;
+    /* 减少底部margin */
     display: flex;
     align-items: center;
     gap: 8px;
@@ -621,8 +670,10 @@ const getTagType = (index) => {
 
 .timeline-item {
     position: relative;
-    padding-bottom: 12px; /* 减少底部padding */
-    margin-bottom: 8px; /* 减少底部margin */
+    padding-bottom: 12px;
+    /* 减少底部padding */
+    margin-bottom: 8px;
+    /* 减少底部margin */
 }
 
 .timeline-item:last-child {
@@ -645,7 +696,8 @@ const getTagType = (index) => {
 }
 
 .timeline-content h4 {
-    margin: 0 0 3px 0; /* 减少底部margin */
+    margin: 0 0 3px 0;
+    /* 减少底部margin */
     font-size: 16px;
     font-weight: 600;
     color: var(--heading-color);
@@ -688,8 +740,10 @@ const getTagType = (index) => {
 /* 技术栈和兴趣 */
 .tech-interests {
     display: flex;
-    gap: 20px; /* 减少间距 */
-    margin-bottom: 25px; /* 减少底部margin */
+    gap: 20px;
+    /* 减少间距 */
+    margin-bottom: 25px;
+    /* 减少底部margin */
 }
 
 .tech {
@@ -703,12 +757,15 @@ const getTagType = (index) => {
 .skill-categories {
     display: flex;
     flex-direction: column;
-    gap: 12px; /* 减少间距 */
+    gap: 12px;
+    /* 减少间距 */
 }
 
 .category-name {
-    font-size: 15px; /* 稍微减小字体 */
-    margin: 0 0 5px 0; /* 减少底部margin */
+    font-size: 15px;
+    /* 稍微减小字体 */
+    margin: 0 0 5px 0;
+    /* 减少底部margin */
     color: var(--heading-color);
 }
 
@@ -727,25 +784,31 @@ const getTagType = (index) => {
 .interests-grid {
     display: flex;
     flex-direction: column;
-    gap: 12px; /* 减少间距 */
+    gap: 15px;
 }
 
 .interest-item {
     display: flex;
-    gap: 10px; /* 减少间距 */
+    gap: 10px;
     align-items: flex-start;
 }
 
 .interest-icon {
-    background-color: var(--accent-color);
-    color: white;
-    width: 32px; /* 减小图标尺寸 */
+    width: 32px;
     height: 32px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    overflow: hidden;
+    /* 确保图片不会溢出圆形边界 */
+}
+
+.interest-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .interest-content {
@@ -760,34 +823,35 @@ const getTagType = (index) => {
 
 .interest-content p {
     margin: 0;
-    font-size: 13px; /* 稍微减小字体 */
-    line-height: 1.4; /* 减小行高 */
+    font-size: 13px;
+    line-height: 1.4;
     color: var(--text-secondary);
 }
 
 /* 座右铭和联系方式 */
 .motto-contact {
     display: flex;
-    flex-direction: row; /* 改为水平排列 */
+    flex-direction: row;
     gap: 20px;
-    align-items: flex-start; /* 顶部对齐 */
-    justify-content: space-between; /* 两端对齐 */
+    align-items: center;
+    /* 修改为居中对齐，更好地与联系图标对齐 */
+    justify-content: space-between;
 }
 
 .motto {
-    width: 75%; /* 占据75%的宽度 */
+    width: 75%;
     padding: 0;
 }
 
 blockquote {
     background-color: var(--quote-bg);
     border-left: 4px solid var(--accent-color);
-    padding: 12px 18px; /* 减少内边距 */
+    padding: 12px 18px;
     margin: 0;
     border-radius: 8px;
     font-style: italic;
-    font-size: 15px; /* 减小字体 */
-    line-height: 1.5; /* 减小行高 */
+    font-size: 15px;
+    line-height: 1.5;
     color: var(--text-color);
     position: relative;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -804,9 +868,12 @@ blockquote cite {
 
 .contact-links {
     display: flex;
-    flex-direction: column; /* 垂直排列社交链接 */
+    flex-direction: row;
+    /* 修改为水平排列 */
     gap: 12px;
     margin-top: 0;
+    flex-wrap: wrap;
+    /* 允许在小屏幕上换行 */
 }
 
 .contact-link {
@@ -854,13 +921,15 @@ blockquote cite {
 
 /* 添加一个桌面优化媒体查询 */
 @media (min-width: 1200px) {
+
     .education-research,
     .tech-interests {
         display: grid;
-        grid-template-columns: 3fr 2fr; /* 使用网格布局优化比例 */
+        grid-template-columns: 3fr 2fr;
+        /* 使用网格布局优化比例 */
         gap: 20px;
     }
-    
+
     /* 在大屏下优化研究标签和技能标签的布局 */
     .research-tags,
     .skill-tags {
@@ -869,12 +938,17 @@ blockquote cite {
         gap: 8px;
         align-content: flex-start;
     }
-    
+
     /* 优化兴趣爱好网格在大屏下的布局 */
     .interests-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         gap: 15px;
+    }
+
+    .interest-image {
+        height: 120px;
+        /* 在网格布局中稍微缩小图片高度 */
     }
 }
 
@@ -894,7 +968,8 @@ blockquote cite {
 
     .basic-info {
         justify-content: center;
-        flex-direction: column; /* 在小屏上恢复垂直布局 */
+        flex-direction: column;
+        /* 在小屏上恢复垂直布局 */
     }
 
     .education-research,
@@ -905,13 +980,20 @@ blockquote cite {
     .info-row {
         justify-content: center;
     }
-    
+
     .motto-contact {
-        flex-direction: column; /* 在小屏上恢复垂直布局 */
+        flex-direction: column;
+        align-items: flex-start;
     }
-    
+
     .motto {
         width: 100%;
+        margin-bottom: 15px;
+    }
+
+    .contact-links {
+        width: 100%;
+        justify-content: flex-start;
     }
 }
 

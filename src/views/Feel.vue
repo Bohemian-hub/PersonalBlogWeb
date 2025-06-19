@@ -148,7 +148,7 @@
                             <div class="status-item">
                                 <span class="status-icon thinking">
                                     <el-icon>
-                                        <Lightbulb />
+                                        <EditPen />
                                     </el-icon>
                                 </span>
                                 <div class="status-detail">
@@ -245,7 +245,7 @@
 import { ref } from 'vue'
 import {
     Edit, Star, ChatDotRound, ArrowRight, Reading,
-    Search, Menu, Collection, PriceTag, MagicStick, Lightbulb, EditPen
+    Search, Menu, Collection, PriceTag, MagicStick, EditPen
 } from '@element-plus/icons-vue'
 import TopBar from '../components/TopBar.vue'
 import Footer from '../components/Footer.vue'

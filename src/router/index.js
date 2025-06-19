@@ -20,14 +20,6 @@ const routes = [
         }
     },
     {
-        path: '/about',
-        name: 'About',
-        component: About,
-        meta: {
-            title: '关于我 - HeDong的博客'
-        }
-    },
-    {
         path: '/research',
         name: 'Research',
         component: Research,
@@ -65,6 +57,14 @@ const routes = [
         component: Say,
         meta: {
             title: '互动集市 - HeDong的博客'
+        }
+    },
+    {
+        path: '/about',
+        name: 'About',
+        component: About,
+        meta: {
+            title: '关于我 - HeDong的博客'
         }
     },
     {
