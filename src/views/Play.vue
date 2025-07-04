@@ -1850,7 +1850,40 @@ onUnmounted(() => {
     }
 
     .masonry-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(1, 1fr);
+        grid-auto-rows: auto;
+    }
+    
+    /* 移动端特别样式 - 重置所有网格项为单列 */
+    .masonry-item {
+        grid-column: span 1 !important;
+        grid-row: span 1 !important;
+        height: 250px;
+        margin-bottom: 20px;
+    }
+    
+    /* 移动端直接显示照片信息，不需要悬浮 */
+    .photo-overlay {
+        transform: translateY(0);
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0) 120px);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+    }
+    
+    /* 调整标签在移动端的显示 */
+    .tags {
+        max-width: 100%;
+        overflow-x: auto;
+        padding-bottom: 5px;
+        /* 允许水平滚动查看所有标签 */
+        flex-wrap: nowrap;
+        scrollbar-width: none; /* Firefox */
+    }
+    
+    .tags::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, Edge */
     }
 
     .article-grid {
@@ -1881,11 +1914,25 @@ onUnmounted(() => {
         flex-direction: column;
         align-items: flex-start;
     }
+    
+    /* 移动端照片统计显示优化 */
+    .photo-stats {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(0, 0, 0, 0.6);
+        border-radius: 20px;
+        padding: 3px 8px;
+    }
 }
 
 @media (max-width: 480px) {
     .masonry-grid {
         grid-template-columns: 1fr;
+    }
+    
+    .masonry-item {
+        height: 220px;
     }
 
     .article-grid {
@@ -1894,6 +1941,17 @@ onUnmounted(() => {
 
     .control-buttons {
         gap: 10px;
+    }
+    
+    /* 标题字体缩小 */
+    .photo-overlay h4 {
+        font-size: 18px;
+    }
+    
+    /* 照片计数移到左上角 */
+    .photo-count {
+        left: 10px;
+        right: auto;
     }
 }
 </style>

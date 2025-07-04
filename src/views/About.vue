@@ -142,11 +142,24 @@
                             </div>
                             <div class="photo-overlay">
                                 <h4>{{ photo.title }}</h4>
-                                <p>{{ photo.location }} · {{ photo.date }}</p>
-                                <div class="photo-tags">
+                                <!-- 修改标签区域的类名为tags与Play页面保持一致 -->
+                                <div class="tags">
                                     <el-tag size="small" v-for="tag in photo.tags" :key="tag" class="tag-item">
                                         {{ tag }}
                                     </el-tag>
+                                </div>
+                                <!-- 修改为只显示位置，与Play页面保持一致 -->
+                                <p>{{ photo.location }}</p>
+                                <!-- 添加照片点赞和评论数量显示 -->
+                                <div class="photo-stats">
+                                    <div class="stat-item">
+                                        <img :src="heartIcon" alt="likes" class="stat-icon" />
+                                        <span>{{ photo.likes }}</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <img :src="commentIcon" alt="comments" class="stat-icon" />
+                                        <span>{{ photo.comments.length }}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -173,70 +186,20 @@
                 </div>
             </section>
 
-            <!-- 照片详情弹窗 - 修改支持多张图片 -->
-            <el-dialog v-model="showPhotoDialog" class="photo-dialog" :show-close="true" width="70%" destroy-on-close>
-                <div class="photo-details">
-                    <div class="gallery-slider">
-                        <div class="current-photo">
-                            <img :src="currentImage?.url" :alt="currentImage?.caption" />
-                        </div>
-                        <div class="photo-controls" v-if="currentPhoto?.images.length > 1">
-                            <el-button type="primary" circle @click="prevImage" :disabled="currentImageIndex === 0">
-                                <el-icon>
-                                    <ArrowLeft />
-                                </el-icon>
-                            </el-button>
-                            <span class="photo-counter">{{ currentImageIndex + 1 }} / {{ currentPhoto?.images.length
-                            }}</span>
-                            <el-button type="primary" circle @click="nextImage"
-                                :disabled="currentImageIndex === (currentPhoto?.images.length - 1)">
-                                <el-icon>
-                                    <ArrowRight />
-                                </el-icon>
-                            </el-button>
-                        </div>
-                        <div class="photo-thumbnails" v-if="currentPhoto?.images.length > 1">
-                            <div v-for="(image, index) in currentPhoto?.images" :key="index" class="thumbnail"
-                                :class="{ 'active': currentImageIndex === index }" @click="currentImageIndex = index">
-                                <img :src="image.url" :alt="image.caption" />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="photo-info">
-                        <h3>{{ currentPhoto?.title }}</h3>
-                        <div class="photo-meta">
-                            <div class="location">
-                                <el-icon>
-                                    <Location />
-                                </el-icon>
-                                {{ currentPhoto?.location }}
-                            </div>
-                            <div class="date">
-                                <el-icon>
-                                    <Calendar />
-                                </el-icon>
-                                {{ currentPhoto?.date }}
-                            </div>
-                        </div>
-                        <div class="photo-description" v-html="currentPhoto?.description"></div>
-                        <div class="image-caption" v-if="currentImage?.caption">
-                            <strong>当前图片:</strong> {{ currentImage?.caption }}
-                        </div>
-                        <div class="photo-tags">
-                            <el-tag v-for="tag in currentPhoto?.tags" :key="tag" class="tag-item">
-                                {{ tag }}
-                            </el-tag>
-                        </div>
-                    </div>
-                </div>
-            </el-dialog>
-
-            <!-- 底部版权 -->
-            <Footer />
-            <el-image class="bg-image" :src="bgUrl" :fit="'cover'" draggable="false"
-                :class="{ 'dim-bg': currentTheme === 'dark' }" />
         </div>
     </div>
+
+    <!-- 底部版权 - 移到about-wrapper外部，与Play页面保持一致 -->
+    <Footer />
+    
+    <!-- 替换原来的照片详情弹窗为PhotoGallery组件 -->
+    <PhotoGallery v-model:visible="showPhotoDialog" :photos="personalPhotos" :initialPhotoIndex="currentPhotoIndex"
+        :heartFilledIcon="heartIcon" :heartOutlineIcon="heartOutlineIcon" :commentIcon="commentIcon"
+        :likedPhotoIds="likedPhotos" @like="handlePhotoLike" @comment="handlePhotoComment" />
+
+    <!-- 背景图片 - 秮到与Play页面相同位置 -->
+    <el-image class="bg-image" :src="bgUrl" :fit="'cover'" draggable="false"
+        :class="{ 'dim-bg': currentTheme === 'dark' }" />
 </template>
 
 <script setup>
@@ -252,6 +215,17 @@ import {
     Headset, Film, Suitcase, Reading, Brush, Picture,
     ArrowLeft, ArrowRight
 } from '@element-plus/icons-vue'
+import PhotoGallery from '../components/PhotoGallery.vue'
+import { ElMessage } from 'element-plus'
+
+// 引入点赞和评论图标
+import heartFilledIcon from '@/assets/icons/heart-filled.png'
+import commentIconFile from '@/assets/icons/comment.png'
+import heartOutlineIcon from '@/assets/icons/heart.png'
+
+// 图标引用
+const heartIcon = heartFilledIcon
+const commentIcon = commentIconFile
 
 // 恢复使用原始背景图片
 import bgFile from '@/assets/images/bg7.png'
@@ -369,14 +343,14 @@ const contacts = reactive([
     { icon: Connection, title: 'LinkedIn', link: '#' }
 ])
 
-// 个人照片墙数据 - 修改结构以支持多图并更新"实验室研究"为"工作出差"
+// 个人照片墙数据 - 修改结构以支持多图浏览，并添加likes和comments字段
 const personalPhotos = ref([
     {
         id: 1,
         title: '研究生入学季',
         location: '昆明理工大学',
         date: '2022年9月',
-        description: '硕士研究生入学的第一天，开始了新的学术旅程。校园环境优美，充满学术氛围。',
+        description: '<h1>硕士研究生入学</h1><p>入学的第一天，开始了新的学术旅程。校园环境优美，充满学术氛围。</p>',
         images: [
             {
                 url: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
@@ -391,14 +365,23 @@ const personalPhotos = ref([
                 caption: '研究生开学典礼'
             }
         ],
-        tags: ['校园', '学术', '新起点']
+        tags: ['校园', '学术', '新起点'],
+        likes: 78,
+        comments: [
+            {
+                author: '同学小王',
+                avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
+                text: '恭喜入学！我也是昆工的学生，有空可以一起交流',
+                time: '2天前'
+            }
+        ]
     },
     {
         id: 2,
         title: '工作出差',
         location: '上海人工智能大会',
         date: '2023年4月',
-        description: '代表公司参加上海人工智能大会，了解行业最新动态，与各大企业技术专家进行交流。期间拜访了多家AI企业，为后续合作奠定基础。',
+        description: '<h1>上海人工智能大会</h1><p>代表公司参加上海人工智能大会，了解行业最新动态，与各大企业技术专家进行交流。期间拜访了多家AI企业，为后续合作奠定基础。</p>',
         images: [
             {
                 url: 'https://images.unsplash.com/photo-1483389127117-b6a2102724ae?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
@@ -413,14 +396,29 @@ const personalPhotos = ref([
                 caption: '上海夜景'
             }
         ],
-        tags: ['出差', '会议', '人工智能']
+        tags: ['出差', '会议', '人工智能'],
+        likes: 56,
+        comments: [
+            {
+                author: 'AI研究员',
+                avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
+                text: '这次大会干货满满，我也参加了，可惜没有遇到你',
+                time: '1周前'
+            },
+            {
+                author: '技术总监',
+                avatar: 'https://randomuser.me/api/portraits/men/45.jpg',
+                text: '会上的张教授演讲确实很精彩，学到很多',
+                time: '3周前'
+            }
+        ]
     },
     {
         id: 3,
         title: '第一篇论文发表',
         location: '办公室',
         date: '2023年7月',
-        description: '第一篇SCI论文被接收的喜悦时刻，经过数月的努力终于有了成果。',
+        description: '<h1>SCI论文接收</h1><p>第一篇SCI论文被接收的喜悦时刻，经过数月的努力终于有了成果。</p>',
         images: [
             {
                 url: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
@@ -431,28 +429,39 @@ const personalPhotos = ref([
                 caption: '收到录用通知'
             }
         ],
-        tags: ['论文', '科研', '成就']
+        tags: ['论文', '科研', '成就'],
+        likes: 124,
+        comments: [
+            {
+                author: '导师',
+                avatar: 'https://randomuser.me/api/portraits/men/52.jpg',
+                text: '恭喜你！这是一个很好的开始，继续努力！',
+                time: '5天前'
+            }
+        ]
     },
     {
         id: 4,
         title: '技术沙龙',
         location: '创新中心',
         date: '2023年10月',
-        description: '参加校内技术沙龙，分享最新的AI技术发展趋势，与其他研究者交流学习。',
+        description: '<h1>技术沙龙分享</h1><p>参加校内技术沙龙，分享最新的AI技术发展趋势，与其他研究者交流学习。</p>',
         images: [
             {
                 url: 'https://images.unsplash.com/photo-1556761175-b413da4baf72?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
                 caption: '演讲现场'
             }
         ],
-        tags: ['分享', '交流', '技术']
+        tags: ['分享', '交流', '技术'],
+        likes: 45,
+        comments: []
     },
     {
         id: 5,
         title: '周末徒步',
         location: '云南石林',
         date: '2023年11月',
-        description: '与实验室同学一起去石林徒步，呼吸新鲜空气，放松身心。大自然的鬼斧神工令人惊叹。',
+        description: '<h1>石林徒步</h1><p>与实验室同学一起去石林徒步，呼吸新鲜空气，放松身心。大自然的鬼斧神工令人惊叹。</p>',
         images: [
             {
                 url: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
@@ -467,14 +476,29 @@ const personalPhotos = ref([
                 caption: '奇特石景'
             }
         ],
-        tags: ['户外', '放松', '自然']
+        tags: ['户外', '放松', '自然'],
+        likes: 89,
+        comments: [
+            {
+                author: '同学小李',
+                avatar: 'https://randomuser.me/api/portraits/women/33.jpg',
+                text: '下次去记得叫上我啊，这里风景真美！',
+                time: '3天前'
+            },
+            {
+                author: '摄影爱好者',
+                avatar: 'https://randomuser.me/api/portraits/men/91.jpg',
+                text: '构图不错，石林的景色拍出来很有层次感',
+                time: '1周前'
+            }
+        ]
     },
     {
         id: 6,
         title: '项目演示日',
         location: '科技园',
         date: '2024年1月',
-        description: '向学院领导和企业代表展示我们的智能医疗辅助诊断系统，获得了积极反馈。',
+        description: '<h1>项目成果展示</h1><p>向学院领导和企业代表展示我们的智能医疗辅助诊断系统，获得了积极反馈。</p>',
         images: [
             {
                 url: 'https://images.unsplash.com/photo-1558403194-611308249627?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
@@ -485,14 +509,23 @@ const personalPhotos = ref([
                 caption: '系统演示'
             }
         ],
-        tags: ['项目', '演示', '成果']
+        tags: ['项目', '演示', '成果'],
+        likes: 67,
+        comments: [
+            {
+                author: '医学专家',
+                avatar: 'https://randomuser.me/api/portraits/men/22.jpg',
+                text: '这个系统很有潜力，希望能尽快应用到临床实践中',
+                time: '2周前'
+            }
+        ]
     },
     {
         id: 7,
         title: '学术会议',
         location: '北京国际会议中心',
         date: '2024年3月',
-        description: '参加全国人工智能学术会议，与领域内专家学者交流，开拓视野。',
+        description: '<h1>全国人工智能学术会议</h1><p>参加全国人工智能学术会议，与领域内专家学者交流，开拓视野。</p>',
         images: [
             {
                 url: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
@@ -507,7 +540,9 @@ const personalPhotos = ref([
                 caption: '与同行交流'
             }
         ],
-        tags: ['会议', '学术', '交流']
+        tags: ['会议', '学术', '交流'],
+        likes: 35,
+        comments: []
     }
 ])
 
@@ -528,42 +563,40 @@ const getMasonryClass = (index) => {
     }
 }
 
-// 照片详情弹窗控制 - 更新以支持多图浏览
+// 照片详情弹窗控制
 const showPhotoDialog = ref(false)
 const currentPhotoIndex = ref(0)
-const currentImageIndex = ref(0)
-
-// 当前照片组
-const currentPhoto = computed(() => personalPhotos.value[currentPhotoIndex.value])
-
-// 当前显示的照片
-const currentImage = computed(() => {
-    const photo = currentPhoto.value
-    if (photo && photo.images && photo.images.length > currentImageIndex.value) {
-        return photo.images[currentImageIndex.value]
-    }
-    return null
-})
+const likedPhotos = ref([]) // 存储已点赞的照片ID
 
 // 显示照片详情
 const showPhotoDetails = (index) => {
     currentPhotoIndex.value = index
-    currentImageIndex.value = 0
     showPhotoDialog.value = true
 }
 
-// 下一张图片
-const nextImage = () => {
-    if (currentImageIndex.value < currentPhoto.value.images.length - 1) {
-        currentImageIndex.value++
+// 处理照片点赞
+const handlePhotoLike = (photoId) => {
+    const photoIndex = personalPhotos.value.findIndex(photo => photo.id === photoId);
+    if (photoIndex === -1) return;
+
+    if (likedPhotos.value.includes(photoId)) {
+        // 取消点赞
+        likedPhotos.value = likedPhotos.value.filter(id => id !== photoId);
+        personalPhotos.value[photoIndex].likes--;
+    } else {
+        // 添加点赞
+        likedPhotos.value.push(photoId);
+        personalPhotos.value[photoIndex].likes++;
     }
 }
 
-// 上一张图片
-const prevImage = () => {
-    if (currentImageIndex.value > 0) {
-        currentImageIndex.value--
-    }
+// 处理照片评论
+const handlePhotoComment = ({ photoId, comment }) => {
+    const photoIndex = personalPhotos.value.findIndex(photo => photo.id === photoId);
+    if (photoIndex === -1) return;
+
+    personalPhotos.value[photoIndex].comments.unshift(comment);
+    ElMessage.success('评论成功！');
 }
 </script>
 
@@ -644,12 +677,19 @@ const prevImage = () => {
     /* 只调整亮度和饱和度，不添加模糊 */
 }
 
+.about-theme-toggler {
+    position: fixed;
+    bottom: 30px;
+    left: 30px;
+    z-index: 1000;
+}
+
 /* 全局布局 - 调整与 Play 页面一致 */
 .about-wrapper {
     min-height: calc(100vh - 50px);
     display: flex;
     flex-direction: column;
-    padding-bottom: 40px;
+    padding-bottom: 100px; /* 调整为与Play页面一致的100px */
     position: relative;
 }
 
@@ -665,18 +705,27 @@ const prevImage = () => {
 
 .about-content {
     padding: 80px 40px 40px;
-    /* 调整顶部padding与Play页面一致 */
     max-width: 1400px;
     margin: 0 auto;
     width: 100%;
     color: var(--text-color);
 }
 
-.about-theme-toggler {
+/* 背景图片样式 */
+.bg-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: filter 0.5s ease;
     position: fixed;
-    bottom: 30px;
-    left: 30px;
-    z-index: 1000;
+    top: 0;
+    left: 0;
+    opacity: 1;
+    z-index: -2;
+}
+
+.bg-image.dim-bg {
+    filter: brightness(0.9) saturate(0.8);
 }
 
 /* 页面标题 - 调整与 Play 页面一致 */
@@ -1305,7 +1354,6 @@ blockquote cite {
 
 .about-wrapper.light .photo-overlay {
     background: rgba(0, 0, 0, 0.6);
-    /* 确保在浅色主题下照片覆盖层文字清晰可见 */
     color: white;
 }
 
@@ -1319,152 +1367,60 @@ blockquote cite {
 }
 
 .photo-overlay p {
-    margin: 0 0 8px;
+    margin: 0;
     font-size: 14px;
     opacity: 0.9;
 }
 
-/* 照片数量标签样式 - 补充样式 */
-.photo-count {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: rgba(0, 0, 0, 0.7);
-    color: white;
-    font-size: 12px;
-    font-weight: 500;
-    padding: 4px 8px;
-    border-radius: 12px;
-    z-index: 2;
-}
-
-/* 补充照片标签样式 - 与Play页面保持一致 */
-.photo-tags {
+/* 修改标签样式，与Play页面保持一致 */
+.tags {
     display: flex;
     flex-wrap: wrap;
     gap: 5px;
-    margin-top: 8px;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 .tag-item {
+    background: var(--tag-bg);
+    color: var(--tag-text);
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
     margin-right: 5px;
-    margin-bottom: 5px;
 }
 
-/* 照片详情弹窗样式增强 - 支持多张图片浏览 */
-.photo-dialog :deep(.el-dialog__header) {
-    padding: 15px;
-    text-align: right;
-}
-
-.photo-dialog :deep(.el-dialog__body) {
-    padding: 0;
-}
-
-.photo-details {
-    display: flex;
-    height: 70vh;
-    max-height: 600px;
-}
-
-.gallery-slider {
-    flex: 3;
-    display: flex;
-    flex-direction: column;
-    padding-right: 20px;
-    overflow: hidden;
-}
-
-.current-photo {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 15px;
-    background-color: rgba(0, 0, 0, 0.2);
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-.current-photo img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-}
-
-.photo-controls {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 15px;
-}
-
-.photo-counter {
-    font-size: 16px;
-    font-weight: 500;
-    color: var(--text-color);
-}
-
-.photo-thumbnails {
+/* 照片统计样式 */
+.photo-stats {
     display: flex;
     gap: 10px;
-    overflow-x: auto;
-    padding: 10px 0;
+    margin-top: 10px;
 }
 
-.thumbnail {
-    width: 80px;
-    height: 60px;
-    border-radius: 6px;
-    overflow: hidden;
-    cursor: pointer;
-    opacity: 0.7;
-    transition: all 0.3s ease;
-    flex-shrink: 0;
+.stat-item {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: 12px;
 }
 
-.thumbnail img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+.stat-icon {
+    width: 16px !important;
+    height: 16px !important;
+    margin-right: 4px;
 }
 
-.thumbnail.active {
-    opacity: 1;
-    box-shadow: 0 0 0 3px var(--accent-color);
-}
-
-.thumbnail:hover {
-    opacity: 0.9;
-}
-
-.photo-info {
-    flex: 2;
-    padding: 25px;
-    overflow-y: auto;
-    background-color: var(--bg-secondary);
-    color: var(--text-color);
-}
-
-.image-caption {
-    margin-bottom: 15px;
-    padding: 8px 12px;
-    background: var(--bg-tertiary);
-    border-radius: 6px;
-    font-size: 14px;
-}
-
-/* 响应式设计调整 */
+/* 修复响应式样式 */
 @media (max-width: 768px) {
     .about-content {
         padding: 60px 20px 20px;
-        /* 响应式布局下与Play页面保持一致 */
     }
 
     .page-title {
         font-size: 32px;
-        /* 响应式布局下与Play页面保持一致 */
     }
 
     .profile-header {
@@ -1482,7 +1438,6 @@ blockquote cite {
     .basic-info {
         justify-content: center;
         flex-direction: column;
-        /* 在小屏上恢复垂直布局 */
     }
 
     .education-research,
@@ -1509,22 +1464,51 @@ blockquote cite {
         justify-content: flex-start;
     }
 
+    /* 照片墙移动端适配 - 单列布局 */
     .masonry-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(1, 1fr);
+        grid-auto-rows: auto;
     }
-
-    .photo-details {
-        flex-direction: column;
-        height: auto;
-    }
-
-    .gallery-slider {
-        padding-right: 0;
+    
+    /* 移动端特别样式 - 重置所有网格项为单列 */
+    .masonry-item {
+        grid-column: span 1 !important;
+        grid-row: span 1 !important;
+        height: 250px;
         margin-bottom: 20px;
     }
-
-    .current-photo {
-        height: 300px;
+    
+    /* 移动端直接显示照片信息，不需要悬浮 */
+    .photo-overlay {
+        transform: translateY(0);
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0) 120px);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+    }
+    
+    /* 调整标签在移动端的显示，与Play页面保持一致 */
+    .tags {
+        max-width: 100%;
+        overflow-x: auto;
+        padding-bottom: 5px;
+        flex-wrap: nowrap;
+        scrollbar-width: none; /* Firefox */
+    }
+    
+    .tags::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, Edge */
+    }
+    
+    /* 移动端照片统计显示优化 */
+    .photo-stats {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(0, 0, 0, 0.6);
+        border-radius: 20px;
+        padding: 3px 8px;
     }
 }
 
@@ -1551,11 +1535,6 @@ blockquote cite {
         gap: 10px;
     }
 
-    .about-theme-toggler {
-        bottom: 20px;
-        left: 20px;
-    }
-
     /* 联系方式tooltip在小屏幕上的调整 */
     .contact-tooltip {
         font-size: 11px;
@@ -1564,6 +1543,21 @@ blockquote cite {
 
     .masonry-grid {
         grid-template-columns: 1fr;
+    }
+    
+    .masonry-item {
+        height: 220px;
+    }
+    
+    /* 标题字体缩小 */
+    .photo-overlay h4 {
+        font-size: 18px;
+    }
+    
+    /* 照片计数移到左上角 */
+    .photo-count {
+        left: 10px;
+        right: auto;
     }
 }
 </style>
