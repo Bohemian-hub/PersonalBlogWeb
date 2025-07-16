@@ -5,7 +5,7 @@
             <div class="record-actions">
                 <el-button type="info" @click="saveAsDraft">保存草稿</el-button>
                 <el-button type="primary" @click="publishArticle">{{ isEditMode ? '更新并发布' : '发布文章' }}</el-button>
-                <el-button v-if="isEditMode" @click="cancelEdit">取消编辑</el-button>
+                <el-button @click="cancelEdit">关闭</el-button>
             </div>
         </div>
 
@@ -198,13 +198,13 @@ const resetForm = () => {
 const loadArticleForEdit = async (articleId) => {
     console.log("你好");
 
-    try {
-        const loading = ElLoading.service({
-            lock: true,
-            text: '加载文章内容中...',
-            background: 'rgba(0, 0, 0, 0.7)'
-        });
+    const loading = ElLoading.service({
+        lock: true,
+        text: '加载文章内容中...',
+        background: 'rgba(0, 0, 0, 0.7)'
+    });
 
+    try {
         // 获取文章基本信息
         const response = await getArticleContent(articleId);
 
@@ -343,6 +343,7 @@ const uploadEditorContent = async () => {
     formData.append('file', file);
     formData.append('title', articleForm.title || 'Untitled');
     formData.append('description', articleForm.summary || '');
+
     //等待提示
     const loading = ElLoading.service({
         lock: true,
@@ -350,11 +351,17 @@ const uploadEditorContent = async () => {
         background: 'rgba(0, 0, 0, 0.7)'
     });
 
-    // 调用上传接口
-    const result = await uploadMarkdown(formData);
-    // 关闭提示
-    loading.close();
-    return result;
+    try {
+        // 调用上传接口
+        const result = await uploadMarkdown(formData);
+        // 关闭提示
+        loading.close();
+        return result;
+    } catch (error) {
+        // 确保在错误时也关闭加载提示
+        loading.close();
+        throw error;
+    }
 };
 // 准备上传的文章数据
 // 修改为异步函数
@@ -397,13 +404,13 @@ const prepareArticleData = async () => {
 const customUploadCover = async (options) => {
     const { file, onSuccess, onError } = options;
 
-    try {
-        const loading = ElLoading.service({
-            lock: true,
-            text: '封面图片上传中...',
-            background: 'rgba(0, 0, 0, 0.7)'
-        });
+    const loading = ElLoading.service({
+        lock: true,
+        text: '封面图片上传中...',
+        background: 'rgba(0, 0, 0, 0.7)'
+    });
 
+    try {
         const formData = new FormData();
         formData.append('file', file);
 
@@ -416,6 +423,8 @@ const customUploadCover = async (options) => {
         onSuccess(result);
         ElMessage.success('封面图片上传成功');
     } catch (error) {
+        // 确保在错误时也关闭加载提示
+        loading.close();
         // 错误已被拦截器处理并显示
         onError(error);
     }
@@ -424,13 +433,13 @@ const customUploadCover = async (options) => {
 
 // Markdown编辑器的图片上传
 const handleImgAdd = async (pos, file) => {
-    try {
-        const loading = ElLoading.service({
-            lock: true,
-            text: '图片上传中...',
-            background: 'rgba(0, 0, 0, 0.7)'
-        });
+    const loading = ElLoading.service({
+        lock: true,
+        text: '图片上传中...',
+        background: 'rgba(0, 0, 0, 0.7)'
+    });
 
+    try {
         const formData = new FormData();
         formData.append('file', file);
 
@@ -441,6 +450,8 @@ const handleImgAdd = async (pos, file) => {
         mdEditor.value.$img2Url(pos, baseUrl + result.url);
         ElMessage.success('图片上传成功');
     } catch (error) {
+        // 确保在错误时也关闭加载提示
+        loading.close();
         // 错误已被拦截器处理并显示
     }
 };
@@ -471,13 +482,13 @@ const saveAsDraft = async () => {
 
     if (!isContentReady()) return;
 
-    try {
-        const loading = ElLoading.service({
-            lock: true,
-            text: '保存草稿中...',
-            background: 'rgba(0, 0, 0, 0.7)'
-        });
+    const loading = ElLoading.service({
+        lock: true,
+        text: '保存草稿中...',
+        background: 'rgba(0, 0, 0, 0.7)'
+    });
 
+    try {
         articleForm.status = 'draft';
         const articleData = await prepareArticleData();
 
@@ -492,9 +503,12 @@ const saveAsDraft = async () => {
         loading.close();
         ElMessage.success('草稿保存成功');
 
-        // 发送事件通知父组件
+        // 发送事件通知父组件并自动切换回文章管理
         emit('saveSuccess');
+        emit('switchToManage');
     } catch (error) {
+        // 确保在错误时也关闭加载提示
+        loading.close();
         // 错误已被拦截器处理并显示
     }
 };
@@ -508,13 +522,13 @@ const publishArticle = async () => {
 
     if (!isContentReady()) return;
 
-    try {
-        const loading = ElLoading.service({
-            lock: true,
-            text: isEditMode.value ? '更新文章中...' : '发布文章中...',
-            background: 'rgba(0, 0, 0, 0.7)'
-        });
+    const loading = ElLoading.service({
+        lock: true,
+        text: isEditMode.value ? '更新文章中...' : '发布文章中...',
+        background: 'rgba(0, 0, 0, 0.7)'
+    });
 
+    try {
         articleForm.status = 'published';
         const articleData = await prepareArticleData();
 
@@ -527,9 +541,12 @@ const publishArticle = async () => {
         loading.close();
         ElMessage.success(isEditMode.value ? '文章更新成功' : '文章发布成功');
 
-        // 发送事件通知父组件切换回文章管理
+        // 发送事件通知父组件切换回文章管理并自动切换
         emit('publishSuccess');
+        emit('switchToManage');
     } catch (error) {
+        // 确保在错误时也关闭加载提示
+        loading.close();
         // 错误已被拦截器处理并显示
     }
 };
@@ -537,23 +554,24 @@ const publishArticle = async () => {
 // 修改取消编辑函数 - 发送事件而不是路由导航
 const cancelEdit = () => {
     ElMessageBox.confirm(
-        '确定要取消编辑吗？未保存的更改将丢失',
-        '确认取消',
+        '确定要关闭编辑吗？未保存的更改将丢失',
+        '确认关闭',
         {
-            confirmButtonText: '确定',
+            confirmButtonText: '关闭',
             cancelButtonText: '继续编辑',
             type: 'warning'
         }
     ).then(() => {
         // 发送事件通知父组件切换回文章管理
         emit('cancelEdit');
+        emit('switchToManage');
     }).catch(() => {
         // 用户选择继续编辑
     });
 };
 
 // 定义emit
-const emit = defineEmits(['cancelEdit', 'publishSuccess', 'saveSuccess']);
+const emit = defineEmits(['cancelEdit', 'publishSuccess', 'saveSuccess', 'switchToManage']);
 
 // 监听props变化
 watch(() => props.articleId, (newId) => {

@@ -184,7 +184,7 @@ const handleLogin = async () => {
     sessionStorage.setItem('user', JSON.stringify(userData.user));
     // 登录后不再设置固定主题，保持当前主题状态
     user.value = userData.user;
-    // console.log(user);
+    console.log(user);
 
     showUserPanel.value = false; // 登录成功后关闭面板
   } catch (error) {
