@@ -1,10 +1,11 @@
 <template>
     <div class="record-container">
         <div class="record-header">
-            <h1>创建新文章</h1>
+            <h1>{{ isEditMode ? '编辑文章' : '创建新文章' }}</h1>
             <div class="record-actions">
                 <el-button type="info" @click="saveAsDraft">保存草稿</el-button>
-                <el-button type="primary" @click="publishArticle">发布文章</el-button>
+                <el-button type="primary" @click="publishArticle">{{ isEditMode ? '更新并发布' : '发布文章' }}</el-button>
+                <el-button v-if="isEditMode" @click="cancelEdit">取消编辑</el-button>
             </div>
         </div>
 
@@ -101,22 +102,44 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, onBeforeUnmount } from 'vue';
+import { ref, reactive, onMounted, watch } from 'vue';
 import { ElMessage, ElMessageBox, ElLoading } from 'element-plus';
 import { Plus, Picture } from '@element-plus/icons-vue';
 import { useRouter } from 'vue-router';
 import { mavonEditor } from 'mavon-editor';
 import 'mavon-editor/dist/css/index.css';
-import { uploadImage, uploadMarkdown, saveAsDraftApi, publishArticleApi } from '@/api/article';
+import {
+    uploadImage,
+    uploadMarkdown,
+    saveAsDraftApi,
+    publishArticleApi,
+    getArticleContent,
+    updateAsDraftApi,
+    updateAndPublishApi,
+    getMarkdownContent
+} from '@/api/article';
 
 import { baseUrl } from '@/common/config'
 
+
+// 定义props
+const props = defineProps({
+    articleId: {
+        type: Number,
+        default: null
+    }
+});
 
 const base_url = ref(baseUrl);
 const router = useRouter();
 const mdEditor = ref(null); // 引用Markdown编辑器实例
 const coverMethod = ref('upload'); // 封面图片的获取方式：'upload' 或 'link'
 const coverLink = ref(''); // 存储用户输入的封面图片链接
+
+// 编辑模式相关状态
+const isEditMode = ref(false);
+const editingArticleId = ref(null);
+const originalContent = ref('');
 
 // 分类和标签数据
 const categories = [
@@ -150,6 +173,100 @@ const articleForm = reactive({
     content: '',
     status: 'draft' // draft 或 published
 });
+
+// Markdown文件上传相关
+const mdFileId = ref('');
+const mdFileName = ref('');
+
+// 重置表单 - 移到前面定义
+const resetForm = () => {
+    Object.assign(articleForm, {
+        title: '',
+        category: '',
+        tags: [],
+        coverUrl: '',
+        summary: '',
+        content: '',
+        status: 'draft'
+    });
+    coverMethod.value = 'upload';
+    coverLink.value = '';
+    originalContent.value = '';
+};
+
+// 加载要编辑的文章 - 修复数据解析问题
+const loadArticleForEdit = async (articleId) => {
+    console.log("你好");
+
+    try {
+        const loading = ElLoading.service({
+            lock: true,
+            text: '加载文章内容中...',
+            background: 'rgba(0, 0, 0, 0.7)'
+        });
+
+        // 获取文章基本信息
+        const response = await getArticleContent(articleId);
+
+        // 检查响应格式，确保正确获取数据
+        const articleData = response.data ? response.data : response;
+
+        console.log('获取到的文章数据:', articleData); // 调试输出
+
+        if (!articleData) {
+            throw new Error('未获取到文章数据');
+        }
+
+        // 填充表单数据
+        articleForm.title = articleData.title || '';
+        articleForm.category = articleData.category || '';
+        articleForm.tags = Array.isArray(articleData.tags) ? articleData.tags : [];
+        articleForm.coverUrl = articleData.cover_image_url || '';
+        articleForm.summary = articleData.summary || '';
+        articleForm.status = articleData.status || 'draft';
+
+        // 如果封面是URL链接，设置为链接模式
+        if (articleForm.coverUrl && !articleForm.coverUrl.startsWith('/media/')) {
+            coverMethod.value = 'link';
+            coverLink.value = articleForm.coverUrl;
+        } else {
+            coverMethod.value = 'upload';
+            coverLink.value = '';
+        }
+
+        // 获取Markdown内容
+        if (articleData.content_url) {
+            // 从content_url中提取markdown ID
+            const match = articleData.content_url.match(/\/media\/markdown\/(.+)/);
+            if (match) {
+                const markdownId = match[1];
+                try {
+                    const contentResponse = await getMarkdownContent(markdownId);
+                    const contentData = contentResponse.data ? contentResponse.data : contentResponse;
+                    articleForm.content = contentData.content || contentData || '';
+                    originalContent.value = articleForm.content;
+                } catch (contentError) {
+                    console.warn('获取Markdown内容失败:', contentError);
+                    articleForm.content = '';
+                    originalContent.value = '';
+                }
+            }
+        } else {
+            articleForm.content = '';
+            originalContent.value = '';
+        }
+
+        loading.close();
+        ElMessage.success('文章内容加载成功');
+    } catch (error) {
+        loading.close();
+        console.error('加载文章错误详情:', error);
+        ElMessage.error('加载文章失败：' + (error.message || error || '网络错误'));
+
+        // 加载失败时重置表单
+        resetForm();
+    }
+};
 
 // 处理图片链接输入
 const handleCoverLinkInput = () => {
@@ -208,10 +325,6 @@ const markdownToolbars = {
     preview: true, // 预览
 };
 
-// Markdown文件上传相关
-const mdFileId = ref('');
-const mdFileName = ref('');
-
 // 检查文章内容是否准备好上传
 const isContentReady = () => {
     if (!articleForm.content && !mdFileId.value) {
@@ -256,7 +369,15 @@ const prepareArticleData = async () => {
     };
 
 
-    // 否则将编辑器内容转为md文件并上传
+    // 检查内容是否有变化
+    const contentChanged = originalContent.value !== articleForm.content;
+
+    if (isEditMode.value && !contentChanged) {
+        // 编辑模式且内容未变化，不需要重新上传
+        return data;
+    }
+
+    // 内容有变化或是新建模式，需要上传新内容
     try {
         const result = await uploadEditorContent();
         data.content_url = `/media/markdown/${result.id}`;
@@ -299,7 +420,6 @@ const customUploadCover = async (options) => {
         onError(error);
     }
 };
-
 
 
 // Markdown编辑器的图片上传
@@ -359,13 +479,21 @@ const saveAsDraft = async () => {
         });
 
         articleForm.status = 'draft';
-        const articleData = await prepareArticleData(); // 使用await等待上传完成
+        const articleData = await prepareArticleData();
 
-        // 调用保存接口，拦截器已处理响应
-        const result = await saveAsDraftApi(articleData);
+        if (isEditMode.value && editingArticleId.value) {
+            // 更新模式
+            await updateAsDraftApi(editingArticleId.value, articleData);
+        } else {
+            // 创建模式
+            await saveAsDraftApi(articleData);
+        }
+
         loading.close();
-
         ElMessage.success('草稿保存成功');
+
+        // 发送事件通知父组件
+        emit('saveSuccess');
     } catch (error) {
         // 错误已被拦截器处理并显示
     }
@@ -380,24 +508,66 @@ const publishArticle = async () => {
 
     if (!isContentReady()) return;
 
+    try {
+        const loading = ElLoading.service({
+            lock: true,
+            text: isEditMode.value ? '更新文章中...' : '发布文章中...',
+            background: 'rgba(0, 0, 0, 0.7)'
+        });
 
-    const loading = ElLoading.service({
-        lock: true,
-        text: '发布文章中...',
-        background: 'rgba(0, 0, 0, 0.7)'
-    });
+        articleForm.status = 'published';
+        const articleData = await prepareArticleData();
 
-    articleForm.status = 'published';
-    const articleData = await prepareArticleData(); // 使用await等待上传完成
+        if (isEditMode.value && editingArticleId.value) {
+            await updateAndPublishApi(editingArticleId.value, articleData);
+        } else {
+            await publishArticleApi(articleData);
+        }
 
-    // 调用发布接口，拦截器已处理响应
-    await publishArticleApi(articleData);
-    loading.close();
+        loading.close();
+        ElMessage.success(isEditMode.value ? '文章更新成功' : '文章发布成功');
 
-    ElMessage.success('文章发布成功');
-    // router.push('/' + articleForm.category);
-
+        // 发送事件通知父组件切换回文章管理
+        emit('publishSuccess');
+    } catch (error) {
+        // 错误已被拦截器处理并显示
+    }
 };
+
+// 修改取消编辑函数 - 发送事件而不是路由导航
+const cancelEdit = () => {
+    ElMessageBox.confirm(
+        '确定要取消编辑吗？未保存的更改将丢失',
+        '确认取消',
+        {
+            confirmButtonText: '确定',
+            cancelButtonText: '继续编辑',
+            type: 'warning'
+        }
+    ).then(() => {
+        // 发送事件通知父组件切换回文章管理
+        emit('cancelEdit');
+    }).catch(() => {
+        // 用户选择继续编辑
+    });
+};
+
+// 定义emit
+const emit = defineEmits(['cancelEdit', 'publishSuccess', 'saveSuccess']);
+
+// 监听props变化
+watch(() => props.articleId, (newId) => {
+    if (newId) {
+        isEditMode.value = true;
+        editingArticleId.value = newId;
+        loadArticleForEdit(newId);
+    } else {
+        isEditMode.value = false;
+        editingArticleId.value = null;
+        resetForm();
+    }
+}, { immediate: true });
+
 
 // 验证用户权限
 onMounted(() => {
@@ -408,9 +578,14 @@ onMounted(() => {
         return;
     }
 
-
+    // 移除这里的重复调用，因为watch已经处理了
+    // 只有在watch没有触发时才需要手动初始化
+    if (!props.articleId) {
+        isEditMode.value = false;
+        editingArticleId.value = null;
+        resetForm();
+    }
 });
-
 </script>
 
 <style scoped>

@@ -11,6 +11,19 @@
       </el-select>
       <el-input v-model="searchKeyword" placeholder="搜索文章标题" prefix-icon="Search" style="width: 250px" clearable
         @input="handleSearch" />
+
+      <!-- 批量操作按钮 -->
+      <div class="batch-actions">
+        <el-button size="small" type="danger" :disabled="!canBatchDelete" @click="confirmBatchDelete">
+          批量删除 ({{ selectedArticles.length }})
+        </el-button>
+        <el-button size="small" type="primary" :disabled="!canBatchPublish" @click="confirmBatchPublish">
+          批量发布 ({{ selectedArticles.length }})
+        </el-button>
+        <el-button size="small" type="warning" :disabled="!canBatchUnpublish" @click="confirmBatchUnpublish">
+          批量撤回 ({{ selectedArticles.length }})
+        </el-button>
+      </div>
     </div>
 
     <!-- 文章列表 -->
@@ -73,7 +86,12 @@
             @click="publishArticle(scope.row.id)">
             发布
           </el-button>
-          <el-button size="small" type="danger" @click="confirmDelete(scope.row.id)">
+          <el-button size="small" type="warning" v-if="scope.row.status === 'published'"
+            @click="unpublishArticle(scope.row.id)">
+            撤回
+          </el-button>
+          <el-button size="small" type="danger" :disabled="scope.row.status === 'published'"
+            @click="confirmDelete(scope.row.id)">
             删除
           </el-button>
         </template>
@@ -93,7 +111,16 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { Search } from '@element-plus/icons-vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
-import { getArticles, deleteArticle, publishDraftArticle, getImage } from '@/api/article';
+import {
+  getArticles,
+  deleteArticle,
+  publishDraftArticle,
+  unPublishArticle,
+  getImage,
+  batchDeleteArticles,
+  batchPublishArticles,
+  batchUnpublishArticles
+} from '@/api/article';
 import { baseUrl } from '@/common/config'
 
 
@@ -200,11 +227,14 @@ const handleSizeChange = (val) => {
   fetchArticles();
 };
 
-// 编辑文章
+// 编辑文章 - 修改为通过事件通信
 const editArticle = (id) => {
-  // 实际项目中应该跳转到编辑页面
-  console.log('编辑文章', id);
+  // 通过emit通知父组件切换到编辑模式
+  emit('editArticle', id);
 };
+
+// 定义emit
+const emit = defineEmits(['editArticle']);
 
 // 发布草稿
 const publishArticle = async (id) => {
@@ -215,6 +245,18 @@ const publishArticle = async (id) => {
   } catch (error) {
     console.error('发布错误:', error);
     ElMessage.error('发布失败：' + (error.message || '网络错误'));
+  }
+};
+
+// 撤回已发布文章
+const unpublishArticle = async (id) => {
+  try {
+    await unPublishArticle(id);
+    ElMessage.success('文章撤回成功');
+    fetchArticles();
+  } catch (error) {
+    console.error('撤回错误:', error);
+    ElMessage.error('撤回失败：' + (error.message || '网络错误'));
   }
 };
 
@@ -240,6 +282,124 @@ const confirmDelete = (id) => {
     } catch (error) {
       console.error('删除错误:', error);
       ElMessage.error('删除失败：' + (error.message || '网络错误'));
+    }
+  }).catch(() => {
+    // 用户取消操作
+  });
+};
+
+// 批量操作的计算属性
+const canBatchDelete = computed(() => {
+  return selectedArticles.value.length > 0 &&
+    selectedArticles.value.every(article => article.status === 'draft');
+});
+
+const canBatchPublish = computed(() => {
+  return selectedArticles.value.length > 0 &&
+    selectedArticles.value.every(article => article.status === 'draft');
+});
+
+const canBatchUnpublish = computed(() => {
+  return selectedArticles.value.length > 0 &&
+    selectedArticles.value.every(article => article.status === 'published');
+});
+
+// 批量删除确认
+const confirmBatchDelete = () => {
+  if (!canBatchDelete.value) return;
+
+  ElMessageBox.confirm(
+    `确定要删除选中的 ${selectedArticles.value.length} 篇草稿文章吗？此操作不可逆`,
+    '批量删除确认',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }
+  ).then(async () => {
+    try {
+      const articleIds = selectedArticles.value.map(article => article.id);
+      const response = await batchDeleteArticles(articleIds);
+
+      if (response.success_count > 0) {
+        ElMessage.success(response.msg || `成功删除 ${response.success_count} 篇文章`);
+      }
+      if (response.error_count > 0) {
+        ElMessage.warning(response.msg || `有 ${response.error_count} 篇文章删除失败`);
+      }
+
+      fetchArticles();
+    } catch (error) {
+      console.error('批量删除错误:', error);
+      ElMessage.error('批量删除失败：' + (error.message || '网络错误'));
+    }
+  }).catch(() => {
+    // 用户取消操作
+  });
+};
+
+// 批量发布确认
+const confirmBatchPublish = () => {
+  if (!canBatchPublish.value) return;
+
+  ElMessageBox.confirm(
+    `确定要发布选中的 ${selectedArticles.value.length} 篇草稿文章吗？`,
+    '批量发布确认',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'info'
+    }
+  ).then(async () => {
+    try {
+      const articleIds = selectedArticles.value.map(article => article.id);
+      const response = await batchPublishArticles(articleIds);
+
+      if (response.success_count > 0) {
+        ElMessage.success(response.msg || `成功发布 ${response.success_count} 篇文章`);
+      }
+      if (response.error_count > 0) {
+        ElMessage.warning(response.msg || `有 ${response.error_count} 篇文章发布失败`);
+      }
+
+      fetchArticles();
+    } catch (error) {
+      console.error('批量发布错误:', error);
+      ElMessage.error('批量发布失败：' + (error.message || '网络错误'));
+    }
+  }).catch(() => {
+    // 用户取消操作
+  });
+};
+
+// 批量撤回确认
+const confirmBatchUnpublish = () => {
+  if (!canBatchUnpublish.value) return;
+
+  ElMessageBox.confirm(
+    `确定要撤回选中的 ${selectedArticles.value.length} 篇已发布文章吗？`,
+    '批量撤回确认',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    }
+  ).then(async () => {
+    try {
+      const articleIds = selectedArticles.value.map(article => article.id);
+      const response = await batchUnpublishArticles(articleIds);
+
+      if (response.success_count > 0) {
+        ElMessage.success(response.msg || `成功撤回 ${response.success_count} 篇文章`);
+      }
+      if (response.error_count > 0) {
+        ElMessage.warning(response.msg || `有 ${response.error_count} 篇文章撤回失败`);
+      }
+
+      fetchArticles();
+    } catch (error) {
+      console.error('批量撤回错误:', error);
+      ElMessage.error('批量撤回失败：' + (error.message || '网络错误'));
     }
   }).catch(() => {
     // 用户取消操作
@@ -275,6 +435,12 @@ onMounted(() => {
   gap: 15px;
   align-items: center;
   justify-content: flex-end;
+}
+
+.batch-actions {
+  display: flex;
+  gap: 10px;
+  margin-left: 15px;
 }
 
 .article-title-cell {

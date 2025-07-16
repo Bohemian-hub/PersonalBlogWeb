@@ -14,52 +14,51 @@
       </div>
       <div class="header-actions">
         <el-button type="primary" size="small" round @click="backToSite">
-          <el-icon><Back /></el-icon>
+          <el-icon>
+            <Back />
+          </el-icon>
           返回网站
         </el-button>
       </div>
     </div>
-  
+
     <!-- 主体内容区 -->
     <div class="manage-content">
       <!-- 侧边导航栏 -->
       <transition name="slide-fade">
         <div class="manage-sidebar" v-show="isSidebarVisible">
-
-          <el-menu
-            :default-active="activeIndex"
-            class="sidebar-menu"
-            @select="handleSelect"
-            background-color="#001529"
-            text-color="#ffffff"
-            active-text-color="#1890ff"
-          >
-            <el-menu-item index="article-publish">
-              <el-icon><Document /></el-icon>
-              <span>文章发布</span>
-            </el-menu-item>
+          <el-menu :default-active="activeIndex" class="sidebar-menu" @select="handleSelect" background-color="#001529"
+            text-color="#ffffff" active-text-color="#1890ff">
             <el-menu-item index="article-manage">
-              <el-icon><Collection /></el-icon>
+              <el-icon>
+                <Collection />
+              </el-icon>
               <span>文章管理</span>
             </el-menu-item>
             <el-menu-item index="comment-manage">
-              <el-icon><ChatDotRound /></el-icon>
+              <el-icon>
+                <ChatDotRound />
+              </el-icon>
               <span>评论管理</span>
             </el-menu-item>
             <el-menu-item index="category-manage">
-              <el-icon><Folder /></el-icon>
+              <el-icon>
+                <Folder />
+              </el-icon>
               <span>分类管理</span>
             </el-menu-item>
             <el-menu-item index="settings">
-              <el-icon><Setting /></el-icon>
+              <el-icon>
+                <Setting />
+              </el-icon>
               <span>系统设置</span>
             </el-menu-item>
           </el-menu>
         </div>
       </transition>
-  
+
       <!-- 内容显示区域 -->
-      <div class="manage-main" :class="{'main-expanded': !isSidebarVisible}">
+      <div class="manage-main" :class="{ 'main-expanded': !isSidebarVisible }">
         <div class="panel-container">
           <div class="panel-header">
             <div class="panel-title">
@@ -72,37 +71,36 @@
               <!-- 根据面板类型显示不同操作按钮 -->
               <template v-if="activeIndex === 'article-manage'">
                 <el-button type="primary" @click="navigateToPublish">
-                  <el-icon><Plus /></el-icon>发布新文章
-                </el-button>
-                <el-button type="danger">
-                  <el-icon><Delete /></el-icon>批量删除
+                  <el-icon>
+                    <Plus />
+                  </el-icon>写文章
                 </el-button>
               </template>
             </div>
           </div>
-  
+
           <div class="panel-content">
-            <!-- 使用动态组件实现面板内容切换 -->
-            <keep-alive>
-              <component :is="currentComponent" />
-            </keep-alive>
+            <!-- 处理Record组件的事件 -->
+            <component :is="currentComponent" :key="componentKey" :article-id="editingArticleId"
+              @editArticle="handleEditArticle" @cancelEdit="handleCancelEdit" @publishSuccess="handlePublishSuccess"
+              @saveSuccess="handleSaveSuccess" />
           </div>
         </div>
       </div>
     </div>
   </div>
 </template>
-  
+
 <script setup>
 import { ref, shallowRef, onMounted, onBeforeMount, defineAsyncComponent } from 'vue';
 import { useRouter } from 'vue-router';
-import { 
-  Document, Collection, ChatDotRound, Folder, Setting, 
-  Menu, ArrowRight, Back, Plus, Delete 
+import {
+  Document, Collection, ChatDotRound, Folder, Setting,
+  Menu, ArrowRight, Back, Plus, Delete
 } from '@element-plus/icons-vue';
 
 // 组件动态引入
-const ArticlePublish = defineAsyncComponent(() => import('../components/manage/Record.vue')); 
+const ArticlePublish = defineAsyncComponent(() => import('../components/manage/Record.vue'));
 const ArticleManage = defineAsyncComponent(() => import('../components/manage/ArticleManage.vue'));
 const CommentManage = defineAsyncComponent(() => import('../components/manage/CommentManage.vue'));
 const CategoryManage = defineAsyncComponent(() => import('../components/manage/CategoryManage.vue'));
@@ -111,6 +109,8 @@ const SystemSettings = defineAsyncComponent(() => import('../components/manage/S
 const router = useRouter();
 const activeIndex = ref('article-manage'); // 默认激活的菜单项
 const isSidebarVisible = ref(true); // 控制侧边栏显示状态
+const componentKey = ref(0); // 用于强制重新渲染组件
+const editingArticleId = ref(null); // 编辑文章ID状态
 
 // 使用shallowRef优化性能，因为组件引用不需要深度响应式
 const currentComponent = shallowRef(null);
@@ -162,15 +162,36 @@ const getPanelIcon = (index) => {
   return icons[index] || Document;
 };
 
-// 处理菜单选择事件
-const handleSelect = (index) => {
-  activeIndex.value = index;
+// 处理编辑文章事件
+const handleEditArticle = (articleId) => {
+  console.log('处理编辑文章事件:', articleId);
+
+  // 设置编辑状态
+  editingArticleId.value = articleId;
+  activeIndex.value = 'article-publish';
   updateCurrentComponent();
+
+  // 强制重新渲染组件以确保props更新
+  componentKey.value++;
 };
 
 // 导航到发布页面
 const navigateToPublish = () => {
+  console.log('导航到发布页面');
+
+  editingArticleId.value = null; // 清除编辑ID
   activeIndex.value = 'article-publish';
+  updateCurrentComponent();
+  componentKey.value++;
+};
+
+// 处理菜单选择事件
+const handleSelect = (index) => {
+  console.log('菜单选择:', index);
+
+  // 切换菜单时清除编辑状态
+  editingArticleId.value = null;
+  activeIndex.value = index;
   updateCurrentComponent();
 };
 
@@ -200,8 +221,27 @@ onMounted(() => {
   // 初始化组件
   updateCurrentComponent();
 });
+
+// 处理Record组件的事件
+const handleCancelEdit = () => {
+  editingArticleId.value = null;
+  activeIndex.value = 'article-manage';
+  updateCurrentComponent();
+};
+
+const handlePublishSuccess = () => {
+  editingArticleId.value = null;
+  activeIndex.value = 'article-manage';
+  updateCurrentComponent();
+};
+
+const handleSaveSuccess = () => {
+  // 保存成功后可以选择留在编辑页面或回到管理页面
+  // 这里选择留在编辑页面，用户可以继续编辑
+  ElMessage.success('操作完成');
+};
 </script>
-  
+
 <style scoped>
 .manage-page {
   display: flex;
@@ -423,27 +463,27 @@ onMounted(() => {
   .manage-header h1 {
     font-size: 16px;
   }
-  
+
   .panel-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
   }
-  
+
   .panel-actions {
     width: 100%;
     flex-wrap: wrap;
     gap: 8px;
   }
-  
+
   .panel-actions .el-button {
     font-size: 12px;
   }
-  
+
   .panel-content {
     padding: 16px;
   }
-  
+
   .manage-sidebar {
     position: absolute;
     top: 0;

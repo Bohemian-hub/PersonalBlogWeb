@@ -48,3 +48,46 @@ export const deleteArticle = id => {
 export const publishDraftArticle = id => {
   return http.patch(`/article/${id}/publish`);
 };
+
+// 撤回已发布文章为草稿
+export const unPublishArticle = id => {
+  return http.patch(`/article/${id}/unpublish`);
+};
+
+// 获取文章完整内容（用于编辑）
+export const getArticleContent = id => {
+  return http.get(`/article/${id}/content`);
+};
+
+// 更新文章
+export const updateArticle = (id, data) => {
+  return http.put(`/article/${id}`, data);
+};
+
+// 更新文章为草稿
+export const updateAsDraftApi = (id, data) => {
+  return http.put(`/article/${id}`, { ...data, status: 'draft' });
+};
+
+// 更新并发布文章
+export const updateAndPublishApi = (id, data) => {
+  return http.put(`/article/${id}`, { ...data, status: 'published' });
+};
+
+// 获取Markdown内容
+export const getMarkdownContent = mdId => {
+  return http.get(`/media/markdown/${mdId}`);
+};
+
+// 批量操作接口
+export const batchDeleteArticles = articleIds => {
+  return http.post('/article/batch/delete', { article_ids: articleIds });
+};
+
+export const batchPublishArticles = articleIds => {
+  return http.post('/article/batch/publish', { article_ids: articleIds });
+};
+
+export const batchUnpublishArticles = articleIds => {
+  return http.post('/article/batch/unpublish', { article_ids: articleIds });
+};
