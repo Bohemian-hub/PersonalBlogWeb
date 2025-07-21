@@ -140,6 +140,7 @@ const coverLink = ref(''); // 存储用户输入的封面图片链接
 const isEditMode = ref(false);
 const editingArticleId = ref(null);
 const originalContent = ref('');
+const currentArticleId = ref(null); // 新增：当前文章ID，用于追踪新建文章的状态
 
 // 分类和标签数据
 const categories = [
@@ -192,6 +193,7 @@ const resetForm = () => {
     coverMethod.value = 'upload';
     coverLink.value = '';
     originalContent.value = '';
+    currentArticleId.value = null; // 重置当前文章ID
 };
 
 // 加载要编辑的文章 - 修复数据解析问题
@@ -492,12 +494,21 @@ const saveAsDraft = async () => {
         articleForm.status = 'draft';
         const articleData = await prepareArticleData();
 
+        let result;
         if (isEditMode.value && editingArticleId.value) {
-            // 更新模式
-            await updateAsDraftApi(editingArticleId.value, articleData);
+            // 编辑模式 - 更新现有文章
+            result = await updateAsDraftApi(editingArticleId.value, articleData);
+        } else if (currentArticleId.value) {
+            // 新建模式但已经保存过草稿 - 更新文章
+            result = await updateAsDraftApi(currentArticleId.value, articleData);
         } else {
-            // 创建模式
-            await saveAsDraftApi(articleData);
+            // 新建模式第一次保存 - 创建新文章
+            result = await saveAsDraftApi(articleData);
+            // 保存返回的文章ID，用于后续操作
+            if (result && result.id) {
+                currentArticleId.value = result.id;
+                console.log('首次保存草稿，文章ID:', currentArticleId.value);
+            }
         }
 
         loading.close();
@@ -532,10 +543,21 @@ const publishArticle = async () => {
         articleForm.status = 'published';
         const articleData = await prepareArticleData();
 
+        let result;
         if (isEditMode.value && editingArticleId.value) {
-            await updateAndPublishApi(editingArticleId.value, articleData);
+            // 编辑模式 - 更新并发布现有文章
+            result = await updateAndPublishApi(editingArticleId.value, articleData);
+        } else if (currentArticleId.value) {
+            // 新建模式但已经保存过草稿 - 更新并发布文章
+            result = await updateAndPublishApi(currentArticleId.value, articleData);
         } else {
-            await publishArticleApi(articleData);
+            // 新建模式第一次直接发布 - 创建新文章
+            result = await publishArticleApi(articleData);
+            // 保存返回的文章ID
+            if (result && result.id) {
+                currentArticleId.value = result.id;
+                console.log('直接发布文章，文章ID:', currentArticleId.value);
+            }
         }
 
         loading.close();
@@ -578,10 +600,12 @@ watch(() => props.articleId, (newId) => {
     if (newId) {
         isEditMode.value = true;
         editingArticleId.value = newId;
+        currentArticleId.value = null; // 编辑模式下清空当前文章ID
         loadArticleForEdit(newId);
     } else {
         isEditMode.value = false;
         editingArticleId.value = null;
+        currentArticleId.value = null; // 新建模式下清空当前文章ID
         resetForm();
     }
 }, { immediate: true });
