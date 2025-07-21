@@ -179,10 +179,12 @@ const handleLogin = async () => {
   }
   try {
     const userData = await login(loginForm.value);
-    // console.log(userData);
     ElMessage.success('登录成功');
+
+    // 保存用户信息和token
     sessionStorage.setItem('user', JSON.stringify(userData.user));
-    // 登录后不再设置固定主题，保持当前主题状态
+    sessionStorage.setItem('token', userData.token);
+
     user.value = userData.user;
     console.log(user);
 
@@ -215,6 +217,7 @@ const navigateToManage = () => {
 
 const handleLogout = () => {
   sessionStorage.removeItem('user');
+  sessionStorage.removeItem('token');
   user.value = null;
   showUserPanel.value = true; // 退出登录后显示登录/注册面板
 };

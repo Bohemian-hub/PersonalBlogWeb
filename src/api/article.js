@@ -1,11 +1,11 @@
 import http from '@/common/request';
 
-// 文章操作相关接口
+// 文章操作相关接口（需要管理员权限）
 export const createArticle = data => http.post('/article/upload', data);
 export const saveAsDraftApi = data => http.post('/article/upload', { ...data, status: 'draft' });
 export const publishArticleApi = data => http.post('/article/upload', { ...data, status: 'published' });
 
-// 媒体上传相关接口
+// 媒体上传相关接口（需要管理员权限）
 export const uploadImage = formData => {
   return http.post('/media/upload/image', formData, {
     headers: {
@@ -22,7 +22,7 @@ export const uploadMarkdown = formData => {
   });
 };
 
-// 获取媒体接口
+// 获取媒体接口（公开接口）
 export const getImage = imageId => http.get(`/media/image/${imageId}`);
 export const getMarkdown = mdId => http.get(`/media/markdown/${mdId}`);
 
@@ -32,13 +32,13 @@ export const getImageUrl = imageId => {
   return `${baseURL}/media/image/${imageId}`;
 };
 
-// 文章管理相关接口
-export const getArticles = params => {
-  return http.get('/article/list', { params });
-};
-
+// 文章管理接口（需要管理员权限）
 export const getArticleById = id => {
   return http.get(`/article/${id}`);
+};
+
+export const getArticles = params => {
+  return http.get('/article/list', { params });
 };
 
 export const deleteArticle = id => {

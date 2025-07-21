@@ -10,7 +10,9 @@ const service = axios.create({
 service.interceptors.request.use(
     config => {
         config.baseURL = baseUrl;
-        config.headers.Authorization = sessionStorage['token'] || '';
+        // 优先使用用户token，否则使用默认token
+        const userToken = sessionStorage.getItem('token');
+        config.headers.Authorization = userToken || 'default_token';
         return config;
     },
     error => {
@@ -25,13 +27,20 @@ service.interceptors.response.use(
         if (response.status === 200) {
             if (error === 0) {
                 return body;
-            } else if (error === 10010 || error === 10011) {
+            } else if (error === 401) {
                 ElMessage({
-                    message: msg,
+                    message: msg || '请先登录',
                     type: 'error'
                 });
-                sessionStorage.clear();
-                router.push('/login');
+                sessionStorage.removeItem('token');
+                sessionStorage.removeItem('user');
+                router.push('/');
+                return Promise.reject(new Error(msg));
+            } else if (error === 403) {
+                ElMessage({
+                    message: msg || '无权限访问',
+                    type: 'error'
+                });
                 return Promise.reject(new Error(msg));
             } else {
                 ElMessage({
@@ -50,10 +59,20 @@ service.interceptors.response.use(
     },
     error => {
         console.error('响应错误:', error);
-        ElMessage({
-            message: error.message || '网络错误',
-            type: 'error'
-        });
+        if (error.response?.status === 401) {
+            ElMessage({
+                message: '登录已过期，请重新登录',
+                type: 'error'
+            });
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('user');
+            router.push('/');
+        } else {
+            ElMessage({
+                message: error.message || '网络错误',
+                type: 'error'
+            });
+        }
         return Promise.reject(error);
     }
 );
