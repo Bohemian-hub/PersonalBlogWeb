@@ -71,7 +71,7 @@
                         <div v-for="article in lifeArticles" :key="article.id" class="article-card">
                             <div class="article-cover">
                                 <img :src="article.cover" :alt="article.title" />
-                                <div class="article-category">{{ article.category }}</div>
+                                <div class="article-tags">{{ article.tags }}</div>
                             </div>
                             <div class="article-content">
                                 <h3 class="article-title">{{ article.title }}</h3>
@@ -554,7 +554,7 @@ const allArticles = ref([
     {
         id: 1,
         title: '京都の秋 - 红叶与古寺',
-        category: '旅行日记',
+        tags: '旅行日记',
         date: '2023年11月',
         cover: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
         excerpt: '深秋时节的京都，红叶如火，古寺庭院中落叶缤纷，漫步在这座千年古城，仿佛穿越回了平安时代。',
@@ -563,7 +563,7 @@ const allArticles = ref([
     {
         id: 2,
         title: '北欧极光之旅 - 追寻夜空中的舞者',
-        category: '旅行日记',
+        tags: '旅行日记',
         date: '2023年1月',
         cover: 'https://images.unsplash.com/photo-1483086431886-3590a88317fe?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
         excerpt: '零下20度的寒冷夜晚，漫天繁星下，耐心地等待着北极光的出现。当第一抹绿光在天际浮现时，所有的寒冷瞬间消散。',
@@ -572,7 +572,7 @@ const allArticles = ref([
     {
         id: 3,
         title: '摄影入门指南：如何拍出有故事的照片',
-        category: '兴趣爱好',
+        tags: '兴趣爱好',
         date: '2024年2月',
         cover: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
         excerpt: '摄影不仅是记录，更是讲述故事的艺术。本文分享我的摄影经验，从构图、光线到后期处理的实用技巧。',
@@ -581,7 +581,7 @@ const allArticles = ref([
     {
         id: 4,
         title: '意大利面的50种做法 - 从经典到创新',
-        category: '兴趣爱好',
+        tags: '兴趣爱好',
         date: '2024年3月',
         cover: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
         excerpt: '从传统的博洛尼亚肉酱面到创新的松露奶油意面，探索这个充满魔力的意大利美食世界。',
@@ -590,7 +590,7 @@ const allArticles = ref([
     {
         id: 5,
         title: '2024年必看的五部科幻电影',
-        category: '书影推荐',
+        tags: '书影推荐',
         date: '2024年4月',
         cover: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
         excerpt: '从太空冒险到人工智能伦理，这五部科幻电影不仅有震撼的视觉效果，更有深刻的思想内涵。',
@@ -599,7 +599,7 @@ const allArticles = ref([
     {
         id: 6,
         title: '那些改变我人生轨迹的书籍',
-        category: '书影推荐',
+        tags: '书影推荐',
         date: '2023年12月',
         cover: 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
         excerpt: '分享五本对我影响深远的书籍，它们在不同人生阶段给予我力量、智慧和勇气。',
@@ -608,7 +608,7 @@ const allArticles = ref([
     {
         id: 7,
         title: '威尼斯水城漫步 - 迷失在水巷里',
-        category: '旅行日记',
+        tags: '旅行日记',
         date: '2022年6月',
         cover: 'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
         excerpt: '没有汽车喧嚣的城市，只有贡多拉穿梭在纵横交错的水道上。每一座桥、每一条巷子都藏着故事。',
@@ -617,7 +617,7 @@ const allArticles = ref([
     {
         id: 8,
         title: '徒步者的装备指南 - 从新手到专业',
-        category: '兴趣爱好',
+        tags: '兴趣爱好',
         date: '2024年1月',
         cover: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
         excerpt: '无论是周末短途还是长线徒步，适合的装备能让旅程更安全、舒适。本文详解各类装备的选择与使用。',
@@ -626,7 +626,7 @@ const allArticles = ref([
     {
         id: 9,
         title: '百年孤独 - 一场魔幻的文学盛宴',
-        category: '书影推荐',
+        tags: '书影推荐',
         date: '2023年9月',
         cover: 'https://images.unsplash.com/photo-1474932430478-367dbb6832c1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
         excerpt: '加西亚·马尔克斯的代表作如何通过魔幻现实主义的手法，展现了拉丁美洲的历史与文化。',
@@ -1506,7 +1506,7 @@ onUnmounted(() => {
     object-fit: cover;
 }
 
-.article-category {
+.article-tags {
     position: absolute;
     top: 15px;
     left: 15px;
