@@ -4,7 +4,7 @@
     <div class="page-wrapper" :class="currentTheme">
         <div class="page-content">
             <!-- 使用封装的页面标题组件 -->
-            <PageHeader title="游民时代" description="记录生活点滴，分享旅行见闻与个人兴趣爱好" icon="🌈" />
+            <PageHeader title="朋友圈" description="记录生活点滴，分享旅行见闻与个人兴趣爱好" icon="🌈" />
 
             <!-- 照片墙 - 瀑布流照片墙 -->
             <section class="section-container photo-gallery">
@@ -196,8 +196,7 @@
         </div>
     </div>
     <Footer />
-    <el-image class="bg-image" :src="bgUrl" :fit="'cover'" draggable="false"
-        :class="{ 'dim-bg': currentTheme === 'dark' }" />
+    <div class="global-bg"></div>
 </template>
 
 <script setup>
@@ -211,7 +210,6 @@ import Footer from '../components/Footer.vue'
 import ThemeToggler from '../components/ThemeToggler.vue'
 import PageHeader from '../components/PageHeader.vue'
 import { currentTheme } from '../stores/themeStore'
-import bgFile from '@/assets/images/bg4.png'
 import { ElMessage } from 'element-plus'
 import PhotoGallery from '../components/PhotoGallery.vue';
 
@@ -223,9 +221,6 @@ import heartOutlineIcon from '@/assets/icons/heart.png' // 假设有一个空心
 // 图标引用
 const heartIcon = heartFilledIcon
 const commentIcon = commentIconFile
-
-// 背景图片
-const bgUrl = bgFile
 
 // 创建一个响应式变量来控制TopBar的显示和隐藏
 const showTopBar = ref(true)
@@ -841,30 +836,30 @@ onUnmounted(() => {
 <style scoped>
 /* 主题变量定义 保持不变 */
 .page-wrapper.dark {
-    --bg-primary: rgba(25, 25, 35, 0.173);
-    --bg-secondary: rgba(30, 30, 40, 0.416);
-    --bg-tertiary: rgba(96, 96, 106, 0.4);
+    --bg-primary: rgba(25, 25, 35, 0.2);
+    --bg-secondary: rgba(30, 30, 40, 0.3);
+    --bg-tertiary: rgba(96, 96, 106, 0.3);
     --text-color: #ffffff;
     --text-secondary: rgba(255, 255, 255, 0.8);
     --title-gradient: linear-gradient(45deg, #ffffff, #b8c6db);
     --title-shadow: 0 2px 4px rgba(216, 216, 216, 0.5);
     --divider-color: rgba(255, 255, 255, 0.5);
-    --card-bg: rgba(30, 30, 40, 0.7);
-    --card-bg-hover: rgba(40, 40, 55, 0.8);
-    --card-border: rgba(255, 255, 255, 0.1);
+    --card-bg: rgba(30, 30, 40, 0.4);
+    --card-bg-hover: rgba(40, 40, 55, 0.6);
+    --card-border: rgba(255, 255, 255, 0.5);
     --card-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
     --accent-color: #5a9eff;
     --accent-secondary: #4a90e2;
     --heading-color: #ffffff;
     --text-muted: rgba(255, 255, 255, 0.6);
-    --tag-bg: rgba(60, 60, 80, 0.7);
+    --tag-bg: rgba(255, 255, 255, 0.15);
     --tag-text: #ffffff;
     --card-hover-transform: translateY(-4px);
     --timeline-line: rgba(255, 255, 255, 0.2);
     --timeline-dot: #5a9eff;
     --button-bg: #4a90e2;
     --button-text: white;
-    --button-border: transparent;
+    --button-border: rgba(255, 255, 255, 0.5);
     --button-hover-bg: #3a7bd5;
     --photo-overlay: rgba(0, 0, 0, 0.6);
     --grid-gap: 16px;
@@ -872,50 +867,48 @@ onUnmounted(() => {
 }
 
 .page-wrapper.light {
-    --bg-primary: rgba(245, 245, 250, 0.85);
-    --bg-secondary: rgba(255, 255, 255, 0.9);
-    --bg-tertiary: rgba(235, 235, 245, 0.7);
+    --bg-primary: rgba(255, 255, 255, 0.3);
+    --bg-secondary: rgba(255, 255, 255, 0.4);
+    --bg-tertiary: rgba(235, 235, 245, 0.3);
     --text-color: #333333;
     --text-secondary: rgba(0, 0, 0, 0.7);
     --title-gradient: linear-gradient(45deg, #333333, #555555);
     --title-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     --divider-color: rgba(0, 0, 0, 0.2);
-    --card-bg: rgba(255, 255, 255, 0.85);
-    --card-bg-hover: rgba(255, 255, 255, 0.95);
-    --card-border: rgba(0, 0, 0, 0.1);
-    --card-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    --card-bg: rgba(255, 255, 255, 0.4);
+    --card-bg-hover: rgba(255, 255, 255, 0.6);
+    --card-border: rgba(255, 255, 255, 0.8);
+    --card-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
     --accent-color: #3a7bd5;
     --accent-secondary: #3a7bd5;
     --heading-color: #333333;
     --text-muted: rgba(0, 0, 0, 0.5);
-    --tag-bg: rgba(240, 240, 245, 0.8);
+    --tag-bg: rgba(255, 255, 255, 0.5);
     --tag-text: #333333;
     --card-hover-transform: translateY(-3px);
     --timeline-line: rgba(0, 0, 0, 0.1);
     --timeline-dot: #3a7bd5;
     --button-bg: #4a90e2;
     --button-text: white;
-    --button-border: transparent;
+    --button-border: rgba(255, 255, 255, 0.6);
     --button-hover-bg: #3a7bd5;
     --photo-overlay: rgba(255, 255, 255, 0.7);
     --grid-gap: 16px;
     --accent-gradient: linear-gradient(45deg, #3a7bd5, #5a9eff);
 }
 
-.bg-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: filter 0.5s ease;
+.global-bg {
     position: fixed;
     top: 0;
     left: 0;
-    opacity: 1;
+    width: 100%;
+    height: 100%;
     z-index: -2;
-}
 
-.bg-image.dim-bg {
-    filter: brightness(0.9) saturate(0.8);
+
+
+
+    background: linear-gradient(225deg, #fcb8e2 0.000%, #feb9e4 5.000%, #ffbce7 10.000%, #ffc2ea 15.000%, #ffc8ed 20.000%, #ffd0f0 25.000%, #ffd8f3 30.000%, #fee0f6 35.000%, #fbe8f9 40.000%, #f7effb 45.000%, #f3f4fd 50.000%, #eef8ff 55.000%, #e8f9ff 60.000%, #e3f9ff 65.000%, #dcf6ff 70.000%, #d6f2ff 75.000%, #d0ecff 80.000%, #c9e5ff 85.000%, #c3ddfe 90.000%, #bdd5fc 95.000%, #b8cdfa 100.000%);
 }
 
 .page-wrapper {
@@ -1853,7 +1846,7 @@ onUnmounted(() => {
         grid-template-columns: repeat(1, 1fr);
         grid-auto-rows: auto;
     }
-    
+
     /* 移动端特别样式 - 重置所有网格项为单列 */
     .masonry-item {
         grid-column: span 1 !important;
@@ -1861,7 +1854,7 @@ onUnmounted(() => {
         height: 250px;
         margin-bottom: 20px;
     }
-    
+
     /* 移动端直接显示照片信息，不需要悬浮 */
     .photo-overlay {
         transform: translateY(0);
@@ -1871,7 +1864,7 @@ onUnmounted(() => {
         flex-direction: column;
         justify-content: flex-end;
     }
-    
+
     /* 调整标签在移动端的显示 */
     .tags {
         max-width: 100%;
@@ -1879,11 +1872,13 @@ onUnmounted(() => {
         padding-bottom: 5px;
         /* 允许水平滚动查看所有标签 */
         flex-wrap: nowrap;
-        scrollbar-width: none; /* Firefox */
+        scrollbar-width: none;
+        /* Firefox */
     }
-    
+
     .tags::-webkit-scrollbar {
-        display: none; /* Chrome, Safari, Edge */
+        display: none;
+        /* Chrome, Safari, Edge */
     }
 
     .article-grid {
@@ -1914,7 +1909,7 @@ onUnmounted(() => {
         flex-direction: column;
         align-items: flex-start;
     }
-    
+
     /* 移动端照片统计显示优化 */
     .photo-stats {
         position: absolute;
@@ -1930,7 +1925,7 @@ onUnmounted(() => {
     .masonry-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .masonry-item {
         height: 220px;
     }
@@ -1942,12 +1937,12 @@ onUnmounted(() => {
     .control-buttons {
         gap: 10px;
     }
-    
+
     /* 标题字体缩小 */
     .photo-overlay h4 {
         font-size: 18px;
     }
-    
+
     /* 照片计数移到左上角 */
     .photo-count {
         left: 10px;

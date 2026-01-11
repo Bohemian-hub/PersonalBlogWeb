@@ -144,11 +144,9 @@ const currentArticleId = ref(null); // 新增：当前文章ID，用于追踪新
 
 // 分类和标签数据
 const categories = [
-    { value: 'research', label: '学术札记' },
-    { value: 'studio', label: '实践工坊' },
-    { value: 'play', label: '游民时代' },
-    { value: 'feel', label: '认知轨迹' },
-    { value: 'say', label: '互动集市' },
+    { value: 'research', label: '我的文章' },
+    { value: 'studio', label: '我的项目' },
+    { value: 'play', label: '朋友圈' },
 ];
 
 const tags = [

@@ -378,20 +378,22 @@ onUnmounted(() => {
     --cover-text-color: #ffffff;
     --cover-text-shadow: 0 0 10px rgba(5, 5, 5, 0.5);
     --animated-char-reflection: rgba(0, 0, 0, 0.4);
-    --text-bg-color: rgba(0, 0, 0, 0.412);
+    --text-bg-color: rgba(0, 0, 0, 0.2);
     --cursor-color: #fff;
     --sea-color: #015871;
     --char-color: white;
+    --cover-border: rgba(255, 255, 255, 0.1);
 }
 
 .cover.light {
     --cover-text-color: #333333;
     --cover-text-shadow: 0 0 10px rgba(200, 200, 200, 0.5);
     --animated-char-reflection: rgba(100, 100, 100, 0.4);
-    --text-bg-color: rgba(255, 255, 255, 0.7);
+    --text-bg-color: rgba(255, 255, 255, 0.3);
     --cursor-color: #333;
     --sea-color: #81c4e2;
     --char-color: #333;
+    --cover-border: rgba(0, 0, 0, 0.1);
 }
 
 html,
@@ -464,6 +466,8 @@ body {
             display: inline-block;
             padding: 15px 0;
             background-color: var(--text-bg-color);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--cover-border);
             color: var(--cover-text-color);
             min-width: 2px;
             max-width: 100%;

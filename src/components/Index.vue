@@ -19,26 +19,20 @@
                         </div>
                     </div>
                     <div class="about-btn" @click="handleAboutClick">{{ personalInfo.aboutBtnText }}</div>
-                </div>
-
-                <!-- 右侧内容区域 -->
+                </div> <!-- 右侧内容区域 -->
                 <div class="profile-right">
                     <!-- 右上角一句话介绍/通知区域 -->
                     <div class="profile-intro">
                         <p class="tagline">「{{ personalInfo.tagline }}」</p>
-                    </div>
-
-                    <!-- 右下角每日动态格子 -->
+                    </div> <!-- 右下角每日动态格子 -->
                     <Activity :mobile-mode="isMobile" />
                 </div>
             </div>
-        </section>
-
-        <!-- 内容展示区 - 分两列 -->
+        </section> <!-- 内容展示区 - 分两列 -->
         <div class="content-columns">
             <!-- 左侧主要内容列 -->
             <div class="main-column">
-                <!-- 学术札记部分的模板修改 -->
+                <!-- 我的文章部分的模板修改 -->
                 <section class="section academic-notes">
                     <div class="section-header">
                         <h2>{{ academicSection.title }}</h2>
@@ -55,7 +49,7 @@
                                     <h3 class="article-title">{{ article.title }}</h3>
                                     <div class="article-tags">
                                         <span class="tag" v-for="(tag, index) in article.tags" :key="index">{{ tag
-                                            }}</span>
+                                        }}</span>
                                     </div>
                                     <p class="article-summary">{{ article.summary }}</p>
                                     <!-- 点赞和评论 -->
@@ -73,9 +67,7 @@
                             </div>
                         </div>
                     </div>
-                </section>
-
-                <!-- 实践工坊 -->
+                </section> <!-- 我的项目 -->
                 <section class="section workshop">
                     <div class="section-header">
                         <h2>{{ workshopSection.title }}</h2>
@@ -91,7 +83,7 @@
                                     <h3 class="project-title">{{ project.title }}</h3>
                                     <div class="project-tags">
                                         <span class="tag" v-for="(tag, index) in project.tags" :key="index">{{ tag
-                                            }}</span>
+                                        }}</span>
                                     </div>
                                     <p class="project-summary">{{ project.summary }}</p>
                                     <div class="project-meta">
@@ -116,59 +108,7 @@
                     </div>
                 </section>
             </div>
-
-            <!-- 右侧次要内容列 -->
-            <div class="side-column">
-
-                <!-- 最近更新 - 额外添加的板块 -->
-                <section class="section recent-updates">
-                    <div class="section-header">
-                        <h2>最近更新</h2>
-                    </div>
-                    <div class="section-content">
-                        <div class="updates-list">
-                            <!-- 更新列表 -->
-                            <div class="update-item-placeholder"></div>
-                            <div class="update-item-placeholder"></div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- 认知轨迹 -->
-                <section class="section thoughts">
-                    <div class="section-header">
-                        <h2>{{ thoughtsSection.title }}</h2>
-                        <span class="view-all">{{ thoughtsSection.viewAllText }}</span>
-                    </div>
-                    <div class="section-content">
-                        <p class="section-desc">{{ thoughtsSection.description }}</p>
-                        <div class="thought-list">
-                            <!-- 文章列表 -->
-                            <div class="thought-item" v-for="thought in thoughtsSection.thoughts" :key="thought.id"
-                                @click="goToArticle(thought.id)">
-                                <div class="thought-date" :data-date="thought.date">
-                                    <span class="date-month">{{ formatDate(thought.date).month }}</span>
-                                    <span class="date-day">{{ formatDate(thought.date).day }}</span>
-                                    <span class="date-year">{{ formatDate(thought.date).year }}</span>
-                                </div>
-                                <div class="thought-content">
-                                    <h3 class="thought-title">{{ thought.title }}</h3>
-                                    <div class="thought-tags">
-                                        <span class="tag" v-for="(tag, index) in thought.tags" :key="index">{{ tag
-                                            }}</span>
-                                    </div>
-                                    <p class="thought-summary">{{ thought.summary }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-
-            </div>
-        </div>
-
-        <!-- 游民时代 - 全宽度区域 -->
+        </div> <!-- 朋友圈 - 全宽度区域 -->
         <section class="section life-section">
             <div class="section-header">
                 <h2>{{ lifeSection.title }}</h2>
@@ -207,9 +147,7 @@
                 :initialPhotoIndex="currentPhotoIndex" :heartFilledIcon="heartFilledIcon"
                 :heartOutlineIcon="heartOutlineIcon" :commentIcon="commentIcon" :likedPhotoIds="likedPhotoIds"
                 @like="handlePhotoLike" @comment="handlePhotoComment" />
-        </section>
-
-        <!-- 底部区域 -->
+        </section> <!-- 底部区域 -->
         <div class="bottom-sections">
             <!-- 互动交集 -->
             <section class="section interaction">
@@ -234,12 +172,9 @@
                         </div>
                     </div>
                     <div class="message-board">
-                        <h3>留言板</h3>
-
-                        <!-- 留言输入区域 -->
+                        <h3>留言板</h3> <!-- 留言输入区域 -->
                         <div class="message-input-container">
                             <textarea v-model="messageInput" placeholder="写下你的留言..." class="message-input"></textarea>
-
                             <div class="message-actions">
                                 <div class="privacy-toggle">
                                     <input type="checkbox" id="privacy-toggle" v-model="isPrivate">
@@ -247,13 +182,9 @@
                                         <span v-if="isPrivate">私密留言</span>
                                         <span v-else>公开留言</span>
                                     </label>
-                                </div>
-
-                                <button class="send-btn" @click="addMessage">发送</button>
+                                </div> <button class="send-btn" @click="addMessage">发送</button>
                             </div>
-                        </div>
-
-                        <!-- 留言展示区域 -->
+                        </div> <!-- 留言展示区域 -->
                         <div class="message-list">
                             <div class="message-item" v-for="message in displayMessages" :key="message.id">
                                 <div class="message-avatar">
@@ -267,9 +198,7 @@
                                     <p class="message-text">{{ message.content }}</p>
                                 </div>
                             </div>
-                        </div>
-
-                        <!-- 查看更多按钮 -->
+                        </div> <!-- 查看更多按钮 -->
                         <button class="view-more-btn" @click="viewMoreMessages">查看更多留言</button>
                     </div>
                 </div>
@@ -277,7 +206,6 @@
         </div>
     </div>
 </template>
-
 <script setup>
 import { ref, onMounted, computed, onBeforeMount, onBeforeUnmount, watch } from 'vue';
 import { useRouter } from 'vue-router';
@@ -288,11 +216,7 @@ import PhotoGallery from './PhotoGallery.vue';
 import heartFilledIcon from '@/assets/icons/heart-filled.png';
 import heartOutlineIcon from '@/assets/icons/heart.png';
 import commentIcon from '@/assets/icons/comment.png';
-
-
-const router = useRouter();
-
-// 添加响应式布局相关的状态
+const router = useRouter();// 添加响应式布局相关的状态
 const isMobile = ref(false);
 const windowWidth = ref(window.innerWidth);
 // 添加照片画廊相关状态
@@ -303,14 +227,10 @@ const likedPhotoIds = ref([]);
 const showPhotoGallery = (index) => {
     currentPhotoIndex.value = index;
     showPhotoDialog.value = true;
-};
-
-// 处理照片点赞
+};// 处理照片点赞
 const handlePhotoLike = (photoId) => {
     const mediaIndex = lifeSection.value.mediaItems.findIndex(media => media.id === photoId);
-    if (mediaIndex === -1) return;
-
-    if (likedPhotoIds.value.includes(photoId)) {
+    if (mediaIndex === -1) return; if (likedPhotoIds.value.includes(photoId)) {
         // 取消点赞
         likedPhotoIds.value = likedPhotoIds.value.filter(id => id !== photoId);
         lifeSection.value.mediaItems[mediaIndex].likes--;
@@ -319,44 +239,28 @@ const handlePhotoLike = (photoId) => {
         likedPhotoIds.value.push(photoId);
         lifeSection.value.mediaItems[mediaIndex].likes++;
     }
-};
-
-// 处理照片评论
+};// 处理照片评论
 const handlePhotoComment = ({ photoId, comment }) => {
     const mediaIndex = lifeSection.value.mediaItems.findIndex(media => media.id === photoId);
-    if (mediaIndex === -1) return;
-
-    lifeSection.value.mediaItems[mediaIndex].comments.unshift(comment);
-};
-
-// 检测当前设备窗口大小并设置isMobile状态
+    if (mediaIndex === -1) return; lifeSection.value.mediaItems[mediaIndex].comments.unshift(comment);
+};// 检测当前设备窗口大小并设置isMobile状态
 const checkScreenSize = () => {
     windowWidth.value = window.innerWidth;
     isMobile.value = windowWidth.value < 768;
-};
-
-// 在组件挂载前检测屏幕尺寸
+};// 在组件挂载前检测屏幕尺寸
 onBeforeMount(() => {
     checkScreenSize();
-});
-
-// 在组件挂载后添加窗口大小变化事件监听
+});// 在组件挂载后添加窗口大小变化事件监听
 onMounted(() => {
-    window.addEventListener('resize', checkScreenSize);
-
-    // 读取sessionStorage中的主题设置
+    window.addEventListener('resize', checkScreenSize);    // 读取sessionStorage中的主题设置
     const savedTheme = sessionStorage.getItem('theme');
     if (savedTheme) {
         currentTheme.value = savedTheme;
     }
-});
-
-// 在组件卸载时移除事件监听器
+});// 在组件卸载时移除事件监听器
 onBeforeUnmount(() => {
     window.removeEventListener('resize', checkScreenSize);
-});
-
-// 个人介绍数据
+});// 个人介绍数据
 const personalInfo = ref({
     sectionTitle: '个人介绍',
     avatar: 'https://picsum.photos/600/400?random=8', // 可以添加头像URL
@@ -367,11 +271,9 @@ const personalInfo = ref({
     ],
     aboutBtnText: '关于我',
     tagline: '浅夜未央，星河流转，无论走到哪里，都是追寻自我的旅程'
-});
-
-// 学术札记数据
+});// 我的文章数据
 const academicSection = ref({
-    title: '学术札记',
+    title: '我的文章',
     description: '分享科研心得、学术观点与专业探索',
     viewAllText: '查看全部',
     articles: [
@@ -404,11 +306,9 @@ const academicSection = ref({
         }
     ]
 });
-
-
-// 实践工坊数据
+// 我的项目数据
 const workshopSection = ref({
-    title: '实践工坊',
+    title: '我的项目',
     description: '展示个人项目、工具开发与方法分享',
     viewAllText: '查看全部',
     projects: [
@@ -433,39 +333,9 @@ const workshopSection = ref({
             comments: 24
         }
     ]
-});
-// 认知轨迹数据
-const thoughtsSection = ref({
-    title: '认知轨迹',
-    description: '思考与观点的表达空间',
-    viewAllText: '查看全部',
-    thoughts: [
-        {
-            id: 1,
-            title: '创造性思维的培养',
-            date: '2023-11-15',
-            tags: ['思维模式', '创新'],
-            summary: '关于如何培养和激发创造性思维的个人思考与实践方法...'
-        },
-        {
-            id: 2,
-            title: '数字极简主义',
-            date: '2023-11-15',
-            tags: ['数字生活', '效率'],
-            summary: '在信息过载时代如何实践数字极简主义，提升注意力质量...'
-        },
-        {
-            id: 3,
-            title: '专注与心流',
-            date: '2023-11-15',
-            tags: ['心理学', '生产力'],
-            summary: '探讨进入心流状态的条件与方法，以及其对创造力的影响...'
-        }
-    ]
-});
-// 游民时代数据
+});// 朋友圈数据
 const lifeSection = ref({
-    title: '游民时代',
+    title: '朋友圈',
     description: '生活瞬间、旅行记忆与个人故事集',
     viewAllText: '查看全部',
     mediaItems: [
@@ -597,9 +467,7 @@ const lifeSection = ref({
             ]
         }
     ]
-});
-
-// 友情链接数据
+});// 友情链接数据
 const friendLinks = ref([
     {
         id: 1,
@@ -644,8 +512,6 @@ const friendLinks = ref([
         description: '开放学术预印本'
     }
 ]);
-
-
 // 留言板数据
 const messageInput = ref(''); // 用户输入的留言内容
 const isPrivate = ref(false); // 是否是私密留言
@@ -662,7 +528,7 @@ const messages = ref([
         id: 2,
         author: '李四',
         avatar: 'https://randomuser.me/api/portraits/women/2.jpg',
-        content: '学术札记部分的观点很有启发性，已经收藏了。',
+        content: '我的文章部分的观点很有启发性，已经收藏了。',
         date: '2025-04-04',
         isPrivate: false
     },
@@ -670,7 +536,7 @@ const messages = ref([
         id: 3,
         author: '王五',
         avatar: 'https://randomuser.me/api/portraits/men/3.jpg',
-        content: '请问实践工坊中提到的知识库管理系统是否已开源？很感兴趣！',
+        content: '请问我的项目中提到的知识库管理系统是否已开源？很感兴趣！',
         date: '2025-04-03',
         isPrivate: false
     },
@@ -678,7 +544,7 @@ const messages = ref([
         id: 4,
         author: '赵六',
         avatar: 'https://randomuser.me/api/portraits/women/4.jpg',
-        content: '游民时代的照片拍得太美了，请问使用的是什么相机？',
+        content: '朋友圈的照片拍得太美了，请问使用的是什么相机？',
         date: '2025-04-02',
         isPrivate: false
     },
@@ -690,28 +556,20 @@ const messages = ref([
         date: '2025-04-01',
         isPrivate: false
     }
-]);
-
-// 添加跳转函数
+]);// 添加跳转函数
 const goToArticle = (articleId) => {
     router.push({
         name: 'Article',
         query: { id: articleId }
     });
-};
-
-// 计算属性：只显示最新的5条公开留言
+};// 计算属性：只显示最新的5条公开留言
 const displayMessages = computed(() => {
     return messages.value
         .filter(message => !message.isPrivate)
         .slice(0, 5);
-});
-
-// 添加留言方法
+});// 添加留言方法
 const addMessage = () => {
-    if (!messageInput.value.trim()) return;
-
-    // 创建新留言
+    if (!messageInput.value.trim()) return;    // 创建新留言
     const newMessage = {
         id: Date.now(), // 使用时间戳作为唯一ID
         author: '访客用户', // 实际应用中可能需要登录系统
@@ -719,16 +577,10 @@ const addMessage = () => {
         content: messageInput.value,
         date: new Date().toISOString().split('T')[0],
         isPrivate: isPrivate.value
-    };
-
-    // 添加到留言列表最前面
-    messages.value.unshift(newMessage);
-
-    // 清空输入框
+    };    // 添加到留言列表最前面
+    messages.value.unshift(newMessage);    // 清空输入框
     messageInput.value = '';
-};
-
-// 查看更多留言
+};// 查看更多留言
 const viewMoreMessages = () => {
     // console.log('查看更多留言被点击');
     // 这里可以添加导航到留言详情页面的逻辑
@@ -746,42 +598,38 @@ const formatDate = (dateString) => {
 const handleAboutClick = () => {
     // console.log('关于我按钮被点击');
     // 这里可以添加导航到关于页面或显示关于信息弹窗的逻辑
-};
-
-</script>
-
+};</script>
 <style scoped>
 /* 主题变量定义 */
 .dark {
-    --bg-primary: rgba(25, 25, 35, 0.55);
-    --bg-secondary: rgba(30, 30, 40, 0.7);
-    --bg-tertiary: rgba(40, 40, 55, 0.4);
+    --bg-primary: rgba(25, 25, 35, 0.2);
+    --bg-secondary: rgba(30, 30, 40, 0.3);
+    --bg-tertiary: rgba(40, 40, 55, 0.3);
     --text-primary: white;
     --text-secondary: rgba(255, 255, 255, 0.8);
-    --border-color: rgba(255, 255, 255, 0.1);
+    --border-color: rgba(255, 255, 255, 0.5);
     --shadow-color: rgba(0, 0, 0, 0.2);
     --gradient-text: linear-gradient(45deg, #ffffff, #b8c6db);
     --hover-bg: rgba(255, 255, 255, 0.1);
-    --card-bg: rgba(30, 30, 40, 0.7);
+    --card-bg: rgba(30, 30, 40, 0.4);
     --input-bg: rgba(255, 255, 255, 0.05);
 }
 
 .light {
-    --bg-primary: rgba(245, 245, 250, 0.85);
-    --bg-secondary: rgba(255, 255, 255, 0.9);
-    --bg-tertiary: rgba(235, 235, 245, 0.7);
+    --bg-primary: rgba(255, 255, 255, 0.3);
+    --bg-secondary: rgba(255, 255, 255, 0.4);
+    --bg-tertiary: rgba(235, 235, 245, 0.3);
     --text-primary: #333;
     --text-secondary: #555;
-    --border-color: rgba(0, 0, 0, 0.1);
+    --border-color: rgba(255, 255, 255, 0.6);
     --shadow-color: rgba(0, 0, 0, 0.1);
     --gradient-text: linear-gradient(45deg, #333, #666);
     --hover-bg: rgba(0, 0, 0, 0.05);
-    --card-bg: rgba(255, 255, 255, 0.85);
+    --card-bg: rgba(255, 255, 255, 0.4);
     --input-bg: rgba(0, 0, 0, 0.03);
 }
 
 /* 主题切换按钮样式 */
-
 .main {
     width: 100%;
     max-width: 1400px;
@@ -796,7 +644,7 @@ const handleAboutClick = () => {
 
 /* 通用板块样式 */
 .section {
-    border: none;
+    border: 1px solid var(--border-color);
     border-radius: 16px;
     margin-bottom: 30px;
     padding: 24px;
@@ -805,8 +653,7 @@ const handleAboutClick = () => {
     background-color: var(--bg-primary);
     transition: all 0.3s ease;
     box-shadow: 0 6px 20px var(--shadow-color),
-        0 2px 8px rgba(0, 0, 0, 0.15),
-        0 0 1px var(--border-color);
+        0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .section:hover {
@@ -910,7 +757,6 @@ const handleAboutClick = () => {
         inset 0 0 0 2px rgba(255, 255, 255, 0.3);
 }
 
-
 /* 数据统计样式 */
 .profile-stats {
     display: flex;
@@ -989,7 +835,6 @@ const handleAboutClick = () => {
     color: transparent;
 }
 
-
 /* 颜色图例样式 */
 .color-legend {
     display: flex;
@@ -1051,16 +896,19 @@ const handleAboutClick = () => {
 
 .main-column {
     flex: 3;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
 }
 
 .side-column {
     flex: 2;
 }
 
-/* 学术札记 */
+/* 我的文章 */
 .article-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr;
     gap: 20px;
 }
 
@@ -1071,7 +919,7 @@ const handleAboutClick = () => {
     border: 1px dashed rgba(255, 255, 255, 0.2);
 }
 
-/* 实践工坊 */
+/* 我的项目 */
 .project-showcase {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -1085,25 +933,7 @@ const handleAboutClick = () => {
     border: 1px dashed rgba(255, 255, 255, 0.2);
 }
 
-/* 认知轨迹 */
-.thought-item-placeholder {
-    height: 60px;
-    background-color: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    margin-bottom: 15px;
-    border: 1px dashed rgba(255, 255, 255, 0.2);
-}
-
-/* 最近更新 */
-.update-item-placeholder {
-    height: 50px;
-    background-color: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    margin-bottom: 15px;
-    border: 1px dashed rgba(255, 255, 255, 0.2);
-}
-
-/* 游民时代 */
+/* 朋友圈 */
 .media-gallery {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -1233,53 +1063,61 @@ h3 {
     margin-bottom: 15px;
 }
 
-/* 学术札记卡片样式 */
+/* 我的文章卡片样式 */
 .article-card {
     position: relative;
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     overflow: hidden;
     background-color: var(--card-bg);
     box-shadow: 0 8px 20px var(--shadow-color);
     transition: all 0.3s ease;
-    height: 100%;
+    height: 140px;
+    /* 固定高度，更小巧 */
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    /* 改为水平排列：左图右详情 */
     cursor: pointer;
-    /* 添加鼠标指针样式 */
 }
 
 .article-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 12px 25px var(--shadow-color);
+    transform: translateY(-4px);
+    /* 悬浮移动幅度减小 */
+    box-shadow: 0 10px 25px var(--shadow-color);
 }
 
 .article-image {
-    height: 140px;
+    width: 140px;
+    /* 左侧图片固定宽度 */
+    height: 100%;
+    /* 高度占满 */
     background-size: cover;
     background-position: center;
     position: relative;
+    flex-shrink: 0;
+    /* 防止图片被压缩 */
 }
 
+/* 修改渐变方向为从右向左，或者移除 */
 .article-image::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 40px;
-    background: linear-gradient(to top, var(--card-bg), transparent);
+    display: none;
+    /* 移除图片上的渐变遮罩 */
 }
 
 .article-content {
-    padding: 16px;
+    padding: 12px 16px;
+    /* 减小内边距 */
     flex: 1;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+    /* 防止内容溢出 */
 }
 
 .article-title {
-    margin: 0 0 10px 0;
-    font-size: 18px;
+    margin: 0 0 6px 0;
+    font-size: 16px;
+    /* 减小标题字号 */
     font-weight: 600;
     line-height: 1.3;
     letter-spacing: 0.3px;
@@ -1287,34 +1125,48 @@ h3 {
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+    white-space: nowrap;
+    /* 标题单行显示 */
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .article-tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
-    margin-bottom: 10px;
+    gap: 4px;
+    margin-bottom: 6px;
 }
 
 .article-summary {
     margin: 0;
-    font-size: 14px;
-    line-height: 1.5;
+    font-size: 13px;
+    /* 减小摘要字号 */
+    line-height: 1.4;
     opacity: 0.8;
     flex: 1;
     color: var(--text-secondary);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    /* 限制摘要显示2行 */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
-/* 实践工坊卡片样式 */
+/* 我的项目卡片样式 */
 .project-card {
     position: relative;
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     overflow: hidden;
     background-color: var(--card-bg);
     box-shadow: 0 8px 20px var(--shadow-color);
     transition: all 0.3s ease;
+    height: 100%;
+    /* 高度自适应 */
     display: flex;
     flex-direction: column;
+    /* 改回垂直排列：上图下详情 */
     cursor: pointer;
 }
 
@@ -1324,10 +1176,14 @@ h3 {
 }
 
 .project-image {
-    height: 160px;
+    width: 100%;
+    /* 宽度占满 */
+    height: 270px;
+    /* 固定高度 */
     background-size: cover;
     background-position: center;
     position: relative;
+    flex-shrink: 0;
 }
 
 .project-image::after {
@@ -1338,6 +1194,7 @@ h3 {
     right: 0;
     height: 50px;
     background: linear-gradient(to top, var(--card-bg), transparent);
+    display: block;
 }
 
 .project-content {
@@ -1349,7 +1206,7 @@ h3 {
 
 .project-title {
     margin: 0 0 10px 0;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 600;
     line-height: 1.3;
     background: var(--gradient-text);
@@ -1372,6 +1229,10 @@ h3 {
     opacity: 0.8;
     flex: 1;
     color: var(--text-secondary);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 /* 项目卡片调整 */
@@ -1389,21 +1250,6 @@ h3 {
     align-items: center;
     gap: 5px;
 }
-
-/* 认知轨迹卡片样式 */
-.thought-item {
-    background-color: var(--card-bg);
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 15px;
-    position: relative;
-    box-shadow: 0 4px 15px var(--shadow-color);
-    transition: all 0.3s ease;
-    display: flex;
-    gap: 15px;
-    cursor: pointer;
-}
-
 
 .thought-date {
     min-width: 80px;
@@ -1509,9 +1355,10 @@ h3 {
     color: var(--text-secondary);
 }
 
-/* 游民时代卡片样式 */
+/* 朋友圈卡片样式 */
 .media-item {
     position: relative;
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     overflow: hidden;
     height: 200px;
@@ -1574,7 +1421,6 @@ h3 {
     background-color: rgba(0, 0, 0, 0.4);
     border-color: rgba(255, 255, 255, 0.3);
 }
-
 
 .media-summary {
     margin: 0;
@@ -1682,7 +1528,7 @@ h3 {
     color: rgba(115, 192, 222, 0.9);
 }
 
-/* 游民时代调整 */
+/* 朋友圈调整 */
 .media-stats {
     margin-top: 10px;
     opacity: 0;
@@ -1874,13 +1720,10 @@ h3 {
     background-color: rgba(255, 255, 255, 0.15);
 }
 
-
 /* 响应式布局媒体查询 */
 @media (max-width: 1200px) {
-    .article-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
 
+    /* .article-grid 已调整为单列，此处移除覆盖 */
     .media-gallery {
         grid-template-columns: repeat(3, 1fr);
     }
@@ -1891,6 +1734,10 @@ h3 {
 }
 
 @media (max-width: 992px) {
+    .main-column {
+        grid-template-columns: 1fr;
+    }
+
     .personal-intro .section-content {
         flex-direction: column;
     }
@@ -1939,10 +1786,7 @@ h3 {
         flex-direction: column;
     }
 
-    .article-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
+    /* .article-grid 已全局调整 */
     .project-showcase {
         grid-template-columns: 1fr;
     }
@@ -1999,7 +1843,7 @@ h3 {
         grid-template-columns: 1fr;
     }
 
-    /* 移动端游民时代卡片默认显示摘要和点赞信息 */
+    /* 移动端朋友圈卡片默认显示摘要和点赞信息 */
     .media-summary {
         opacity: 0.9;
         height: auto;
@@ -2024,6 +1868,26 @@ h3 {
 @media (max-width: 576px) {
     .main {
         padding: 15px 10px;
+    }
+
+    .article-card {
+        height: 120px;
+        /* 移动端高度减小 */
+    }
+
+    .project-card {
+        height: auto;
+    }
+
+    .article-image {
+        width: 110px;
+        /* 移动端图片变窄 */
+    }
+
+    .project-image {
+        width: 100%;
+        height: 140px;
+        /* 移动端图片高度 */
     }
 
     .article-grid {

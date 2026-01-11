@@ -10,56 +10,27 @@
     <Index height="100vh" />
     <!-- 底部版权和备案信息 -->
     <Footer />
-    <el-image class="bg-image" :src="bgUrl" :fit="'cover'" draggable="false" />
+    <div class="global-bg"></div>
   </div>
 </template>
-
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue'
-import bgFile from '@/assets/images/bg7.png'
-const bgUrl = bgFile
-
-// 导入顶部栏组件和封装的Cover组件
+import { ref, onMounted, onUnmounted, computed } from 'vue'// 导入顶部栏组件和封装的Cover组件
 import TopBar from '../components/TopBar.vue'
 import Cover from '../components/Cover.vue'
 import Index from '../components/Index.vue'
 import Footer from '../components/Footer.vue'  // 导入新的Footer组件
-import ThemeToggler from '../components/ThemeToggler.vue' // 导入主题切换组件
-
-// 创建一个响应式变量来控制TopBar的显示和隐藏
-const showTopBar = ref(true)
-
-// 处理滚动事件的函数
-const handleScroll = () => {
-  // 当滚动位置为0（页面顶部）时显示TopBar，否则隐藏
-  showTopBar.value = window.scrollY <= 400
-}
-
-// 组件挂载时添加滚动事件监听
-onMounted(() => {
-  window.addEventListener('scroll', handleScroll)
-  // 初始化状态
-  handleScroll()
-})
-
-// 组件卸载时移除事件监听，防止内存泄漏
-onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll)
-})
-</script>
-
+import ThemeToggler from '../components/ThemeToggler.vue' // 导入主题切换组件// 创建一个响应式变量来控制TopBar的显示和隐藏
+const showTopBar = ref(true)</script>
 <style scoped>
-.bg-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  /* 添加平滑过渡效果 */
-  transition: filter 0.3s ease;
+.global-bg {
   position: fixed;
   top: 0;
   left: 0;
-  opacity: 1;
+  width: 100%;
+  height: 100%;
   z-index: -2;
+
+  background: linear-gradient(225deg, #fcb8e2 0.000%, #feb9e4 5.000%, #ffbce7 10.000%, #ffc2ea 15.000%, #ffc8ed 20.000%, #ffd0f0 25.000%, #ffd8f3 30.000%, #fee0f6 35.000%, #fbe8f9 40.000%, #f7effb 45.000%, #f3f4fd 50.000%, #eef8ff 55.000%, #e8f9ff 60.000%, #e3f9ff 65.000%, #dcf6ff 70.000%, #d6f2ff 75.000%, #d0ecff 80.000%, #c9e5ff 85.000%, #c3ddfe 90.000%, #bdd5fc 95.000%, #b8cdfa 100.000%);
 }
 
 .home-theme-toggler {

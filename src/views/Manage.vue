@@ -20,9 +20,7 @@
           返回网站
         </el-button>
       </div>
-    </div>
-
-    <!-- 主体内容区 -->
+    </div> <!-- 主体内容区 -->
     <div class="manage-content">
       <!-- 侧边导航栏 -->
       <transition name="slide-fade">
@@ -55,9 +53,7 @@
             </el-menu-item>
           </el-menu>
         </div>
-      </transition>
-
-      <!-- 内容显示区域 -->
+      </transition> <!-- 内容显示区域 -->
       <div class="manage-main" :class="{ 'main-expanded': !isSidebarVisible }">
         <div class="panel-container">
           <div class="panel-header">
@@ -78,7 +74,6 @@
               </template>
             </div>
           </div>
-
           <div class="panel-content">
             <!-- 处理Record组件的事件 -->
             <component :is="currentComponent" :key="componentKey" :article-id="editingArticleId"
@@ -90,32 +85,23 @@
     </div>
   </div>
 </template>
-
 <script setup>
 import { ref, shallowRef, onMounted, onBeforeMount, defineAsyncComponent } from 'vue';
 import { useRouter } from 'vue-router';
 import {
   Document, Collection, ChatDotRound, Folder, Setting,
   Menu, ArrowRight, Back, Plus, Delete
-} from '@element-plus/icons-vue';
-
-// 组件动态引入
+} from '@element-plus/icons-vue';// 组件动态引入
 const ArticlePublish = defineAsyncComponent(() => import('../components/manage/Record.vue'));
 const ArticleManage = defineAsyncComponent(() => import('../components/manage/ArticleManage.vue'));
 const CommentManage = defineAsyncComponent(() => import('../components/manage/CommentManage.vue'));
 const CategoryManage = defineAsyncComponent(() => import('../components/manage/CategoryManage.vue'));
-const SystemSettings = defineAsyncComponent(() => import('../components/manage/SystemSettings.vue'));
-
-const router = useRouter();
+const SystemSettings = defineAsyncComponent(() => import('../components/manage/SystemSettings.vue')); const router = useRouter();
 const activeIndex = ref('article-manage'); // 默认激活的菜单项
 const isSidebarVisible = ref(true); // 控制侧边栏显示状态
 const componentKey = ref(0); // 用于强制重新渲染组件
-const editingArticleId = ref(null); // 编辑文章ID状态
-
-// 使用shallowRef优化性能，因为组件引用不需要深度响应式
-const currentComponent = shallowRef(null);
-
-// 根据activeIndex计算当前应显示的组件
+const editingArticleId = ref(null); // 编辑文章ID状态// 使用shallowRef优化性能，因为组件引用不需要深度响应式
+const currentComponent = shallowRef(null);// 根据activeIndex计算当前应显示的组件
 const updateCurrentComponent = () => {
   switch (activeIndex.value) {
     case 'article-publish':
@@ -136,9 +122,7 @@ const updateCurrentComponent = () => {
     default:
       currentComponent.value = ArticleManage;
   }
-};
-
-// 获取面板标题
+};// 获取面板标题
 const getPanelTitle = (index) => {
   const titles = {
     'article-publish': '发布文章',
@@ -148,9 +132,7 @@ const getPanelTitle = (index) => {
     'settings': '系统设置'
   };
   return titles[index] || '管理面板';
-};
-
-// 获取面板图标
+};// 获取面板图标
 const getPanelIcon = (index) => {
   const icons = {
     'article-publish': Document,
@@ -160,88 +142,57 @@ const getPanelIcon = (index) => {
     'settings': Setting
   };
   return icons[index] || Document;
-};
-
-// 处理编辑文章事件
+};// 处理编辑文章事件
 const handleEditArticle = (articleId) => {
-  console.log('处理编辑文章事件:', articleId);
-
-  // 设置编辑状态
+  console.log('处理编辑文章事件:', articleId);  // 设置编辑状态
   editingArticleId.value = articleId;
   activeIndex.value = 'article-publish';
-  updateCurrentComponent();
-
-  // 强制重新渲染组件以确保props更新
+  updateCurrentComponent();  // 强制重新渲染组件以确保props更新
   componentKey.value++;
-};
-
-// 导航到发布页面
+};// 导航到发布页面
 const navigateToPublish = () => {
-  console.log('导航到发布页面');
-
-  editingArticleId.value = null; // 清除编辑ID
+  console.log('导航到发布页面'); editingArticleId.value = null; // 清除编辑ID
   activeIndex.value = 'article-publish';
   updateCurrentComponent();
   componentKey.value++;
-};
-
-// 处理菜单选择事件
+};// 处理菜单选择事件
 const handleSelect = (index) => {
-  console.log('菜单选择:', index);
-
-  // 切换菜单时清除编辑状态
+  console.log('菜单选择:', index);  // 切换菜单时清除编辑状态
   editingArticleId.value = null;
   activeIndex.value = index;
   updateCurrentComponent();
-};
-
-// 切换侧边栏显示/隐藏
+};// 切换侧边栏显示/隐藏
 const toggleSidebar = () => {
   isSidebarVisible.value = !isSidebarVisible.value;
-};
-
-// 返回网站
+};// 返回网站
 const backToSite = () => {
   router.push('/');
-};
-
-// 初始化时检查屏幕尺寸
+};// 初始化时检查屏幕尺寸
 const checkScreenSize = () => {
   if (window.innerWidth < 768) {
     isSidebarVisible.value = false;
   }
-};
-
-onBeforeMount(() => {
+}; onBeforeMount(() => {
   checkScreenSize();
   window.addEventListener('resize', checkScreenSize);
-});
-
-onMounted(() => {
+}); onMounted(() => {
   // 初始化组件
   updateCurrentComponent();
-});
-
-// 处理Record组件的事件
+});// 处理Record组件的事件
 const handleCancelEdit = () => {
   editingArticleId.value = null;
   activeIndex.value = 'article-manage';
   updateCurrentComponent();
-};
-
-const handlePublishSuccess = () => {
+}; const handlePublishSuccess = () => {
   editingArticleId.value = null;
   activeIndex.value = 'article-manage';
   updateCurrentComponent();
-};
-
-const handleSaveSuccess = () => {
+}; const handleSaveSuccess = () => {
   // 保存成功后可以选择留在编辑页面或回到管理页面
   // 这里选择留在编辑页面，用户可以继续编辑
   ElMessage.success('操作完成');
 };
 </script>
-
 <style scoped>
 .manage-page {
   display: flex;

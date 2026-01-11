@@ -76,11 +76,9 @@ provide('showUserPanel', showUserPanel)
 // 响应式菜单数据
 const menuList = ref([
   { text: '首页', icon: icon_index, route: '/' },
-  { text: '学术札记', icon: icon_ai, route: '/research' },
-  { text: '实践工坊', icon: icon_command, route: '/studio' },
-  { text: '游民时代', icon: icon_traval, route: '/play' },
-  { text: '认知轨迹', icon: icon_book, route: '/feel' },
-  { text: '互动集市', icon: icon_hudong, route: '/say' },
+  { text: '我的文章', icon: icon_ai, route: '/research' },
+  { text: '我的项目', icon: icon_command, route: '/studio' },
+  { text: '朋友圈', icon: icon_traval, route: '/play' },
   { text: '关于我', icon: icon_about, route: '/about' }
 ])
 // 添加设置随机颜色的方法
@@ -197,28 +195,30 @@ const checkMenuOverflow = () => {
 /* 主题变量定义 */
 .top-bar.dark,
 .mobile-menu.dark {
-  --top-bar-bg: #4141411d;
-  --top-bar-hover-bg: #41414188;
+  --top-bar-bg: rgba(65, 65, 65, 0.2);
+  --top-bar-hover-bg: rgba(65, 65, 65, 0.4);
   --text-color: #fff;
   --text-hover-color: #e06614;
   --underline-color: #e06614;
-  --menu-bg: rgba(65, 65, 65, 0.9);
-  --menu-border: rgba(255, 255, 255, 0.1);
+  --menu-bg: rgba(65, 65, 65, 0.4);
+  --menu-border: rgba(255, 255, 255, 0.5);
   --menu-hover-bg: rgba(224, 102, 20, 0.2);
   --menu-active-bg: rgba(224, 102, 20, 0.4);
+  backdrop-filter: blur(10px);
 }
 
 .top-bar.light,
 .mobile-menu.light {
-  --top-bar-bg: rgba(255, 255, 255, 0.2);
-  --top-bar-hover-bg: rgba(255, 255, 255, 0.85);
+  --top-bar-bg: rgba(255, 255, 255, 0.3);
+  --top-bar-hover-bg: rgba(255, 255, 255, 0.5);
   --text-color: #333;
   --text-hover-color: #e06614;
   --underline-color: #e06614;
-  --menu-bg: rgba(255, 255, 255, 0.95);
-  --menu-border: rgba(0, 0, 0, 0.1);
+  --menu-bg: rgba(255, 255, 255, 0.4);
+  --menu-border: rgba(255, 255, 255, 0.6);
   --menu-hover-bg: rgba(224, 102, 20, 0.1);
   --menu-active-bg: rgba(224, 102, 20, 0.2);
+  backdrop-filter: blur(10px);
 }
 
 .top-bar {
@@ -232,7 +232,9 @@ const checkMenuOverflow = () => {
   transition: opacity 0.3s ease, transform 0.3s ease;
   /* 加一点点默认的背景色，没有 hover 时候那么浓 */
   background-color: var(--top-bar-bg);
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--menu-border);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
 }
 
 .top-bar.hidden {

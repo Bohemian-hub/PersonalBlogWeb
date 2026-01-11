@@ -7,7 +7,6 @@
         </div>
     </header>
 </template>
-
 <script setup>
 defineProps({
     title: {
@@ -24,7 +23,6 @@ defineProps({
     }
 });
 </script>
-
 <style scoped>
 .page-header {
     text-align: center;

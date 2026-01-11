@@ -5,90 +5,35 @@
     <div class="page-wrapper" :class="currentTheme">
         <div class="page-content">
             <!-- 使用封装的页面标题组件 -->
-            <PageHeader title="学术札记" description="分享科研心得、学术观点与专业探索" icon="📚" />
-
-            <!-- 主体内容区 - 两列布局 -->
+            <PageHeader title="我的文章" description="分享科研心得、学术观点与专业探索" icon="📚" /> <!-- 主体内容区 - 两列布局 -->
             <div class="content-layout">
                 <!-- 左侧主内容区 -->
                 <div class="main-column">
-                    <!-- 在移动设备上会显示在最上方的个人资料卡片 -->
-                    <div class="profile-card side-card mobile-first">
-                        <div class="profile-header">
-                            <div class="profile-avatar">
-                                <el-avatar :size="70" :src="profileData.avatarUrl" />
-                            </div>
-                            <div class="profile-info">
-                                <h3>{{ profileData.name }}</h3>
-                                <p>{{ profileData.info }}</p>
-                            </div>
-                        </div>
-                        <div class="profile-stats">
-                            <div class="stat-item" v-for="(stat, index) in profileData.stats" :key="index">
-                                <span class="stat-value">{{ stat.value }}</span>
-                                <span class="stat-label">{{ stat.label }}</span>
-                            </div>
-                        </div>
-                        <div class="profile-links">
-                            <a :href="profileData.scholarLink" class="scholar-link">
-                                <el-icon>
-                                    <Link />
-                                </el-icon>
-                                Google Scholar
-                            </a>
-                            <a :href="profileData.orcidLink" class="orcid-link">
-                                <el-icon>
-                                    <Connection />
-                                </el-icon>
-                                ORCID
-                            </a>
-                        </div>
-                    </div>
-
                     <!-- 文章列表区域 -->
                     <section class="articles-section section-container">
                         <h2 class="section-title">
                             <el-icon>
                                 <Document />
                             </el-icon>
-                            学术分享
+                            记录自己的成就之路
                         </h2>
-                        <div class="filter-bar">
-                            <el-radio-group v-model="articleFilter" size="small">
-                                <el-radio-button v-for="filter in articleFilters" :key="filter.value"
-                                    :label="filter.value">
-                                    {{ filter.label }}
-                                </el-radio-button>
-                            </el-radio-group>
-                            <el-input v-model="searchQuery" placeholder="搜索文章..." prefix-icon="Search" size="small"
-                                class="search-input" />
-                        </div>
                         <div class="articles-container">
                             <div class="article-card" v-for="article in articles" :key="article.id">
-                                <!-- 添加文章封面图 -->
+                                <!-- 左侧：文章封面图 -->
                                 <div class="article-cover">
                                     <img :src="article.coverImg" :alt="article.title" />
-                                    <span class="article-category-tag">{{ article.category }}</span>
-                                </div>
-                                <div class="article-content">
-                                    <div class="article-meta-top">
-                                        <span class="article-date">{{ article.date }}</span>
-                                    </div>
-                                    <h3 class="article-title">{{ article.title }}</h3>
-                                    <p class="article-excerpt">{{ article.excerpt }}...</p>
-                                    <div class="article-footer">
-                                        <span class="read-time">
-                                            <el-icon>
-                                                <Timer />
-                                            </el-icon>
-                                            {{ article.readTime }}分钟阅读
+                                </div> <!-- 中间：文章主要信息 -->
+                                <div class="article-middle-content">
+                                    <h3 class="article-title">
+                                        <span class="article-category-tag">
+                                            {{ article.category }}
                                         </span>
-                                        <el-button type="primary" class="read-btn">
-                                            阅读全文
-                                            <el-icon>
-                                                <ArrowRight />
-                                            </el-icon>
-                                        </el-button>
-                                    </div>
+                                        {{ article.title }}
+                                    </h3>
+                                    <p class="article-excerpt">{{ article.excerpt }}...</p>
+                                </div> <!-- 右侧：时间和操作 -->
+                                <div class="article-right-content">
+                                    <span class="article-date">{{ article.date }}</span>
                                 </div>
                             </div>
                         </div>
@@ -97,265 +42,37 @@
                                 :page-size="paginationData.pageSize" />
                         </div>
                     </section>
-
-                    <!-- 领域前沿论文 (从右侧移到左侧) -->
-                    <section class="paper-recommendations-main section-container">
-                        <h2 class="section-title">
-                            <el-icon>
-                                <Reading />
-                            </el-icon>
-                            领域前沿论文
-                        </h2>
-                        <div class="paper-grid">
-                            <div class="frontier-paper-card" v-for="paper in frontierPapers" :key="paper.id">
-                                <div class="paper-cover">
-                                    <img :src="paper.coverImg" :alt="paper.title" />
-                                    <div class="journal-badge">{{ paper.journal }}</div>
-                                </div>
-                                <div class="paper-content">
-                                    <h3>{{ paper.title }}</h3>
-                                    <p class="paper-authors">{{ paper.authors }}</p>
-                                    <p class="paper-brief">{{ paper.brief }}</p>
-                                    <div class="paper-tags">
-                                        <el-tag size="small" :type="tag.type" v-for="tag in paper.tags" :key="tag.name">
-                                            {{ tag.name }}
-                                        </el-tag>
-                                    </div>
-                                    <el-button link type="primary" class="paper-link-btn">
-                                        查看论文详情
-                                        <el-icon>
-                                            <ArrowRight />
-                                        </el-icon>
-                                    </el-button>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- 学术资源导航区 -->
-                    <section class="academic-resources-compact section-container">
-                        <h2 class="section-title">
-                            <el-icon>
-                                <Collection />
-                            </el-icon>
-                            学术资源导航
-                        </h2>
-                        <div class="resources-grid">
-                            <div class="resource-card" v-for="resource in academicResources" :key="resource.id">
-                                <el-icon class="resource-icon">
-                                    <component :is="resource.icon" />
-                                </el-icon>
-                                <div class="resource-content">
-                                    <h4>{{ resource.title }}</h4>
-                                    <p>{{ resource.description }}</p>
-                                </div>
-                                <el-button link type="primary" :href="resource.link">
-                                    <el-icon>
-                                        <ArrowRight />
-                                    </el-icon>
-                                </el-button>
-                            </div>
-                        </div>
-                    </section>
-                </div>
-
-                <!-- 右侧边栏 -->
-                <div class="side-column">
-                    <!-- 个人学术资料卡片 - 桌面版 -->
-                    <div class="profile-card side-card desktop-only">
-                        <div class="profile-header">
-                            <div class="profile-avatar">
-                                <el-avatar :size="70" :src="profileData.avatarUrl" />
-                            </div>
-                            <div class="profile-info">
-                                <h3>{{ profileData.name }}</h3>
-                                <p>{{ profileData.info }}</p>
-                            </div>
-                        </div>
-                        <div class="profile-stats">
-                            <div class="stat-item" v-for="(stat, index) in profileData.stats" :key="index">
-                                <span class="stat-value">{{ stat.value }}</span>
-                                <span class="stat-label">{{ stat.label }}</span>
-                            </div>
-                        </div>
-                        <div class="profile-links">
-                            <a :href="profileData.scholarLink" class="scholar-link">
-                                <el-icon>
-                                    <Link />
-                                </el-icon>
-                                Google Scholar
-                            </a>
-                            <a :href="profileData.orcidLink" class="orcid-link">
-                                <el-icon>
-                                    <Connection />
-                                </el-icon>
-                                ORCID
-                            </a>
-                        </div>
-                    </div>
-
-                    <!-- 研究时间轴 - 改为更紧凑的侧边栏版本 -->
-                    <section class="research-timeline-compact side-card">
-                        <h3 class="side-card-title">
-                            <el-icon>
-                                <Calendar />
-                            </el-icon>
-                            研究时间轴
-                        </h3>
-                        <ul class="timeline-compact">
-                            <li class="timeline-item" v-for="item in researchTimeline" :key="item.id">
-                                <div class="timeline-dot"></div>
-                                <div class="timeline-date" v-if="item.date">{{ item.date }}</div>
-                                <div class="timeline-content">
-                                    <h4 v-if="item.title">{{ item.title }}</h4>
-                                    <p v-if="item.description">{{ item.description }}</p>
-                                    <div class="timeline-tags" v-if="item.tags && item.tags.length">
-                                        <el-tag size="small" :type="tag.type" v-for="tag in item.tags" :key="tag.name">
-                                            {{ tag.name }}
-                                        </el-tag>
-                                    </div>
-                                    <el-button v-if="item.isButton" text type="primary" size="small">{{ item.buttonText
-                                    }}</el-button>
-                                </div>
-                            </li>
-                        </ul>
-                    </section>
-
-                    <!-- 我的论文卡片 -->
-                    <div class="my-papers side-card">
-                        <h3 class="side-card-title">
-                            <el-icon>
-                                <Collection />
-                            </el-icon>
-                            我的论文
-                        </h3>
-                        <ul class="paper-list">
-                            <li class="paper-item" v-for="paper in myPapers" :key="paper.id">
-                                <div class="paper-title">{{ paper.title }}</div>
-                                <div class="paper-journal">{{ paper.journal }}</div>
-                                <div class="paper-citations">引用: {{ paper.citations }}次</div>
-                            </li>
-                        </ul>
-                        <el-button link type="primary" class="view-all-btn">查看全部论文</el-button>
-                    </div>
-
-                    <!-- 学术工具推荐 -->
-                    <div class="academic-tools side-card">
-                        <h3 class="side-card-title">
-                            <el-icon>
-                                <Tools />
-                            </el-icon>
-                            学术工具推荐
-                        </h3>
-                        <ul class="tool-list">
-                            <li class="tool-item" v-for="tool in academicTools" :key="tool.id">
-                                <el-icon>
-                                    <component :is="tool.icon" />
-                                </el-icon>
-                                <div class="tool-info">
-                                    <div class="tool-name">{{ tool.name }}</div>
-                                    <div class="tool-desc">{{ tool.description }}</div>
-                                </div>
-                                <el-button link type="primary" :href="tool.link">
-                                    <el-icon>
-                                        <Link />
-                                    </el-icon>
-                                </el-button>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <!-- 学术会议日历 -->
-                    <div class="conference-calendar side-card">
-                        <h3 class="side-card-title">
-                            <el-icon>
-                                <Calendar />
-                            </el-icon>
-                            学术会议日历
-                        </h3>
-                        <ul class="conference-list">
-                            <li class="conference-item" v-for="conference in conferences" :key="conference.id">
-                                <div class="conference-date">{{ conference.date }}</div>
-                                <div class="conference-info">
-                                    <div class="conference-name">{{ conference.name }}</div>
-                                    <div class="conference-location">{{ conference.location }}</div>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
     <!-- 底部版权和备案信息 -->
     <Footer />
-    <el-image class="bg-image" :src="bgUrl" :fit="'cover'" draggable="false"
-        :class="{ 'dim-bg': currentTheme === 'dark' }" />
+    <div class="global-bg"></div>
 </template>
-
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import {
-    Document, Calendar, ArrowRight, Search, Link,
-    Collection, Tools, Reading, ChatDotRound, Connection,
-    Edit, Operation, School, VideoPlay, Notebook, Platform,
-    Timer
+    Document, Search
 } from '@element-plus/icons-vue'
 import TopBar from '../components/TopBar.vue'
-import bgFile from '@/assets/images/bg6.png'
 import Footer from '../components/Footer.vue'
 import ThemeToggler from '../components/ThemeToggler.vue'
 import PageHeader from '../components/PageHeader.vue'
-import { currentTheme } from '../stores/themeStore'
-
-// 背景图片
-const bgUrl = bgFile
-
-// 创建一个响应式变量来控制TopBar的显示和隐藏
-const showTopBar = ref(true)
-const articleFilter = ref('all')
-const searchQuery = ref('')
-
-// 处理滚动事件的函数
+import { currentTheme } from '../stores/themeStore'// 创建一个响应式变量来控制TopBar的显示和隐藏
+const showTopBar = ref(true)// 处理滚动事件的函数
 const handleScroll = () => {
     // 当滚动位置为0（页面顶部）时显示TopBar，否则隐藏
     showTopBar.value = window.scrollY <= 400
-}
-
-// 组件挂载时添加滚动事件监听
+}// 组件挂载时添加滚动事件监听
 onMounted(() => {
     window.addEventListener('scroll', handleScroll)
     // 初始化状态
     handleScroll()
-})
-
-// 组件卸载时移除事件监听，防止内存泄漏
+})// 组件卸载时移除事件监听，防止内存泄漏
 onUnmounted(() => {
     window.removeEventListener('scroll', handleScroll)
 })
-
-// 个人资料数据
-const profileData = ref({
-    name: '何东',
-    info: '人工智能与社会伦理研究者人工智能与社会伦理研究者人工智能与社会伦理研究者人工智能与社会伦理研究者人工智能与社会伦理研究者人工智能与社会伦理研究者人工智能与社会伦理研究者人工智能与社会伦理研究者',
-    avatarUrl: 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png',
-    stats: [
-        { value: 12, label: '发表论文' },
-        { value: 4, label: '研究项目' },
-        { value: 320, label: '引用次数' }
-    ],
-    scholarLink: '#',
-    orcidLink: '#'
-})
-
-// 文章过滤选项
-const articleFilters = [
-    { value: 'all', label: '全部文章' },
-    { value: 'ai', label: '人工智能' },
-    { value: 'ethics', label: '科技伦理' },
-    { value: 'education', label: '教育科技' }
-]
-
 // 文章列表数据
 const articles = ref([
     {
@@ -412,269 +129,79 @@ const articles = ref([
         category: '教育科技',
         readTime: 11
     }
-])
-
-// 分页数据
+])// 分页数据
 const paginationData = ref({
     total: 50,
     pageSize: 6
 })
-
-// 前沿论文数据
-const frontierPapers = ref([
-    {
-        id: 1,
-        title: 'Advances in Neural Information Processing Systems',
-        authors: 'Zhang et al. (2024)',
-        brief: '提出了一种新的transformer架构，在多模态任务中取得突破性进展',
-        coverImg: 'https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1469&q=80',
-        journal: 'NeurIPS',
-        tags: [
-            { name: '深度学习', type: '' },
-            { name: '多模态', type: 'info' }
-        ]
-    },
-    {
-        id: 2,
-        title: 'Ethics of Artificial Intelligence in Education',
-        authors: 'Johnson & Williams (2024)',
-        brief: '系统性分析了AI教育应用中的伦理问题与监管框架',
-        coverImg: 'https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1469&q=80',
-        journal: 'Nature',
-        tags: [
-            { name: '教育科技', type: 'success' },
-            { name: '伦理学', type: 'info' }
-        ]
-    },
-    {
-        id: 3,
-        title: 'Causal Inference in Natural Language Processing',
-        authors: 'Li et al. (2023)',
-        brief: '探索因果推断在自然语言处理中的新方法与应用',
-        coverImg: 'https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1469&q=80',
-        journal: 'Science',
-        tags: [
-            { name: 'NLP', type: 'warning' },
-            { name: '因果推断', type: 'danger' }
-        ]
-    }
-])
-
-// 学术资源导航数据
-const academicResources = ref([
-    {
-        id: 1,
-        title: '开放获取期刊',
-        description: '发现高质量的开放获取学术资源',
-        icon: 'School',
-        link: '#'
-    },
-    {
-        id: 2,
-        title: '学术讲座视频',
-        description: '来自顶尖大学和研究机构的公开课',
-        icon: 'VideoPlay',
-        link: '#'
-    },
-    {
-        id: 3,
-        title: '研究方法指南',
-        description: '学术研究方法论与实践技巧',
-        icon: 'Notebook',
-        link: '#'
-    },
-    {
-        id: 4,
-        title: '数据集平台',
-        description: '开放科学研究数据集收集',
-        icon: 'Platform',
-        link: '#'
-    }
-])
-
-// 研究时间轴数据
-const researchTimeline = ref([
-    {
-        id: 1,
-        date: '2024年4月',
-        title: '论文《人工智能与社会影响》发表',
-        description: '在《科技与社会》期刊发表研究成果',
-        tags: [
-            { name: '人工智能', type: '' },
-            { name: '社会科学', type: 'success' }
-        ]
-    },
-    {
-        id: 2,
-        date: '2024年2月',
-        title: '参加亚太地区科技伦理国际会议',
-        description: '发表演讲《大模型时代的伦理挑战与对策》',
-        tags: [
-            { name: '会议', type: 'warning' }
-        ]
-    },
-    {
-        id: 3,
-        date: '2023年11月',
-        title: '启动新研究项目',
-        description: '《人工智能在教育领域的应用研究》项目获批'
-    },
-    {
-        id: 4,
-        isButton: true,
-        buttonText: '查看更多历史研究...'
-    }
-])
-
-// 我的论文数据
-const myPapers = ref([
-    {
-        id: 1,
-        title: '人工智能与社会影响: 一项实证研究',
-        journal: '《科技与社会》, 2024',
-        citations: 37
-    },
-    {
-        id: 2,
-        title: '大语言模型在教育领域的应用与伦理考量',
-        journal: '《教育技术》, 2023',
-        citations: 42
-    },
-    {
-        id: 3,
-        title: '数字化转型与隐私保护的平衡策略',
-        journal: '《信息安全研究》, 2023',
-        citations: 28
-    }
-])
-
-// 学术工具推荐数据
-const academicTools = ref([
-    {
-        id: 1,
-        name: 'Zotero',
-        description: '开源文献管理工具',
-        icon: 'Edit',
-        link: '#'
-    },
-    {
-        id: 2,
-        name: 'Semantic Scholar',
-        description: 'AI驱动的学术搜索引擎',
-        icon: 'Search',
-        link: '#'
-    },
-    {
-        id: 3,
-        name: 'Overleaf',
-        description: '在线LaTeX协作编辑',
-        icon: 'ChatDotRound',
-        link: '#'
-    },
-    {
-        id: 4,
-        name: 'Connected Papers',
-        description: '论文关联可视化工具',
-        icon: 'Operation',
-        link: '#'
-    }
-])
-
-// 学术会议日历数据
-const conferences = ref([
-    {
-        id: 1,
-        date: '6月15-18日',
-        name: 'ICML 2024',
-        location: '维也纳，奥地利'
-    },
-    {
-        id: 2,
-        date: '7月8-12日',
-        name: 'ACL 2024',
-        location: '曼谷，泰国'
-    },
-    {
-        id: 3,
-        date: '9月20-24日',
-        name: 'IJCAI 2024',
-        location: '巴塞罗那，西班牙'
-    }
-])
 </script>
-
 <style scoped>
 /* 主题变量定义 */
 .page-wrapper.dark {
-    --bg-primary: rgba(25, 25, 35, 0.173);
-    --bg-secondary: rgba(30, 30, 40, 0.416);
-    --bg-tertiary: rgba(96, 96, 106, 0.4);
+    --bg-primary: rgba(25, 25, 35, 0.2);
+    --bg-secondary: rgba(30, 30, 40, 0.3);
+    --bg-tertiary: rgba(96, 96, 106, 0.3);
     --text-color: #ffffff;
     --text-secondary: rgba(255, 255, 255, 0.8);
     --title-gradient: linear-gradient(45deg, #ffffff, #b8c6db);
     --title-shadow: 0 2px 4px rgba(216, 216, 216, 0.5);
     --divider-color: rgba(255, 255, 255, 0.5);
-    --card-bg: rgba(30, 30, 40, 0.7);
-    --card-bg-hover: rgba(40, 40, 55, 0.8);
-    --card-border: rgba(255, 255, 255, 0.1);
+    --card-bg: rgba(30, 30, 40, 0.4);
+    --card-bg-hover: rgba(40, 40, 55, 0.6);
+    --card-border: rgba(255, 255, 255, 0.5);
     --card-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
     --accent-color: #5a9eff;
     --accent-secondary: #4a90e2;
     --heading-color: #ffffff;
     --text-muted: rgba(255, 255, 255, 0.6);
-    --tag-bg: rgba(60, 60, 80, 0.7);
+    --tag-bg: rgba(255, 255, 255, 0.15);
     --tag-text: #ffffff;
     --card-hover-transform: translateY(-4px);
     --timeline-line: rgba(255, 255, 255, 0.2);
     --timeline-dot: #5a9eff;
     --button-bg: #4a90e2;
     --button-text: white;
-    --button-border: transparent;
+    --button-border: rgba(255, 255, 255, 0.5);
     --button-hover-bg: #3a7bd5;
 }
 
 .page-wrapper.light {
-    --bg-primary: rgba(245, 245, 250, 0.85);
-    --bg-secondary: rgba(255, 255, 255, 0.9);
-    --bg-tertiary: rgba(235, 235, 245, 0.7);
+    --bg-primary: rgba(255, 255, 255, 0.3);
+    --bg-secondary: rgba(255, 255, 255, 0.4);
+    --bg-tertiary: rgba(235, 235, 245, 0.3);
     --text-color: #333333;
     --text-secondary: rgba(0, 0, 0, 0.7);
     --title-gradient: linear-gradient(45deg, #333333, #555555);
     --title-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     --divider-color: rgba(0, 0, 0, 0.2);
-    --card-bg: rgba(255, 255, 255, 0.85);
-    --card-bg-hover: rgba(255, 255, 255, 0.95);
-    --card-border: rgba(0, 0, 0, 0.1);
-    --card-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    --card-bg: rgba(255, 255, 255, 0.4);
+    --card-bg-hover: rgba(255, 255, 255, 0.6);
+    --card-border: rgba(255, 255, 255, 0.8);
+    --card-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
     --accent-color: #3a7bd5;
     --accent-secondary: #3a7bd5;
     --heading-color: #333333;
     --text-muted: rgba(0, 0, 0, 0.5);
-    --tag-bg: rgba(240, 240, 245, 0.8);
+    --tag-bg: rgba(255, 255, 255, 0.5);
     --tag-text: #333333;
     --card-hover-transform: translateY(-3px);
     --timeline-line: rgba(0, 0, 0, 0.1);
     --timeline-dot: #3a7bd5;
     --button-bg: #4a90e2;
     --button-text: white;
-    --button-border: transparent;
+    --button-border: rgba(255, 255, 255, 0.6);
     --button-hover-bg: #3a7bd5;
 }
 
-.bg-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: filter 0.5s ease;
+.global-bg {
     position: fixed;
     top: 0;
     left: 0;
-    opacity: 1;
+    width: 100%;
+    height: 100%;
     z-index: -2;
-}
 
-.bg-image.dim-bg {
-    filter: brightness(0.9) saturate(0.8);
+    background: linear-gradient(225deg, #fcb8e2 0.000%, #feb9e4 5.000%, #ffbce7 10.000%, #ffc2ea 15.000%, #ffc8ed 20.000%, #ffd0f0 25.000%, #ffd8f3 30.000%, #fee0f6 35.000%, #fbe8f9 40.000%, #f7effb 45.000%, #f3f4fd 50.000%, #eef8ff 55.000%, #e8f9ff 60.000%, #e3f9ff 65.000%, #dcf6ff 70.000%, #d6f2ff 75.000%, #d0ecff 80.000%, #c9e5ff 85.000%, #c3ddfe 90.000%, #bdd5fc 95.000%, #b8cdfa 100.000%);
 }
 
 .page-wrapper {
@@ -800,6 +327,16 @@ const conferences = ref([
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
+.section-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--heading-color);
+}
+
 /* 文章列表 */
 .filter-bar {
     display: flex;
@@ -814,9 +351,8 @@ const conferences = ref([
 }
 
 .articles-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-    /* 调整为更小的尺寸，确保一行显示3个 */
+    display: flex;
+    flex-direction: column;
     gap: 20px;
 }
 
@@ -828,9 +364,9 @@ const conferences = ref([
     box-shadow: var(--card-shadow);
     cursor: pointer;
     position: relative;
-    height: 100%;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    height: 70px;
     border: 1px solid var(--card-border);
 }
 
@@ -839,12 +375,13 @@ const conferences = ref([
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
 
-/* 添加文章封面图样式 */
+/* 封面图 */
 .article-cover {
-    height: 160px;
-    /* 减小高度从180px到160px */
+    width: 100px;
+    height: 100%;
     position: relative;
     overflow: hidden;
+    flex-shrink: 0;
 }
 
 .article-cover img {
@@ -859,87 +396,64 @@ const conferences = ref([
 }
 
 .article-category-tag {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    background: rgba(58, 123, 213, 0.9);
-    color: white;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    color: rgba(58, 123, 213, 0.9);
+    padding-right: 6px;
+    margin-right: 6px;
+    border-right: #3a7bd5 1px solid;
+    display: inline-block;
+    font-size: 16px;
+    font-weight: 900;
 }
 
-.article-content {
-    padding: 15px;
-    /* 减小内边距从20px到15px */
+/* 中间内容 */
+.article-middle-content {
+    flex: 1;
+    padding: 0 25px;
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
-    color: var(--text-color);
-}
-
-.article-meta-top {
-    display: flex;
-    justify-content: flex-end;
-    margin-bottom: 8px;
-    /* 减小下边距 */
-    font-size: 0.8rem;
-    /* 减小字体大小 */
-    color: var(--text-muted);
+    justify-content: center;
+    border-right: 1px dashed var(--timeline-line);
+    min-width: 0;
 }
 
 .article-title {
     font-size: 16px;
-    /* 减小字体大小从18px到16px */
-    margin-bottom: 8px;
-    /* 减小下边距 */
-    line-height: 1.4;
+    margin-bottom: 5px;
+    line-height: title-shadow;
     font-weight: 600;
     color: var(--heading-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .article-excerpt {
-    font-size: 0.85rem;
-    /* 减小字体大小 */
-    line-height: 1.5;
-    margin-bottom: 15px;
-    /* 减小下边距 */
+    font-size: 0.8rem;
+    line-height: 1.4;
     color: var(--text-secondary);
-    flex-grow: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 0;
 }
 
-.article-footer {
+/* 右侧内容 */
+.article-right-content {
+    width: 160px;
+    padding: 0 20px;
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    justify-content: center;
     align-items: center;
-    padding-top: 10px;
-    /* 减小上内边距 */
-    margin-top: auto;
-    border-top: 1px solid var(--card-border);
+    gap: 0;
+    flex-shrink: 0;
+    background-color: rgba(0, 0, 0, 0.02);
 }
 
-.read-time {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.read-btn {
-    border-radius: 20px;
-    padding: 8px 16px;
+.article-date {
     font-size: 0.9rem;
-    background-color: var(--button-bg);
-    border-color: var(--button-border);
-    color: var(--button-text);
-}
-
-.read-btn:hover,
-.read-btn:focus {
-    background-color: var(--button-hover-bg);
+    color: var(--text-muted);
 }
 
 .pagination-container {
@@ -948,482 +462,10 @@ const conferences = ref([
     justify-content: center;
 }
 
-/* 前沿论文区块样式 */
-.paper-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-    /* 与文章卡片保持一致 */
-    margin-top: 20px;
-    gap: 20px;
-}
-
-.frontier-paper-card {
-    background-color: var(--card-bg);
-    border-radius: 10px;
-    /* 减小圆角 */
-    overflow: hidden;
-    transition: all 0.3s ease;
-    box-shadow: var(--card-shadow);
-    height: 100%;
-    border: 1px solid var(--card-border);
-}
-
-.frontier-paper-card:hover {
-    transform: var(--card-hover-transform);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-}
-
-.paper-cover {
-    height: 140px;
-    /* 减小高度从160px到140px */
-    position: relative;
-    overflow: hidden;
-}
-
-.paper-cover img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.5s ease;
-}
-
-.frontier-paper-card:hover .paper-cover img {
-    transform: scale(1.05);
-}
-
-.journal-badge {
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    background: rgba(0, 0, 0, 0.75);
-    color: white;
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    font-weight: 500;
-}
-
-.paper-content {
-    padding: 15px;
-    /* 减小内边距从20px到15px */
-    color: var(--text-color);
-}
-
-.paper-content h3 {
-    font-size: 16px;
-    /* 减小字体大小 */
-    margin: 0 0 6px 0;
-    /* 减小下边距 */
-    line-height: 1.4;
-    color: var(--heading-color);
-    font-weight: 600;
-}
-
-.paper-authors {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    margin: 0 0 8px 0;
-    font-style: italic;
-}
-
-.paper-brief {
-    font-size: 0.9rem;
-    line-height: 1.5;
-    margin: 0 0 15px 0;
-    color: var(--text-secondary);
-}
-
-.paper-tags {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
-}
-
-.paper-tags .el-tag {
-    background-color: var(--tag-bg);
-    color: var(--tag-text);
-    border: none;
-    margin: 0 3px 3px 0;
-}
-
-.paper-link-btn {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    justify-content: flex-end;
-    width: 100%;
-    margin-top: 10px;
-}
-
-/* 学术资源区 - 紧凑版 */
-.academic-resources-compact .resources-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    margin-top: 20px;
-    gap: 16px;
-}
-
-.academic-resources-compact .resource-card {
-    background-color: var(--card-bg);
-    border-radius: 10px;
-    padding: 15px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    transition: all 0.3s;
-    box-shadow: var(--card-shadow);
-    border: 1px solid var(--card-border);
-}
-
-.academic-resources-compact .resource-card:hover {
-    background-color: var(--card-bg-hover);
-    transform: var(--card-hover-transform);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-}
-
-.academic-resources-compact .resource-icon {
-    font-size: 24px;
-    color: var(--accent-color);
-    flex-shrink: 0;
-    background: rgba(58, 123, 213, 0.1);
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 8px;
-}
-
-.academic-resources-compact .resource-content {
-    flex: 1;
-}
-
-.academic-resources-compact h4 {
-    margin: 0 0 5px 0;
-    font-size: 16px;
-    color: var(--heading-color);
-}
-
-.academic-resources-compact p {
-    margin: 0;
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-}
-
-/* 侧边栏卡片 */
-.side-card {
-    background-color: var(--bg-primary);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 24px;
-    backdrop-filter: blur(10px);
-    box-shadow: var(--card-shadow);
-    border: 1px solid var(--card-border);
-    color: var(--text-color);
-    transition: all 0.3s ease;
-}
-
-.side-card:hover {
-    background-color: var(--bg-secondary);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-}
-
-.side-card-title {
-    font-size: 18px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 16px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--card-border);
-    color: var(--heading-color);
-}
-
-.side-card-title .el-icon {
-    color: var(--accent-color);
-}
-
-/* 个人资料卡片 */
-.profile-card {
-    border-top: 4px solid #3a7bd5;
-}
-
-.profile-header {
-    display: flex;
-    /* align-items: center; */
-    margin-bottom: 16px;
-}
-
-.profile-avatar {
-    margin-right: 15px;
-}
-
-.profile-info h3 {
-    margin: 0 0 5px 0;
-    font-size: 18px;
-    color: var(--heading-color);
-}
-
-.profile-info p {
-    margin: 0;
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-}
-
-.profile-stats {
-    display: flex;
-    justify-content: space-between;
-    padding: 15px 0;
-    border-top: 1px solid var(--card-border);
-    border-bottom: 1px solid var(--card-border);
-    margin-bottom: 15px;
-}
-
-.stat-item {
-    text-align: center;
-}
-
-.stat-value {
-    display: block;
-    font-size: 20px;
-    font-weight: 600;
-    color: #3a7bd5;
-}
-
-.stat-label {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-}
-
-.profile-links {
-    display: flex;
-    gap: 15px;
-}
-
-.profile-links a {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    text-decoration: none;
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-    transition: all 0.2s;
-}
-
-.profile-links a:hover {
-    color: var(--accent-color);
-}
-
-/* 自定义紧凑型时间轴 */
-.timeline-compact {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    position: relative;
-}
-
-.timeline-compact::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 10px;
-    width: 2px;
-    background: var(--timeline-line);
-}
-
-.timeline-item {
-    position: relative;
-    padding-left: 30px;
-    padding-bottom: 20px;
-}
-
-.timeline-item:last-child {
-    padding-bottom: 0;
-}
-
-.timeline-dot {
-    position: absolute;
-    left: 6px;
-    top: 5px;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: var(--timeline-dot);
-    box-shadow: 0 0 5px rgba(58, 123, 213, 0.3);
-}
-
-.timeline-date {
-    font-size: 0.85rem;
-    color: var(--accent-color);
-    font-weight: 500;
-    margin-bottom: 4px;
-}
-
-.timeline-content h4 {
-    margin: 0 0 6px 0;
-    font-size: 1rem;
-    color: var(--heading-color);
-}
-
-.timeline-content p {
-    margin: 0 0 8px 0;
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-}
-
-.timeline-tags {
-    margin-top: 6px;
-    display: flex;
-    gap: 4px;
-    flex-wrap: wrap;
-}
-
-/* 论文列表 */
-.paper-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.paper-item {
-    padding: 12px 0;
-    border-bottom: 1px solid var(--card-border);
-}
-
-.paper-item:last-child {
-    border-bottom: none;
-}
-
-.paper-title {
-    font-size: 0.95rem;
-    margin-bottom: 5px;
-    font-weight: 500;
-    color: var(--heading-color);
-}
-
-.paper-journal {
-    font-size: 0.85rem;
-    margin-bottom: 5px;
-    font-style: italic;
-    color: var(--text-secondary);
-}
-
-.paper-citations {
-    font-size: 0.8rem;
-    color: #3a7bd5;
-}
-
-.view-all-btn {
-    display: block;
-    margin: 10px auto 0;
-    text-align: center;
-    color: #3a7bd5;
-}
-
-/* 工具列表 */
-.tool-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.tool-item {
-    display: flex;
-    align-items: center;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--card-border);
-}
-
-.tool-item:last-child {
-    border-bottom: none;
-}
-
-.tool-item .el-icon {
-    font-size: 20px;
-    margin-right: 12px;
-    color: var(--accent-color);
-}
-
-.tool-info {
-    flex: 1;
-}
-
-.tool-name {
-    font-weight: 500;
-    margin-bottom: 3px;
-    color: var(--heading-color);
-}
-
-.tool-desc {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-}
-
-/* 学术会议 */
-.conference-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.conference-item {
-    display: flex;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--card-border);
-}
-
-.conference-item:last-child {
-    border-bottom: none;
-}
-
-.conference-date {
-    min-width: 90px;
-    font-weight: 500;
-    color: #3a7bd5;
-}
-
-.conference-name {
-    font-weight: 500;
-    margin-bottom: 3px;
-    color: var(--heading-color);
-}
-
-.conference-location {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-}
-
 /* 响应式设计 */
 @media (max-width: 1200px) {
     .content-layout {
         flex-direction: column;
-    }
-
-    .side-column {
-        width: 100%;
-    }
-
-    .academic-resources-compact .resources-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    /* 在中等屏幕上显示双列侧边内容 */
-    .side-column {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 24px;
-    }
-
-    .side-column>div {
-        margin-bottom: 0;
-    }
-
-    /* 占据整行的元素 */
-    .side-column .profile-card {
-        grid-column: span 2;
     }
 }
 
@@ -1442,24 +484,6 @@ const conferences = ref([
         display: none;
     }
 
-    /* 单列布局 */
-    .side-column {
-        display: block;
-    }
-
-    /* 移动端侧栏卡片间距 */
-    .side-column .side-card {
-        margin-bottom: 35px;
-        /* 增加移动端侧栏卡片之间的间距 */
-    }
-
-    .articles-container,
-    .paper-grid {
-        grid-template-columns: 1fr;
-        gap: 16px;
-        /* 减小卡片间的间隙 */
-    }
-
     /* 确保移动端各板块之间有足够间距 */
     .section-container {
         margin-bottom: 35px;
@@ -1468,48 +492,35 @@ const conferences = ref([
         /* 减小内边距使卡片更紧凑 */
     }
 
-    /* 使资源导航区更紧凑 */
-    .academic-resources-compact .resources-grid {
-        grid-template-columns: 1fr;
-        gap: 12px;
-        /* 减小间距 */
-    }
-
-    .academic-resources-compact .resource-card {
-        padding: 12px;
-        /* 减小内边距 */
-    }
-
     .page-title {
         font-size: 32px;
     }
 
-    .filter-bar {
+    .article-card {
         flex-direction: column;
-        gap: 15px;
+        height: auto;
     }
 
-    .search-input {
+    .article-cover {
         width: 100%;
+        height: 160px;
     }
 
-    /* 调整卡片内容在移动端的紧凑度 */
-    .article-cover,
-    .paper-cover {
-        height: 140px;
-        /* 统一移动端封面图高度 */
+    .article-middle-content {
+        border-right: none;
+        border-bottom: 1px dashed var(--timeline-line);
     }
 
-    .article-content,
-    .paper-content {
-        padding: 12px;
-        /* 减小内边距 */
+    .article-right-content {
+        width: 100%;
+        padding: 15px;
+        flex-direction: row;
+        justify-content: space-between;
     }
 
     .home-theme-toggler {
         bottom: 20px;
         left: 20px;
     }
-
 }
 </style>

@@ -2,12 +2,10 @@
     <TopBar />
     <!-- 添加主题切换按钮 -->
     <ThemeToggler class="about-theme-toggler" />
-
     <div class="about-wrapper" :class="currentTheme">
         <div class="about-content">
             <!-- 使用封装的页面标题组件 -->
             <PageHeader :title="pageHeader.title" :description="pageHeader.description" :icon="pageHeader.icon" />
-
             <!-- 简介和信息展示区 -->
             <section class="profile-section">
                 <div class="profile-header">
@@ -20,13 +18,11 @@
                             <div class="decoration-item" v-for="i in 5" :key="i"></div>
                         </div>
                     </div>
-
                     <div class="profile-intro">
                         <h2>{{ profile.greeting }}<span class="highlight-text">{{ profile.name }}</span></h2>
                         <p class="intro-text">
                             {{ profile.introduction }}
                         </p>
-
                         <div class="basic-info">
                             <div class="info-row">
                                 <div class="info-item" v-for="(info, index) in profile.basicInfo.slice(0, 2)"
@@ -48,10 +44,8 @@
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- 教育和研究 -->
-                <div class="education-research">
+                </div> <!-- 教育和技术栈 -->
+                <div class="education-tech">
                     <div class="section-block education">
                         <h3 class="block-title"><el-icon>
                                 <School />
@@ -67,21 +61,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="section-block research">
-                        <h3 class="block-title"><el-icon>
-                                <Connection />
-                            </el-icon> {{ sectionTitles.research }}</h3>
-                        <div class="research-tags">
-                            <div class="research-tag" v-for="(research, index) in researchAreas" :key="index">
-                                {{ research }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 技术栈和兴趣 -->
-                <div class="tech-interests">
                     <div class="section-block tech">
                         <h3 class="block-title">
                             <el-icon>
@@ -101,37 +80,13 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="section-block interests">
-                        <h3 class="block-title">
-                            <el-icon>
-                                <Star />
-                            </el-icon>
-                            {{ sectionTitles.interests }}
-                        </h3>
-                        <div class="interests-grid">
-                            <div class="interest-item" v-for="(interest, index) in interests" :key="index">
-                                <div class="interest-icon">
-                                    <img :src="interest.iconImage" :alt="interest.title">
-                                </div>
-                                <div class="interest-content">
-                                    <h4>{{ interest.title }}</h4>
-                                    <p>{{ interest.description }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 个人照片墙 - 调整位置到中间 -->
+                </div> <!-- 个人照片墙 - 调整位置到中间 -->
                 <h3 class="section-title">
                     <el-icon>
                         <Picture />
                     </el-icon>
                     个人照片墙
-                </h3>
-
-                <!-- 照片瀑布流布局 -->
+                </h3> <!-- 照片瀑布流布局 -->
                 <div class="masonry-grid">
                     <div v-for="(photo, index) in personalPhotos" :key="photo.id" class="masonry-item"
                         :class="getMasonryClass(index)" @click="showPhotoDetails(index)">
@@ -164,9 +119,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- 座右铭和联系方式 -->
+                </div> <!-- 座右铭和联系方式 -->
                 <div class="motto-contact">
                     <div class="motto">
                         <blockquote>
@@ -174,7 +127,6 @@
                             <cite>{{ motto.cite }}</cite>
                         </blockquote>
                     </div>
-
                     <div class="contact-links">
                         <a v-for="(contact, index) in contacts" :key="index" :href="contact.link" class="contact-link">
                             <el-icon>
@@ -185,23 +137,14 @@
                     </div>
                 </div>
             </section>
-
         </div>
-    </div>
-
-    <!-- 底部版权 - 移到about-wrapper外部，与Play页面保持一致 -->
-    <Footer />
-    
-    <!-- 替换原来的照片详情弹窗为PhotoGallery组件 -->
+    </div> <!-- 底部版权 - 移到about-wrapper外部，与Play页面保持一致 -->
+    <Footer /> <!-- 替换原来的照片详情弹窗为PhotoGallery组件 -->
     <PhotoGallery v-model:visible="showPhotoDialog" :photos="personalPhotos" :initialPhotoIndex="currentPhotoIndex"
         :heartFilledIcon="heartIcon" :heartOutlineIcon="heartOutlineIcon" :commentIcon="commentIcon"
-        :likedPhotoIds="likedPhotos" @like="handlePhotoLike" @comment="handlePhotoComment" />
-
-    <!-- 背景图片 - 秮到与Play页面相同位置 -->
-    <el-image class="bg-image" :src="bgUrl" :fit="'cover'" draggable="false"
-        :class="{ 'dim-bg': currentTheme === 'dark' }" />
+        :likedPhotoIds="likedPhotos" @like="handlePhotoLike" @comment="handlePhotoComment" /> <!-- 背景图片 -->
+    <div class="global-bg"></div>
 </template>
-
 <script setup>
 import { ref, reactive, computed } from 'vue'
 import TopBar from '../components/TopBar.vue'
@@ -216,29 +159,17 @@ import {
     ArrowLeft, ArrowRight
 } from '@element-plus/icons-vue'
 import PhotoGallery from '../components/PhotoGallery.vue'
-import { ElMessage } from 'element-plus'
-
-// 引入点赞和评论图标
+import { ElMessage } from 'element-plus'// 引入点赞和评论图标
 import heartFilledIcon from '@/assets/icons/heart-filled.png'
 import commentIconFile from '@/assets/icons/comment.png'
-import heartOutlineIcon from '@/assets/icons/heart.png'
-
-// 图标引用
+import heartOutlineIcon from '@/assets/icons/heart.png'// 图标引用
 const heartIcon = heartFilledIcon
-const commentIcon = commentIconFile
-
-// 恢复使用原始背景图片
-import bgFile from '@/assets/images/bg7.png'
-const bgUrl = bgFile
-
-// 页面头部信息
+const commentIcon = commentIconFile// 页面头部信息
 const pageHeader = reactive({
     title: "关于我",
     description: "人工智能研究者 / 全栈开发工程师 / 未来教育者",
     icon: "✨"
-})
-
-// 个人资料信息
+})// 个人资料信息
 const profile = reactive({
     avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=80",
     greeting: "嗨，我是",
@@ -250,17 +181,11 @@ const profile = reactive({
         { icon: 'Star', value: '金牛座' },
         { icon: 'User', value: '180cm / 76kg' }
     ]
-})
-
-// 区段标题
+})// 区段标题
 const sectionTitles = reactive({
     education: "教育背景",
-    research: "研究方向",
-    tech: "技术栈",
-    interests: "兴趣爱好"
-})
-
-// 教育背景
+    tech: "技术栈"
+})// 教育背景
 const education = reactive([
     {
         school: "昆明理工大学",
@@ -274,18 +199,7 @@ const education = reactive([
         degree: "学士",
         period: "2018 - 2022"
     }
-])
-
-// 研究方向
-const researchAreas = reactive([
-    '生物医学工程',
-    '自然语言处理',
-    '信息抽取',
-    '知识图谱',
-    '大模型应用'
-])
-
-// 技术栈
+])// 技术栈
 const techStack = reactive([
     {
         name: '前端开发',
@@ -303,47 +217,17 @@ const techStack = reactive([
         name: '人工智能',
         skills: ['PyTorch', 'TensorFlow', 'NLP', '大型语言模型', '知识图谱']
     }
-])
-
-// 兴趣爱好
-const interests = reactive([
-    {
-        iconImage: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80",
-        title: '旅游探索',
-        description: '喜欢探索不同的城市和自然风光，体验多元文化，收集各地的独特记忆。',
-    },
-    {
-        iconImage: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80",
-        title: '软硬件开发',
-        description: '业余时间喜欢动手做一些创意硬件项目，结合软件开发创造实用工具。',
-    },
-    {
-        iconImage: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80",
-        title: '音乐欣赏',
-        description: '热爱民谣音乐，尤其喜欢回春丹、福绿寿等歌手的作品，享受音乐带来的情感共鸣。',
-    },
-    {
-        iconImage: "https://images.unsplash.com/photo-1478720568477-152d9b164e26?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80",
-        title: '影视作品',
-        description: '科幻电影和古装玄幻剧是闲暇时最爱的放松方式，享受想象力与视觉盛宴。',
-    }
-])
-
-// 座右铭
+])// 座右铭
 const motto = reactive({
     text: "技术改变世界，教育塑造未来。保持好奇，持续学习，让知识照亮前行的道路。",
     cite: "- 人生观：随缘而行，不忘初心"
-})
-
-// 联系方式
+})// 联系方式
 const contacts = reactive([
     { icon: Message, title: '电子邮箱', link: '#' },
     { icon: ElementPlus, title: 'GitHub', link: '#' },
     { icon: ChatDotRound, title: '微信', link: '#' },
     { icon: Connection, title: 'LinkedIn', link: '#' }
-])
-
-// 个人照片墙数据 - 修改结构以支持多图浏览，并添加likes和comments字段
+])// 个人照片墙数据 - 修改结构以支持多图浏览，并添加likes和comments字段
 const personalPhotos = ref([
     {
         id: 1,
@@ -544,15 +428,11 @@ const personalPhotos = ref([
         likes: 35,
         comments: []
     }
-])
-
-// 标签颜色辅助函数
+])// 标签颜色辅助函数
 const getTagType = (index) => {
     const types = ['', 'success', 'warning', 'danger', 'info'];
     return types[index % types.length];
-}
-
-// 照片墙布局类名分配函数
+}// 照片墙布局类名分配函数
 const getMasonryClass = (index) => {
     const pattern = index % 8;
     switch (pattern) {
@@ -561,25 +441,17 @@ const getMasonryClass = (index) => {
         case 5: return 'big';
         default: return '';
     }
-}
-
-// 照片详情弹窗控制
+}// 照片详情弹窗控制
 const showPhotoDialog = ref(false)
 const currentPhotoIndex = ref(0)
-const likedPhotos = ref([]) // 存储已点赞的照片ID
-
-// 显示照片详情
+const likedPhotos = ref([]) // 存储已点赞的照片ID// 显示照片详情
 const showPhotoDetails = (index) => {
     currentPhotoIndex.value = index
     showPhotoDialog.value = true
-}
-
-// 处理照片点赞
+}// 处理照片点赞
 const handlePhotoLike = (photoId) => {
     const photoIndex = personalPhotos.value.findIndex(photo => photo.id === photoId);
-    if (photoIndex === -1) return;
-
-    if (likedPhotos.value.includes(photoId)) {
+    if (photoIndex === -1) return; if (likedPhotos.value.includes(photoId)) {
         // 取消点赞
         likedPhotos.value = likedPhotos.value.filter(id => id !== photoId);
         personalPhotos.value[photoIndex].likes--;
@@ -588,41 +460,36 @@ const handlePhotoLike = (photoId) => {
         likedPhotos.value.push(photoId);
         personalPhotos.value[photoIndex].likes++;
     }
-}
-
-// 处理照片评论
+}// 处理照片评论
 const handlePhotoComment = ({ photoId, comment }) => {
     const photoIndex = personalPhotos.value.findIndex(photo => photo.id === photoId);
-    if (photoIndex === -1) return;
-
-    personalPhotos.value[photoIndex].comments.unshift(comment);
+    if (photoIndex === -1) return; personalPhotos.value[photoIndex].comments.unshift(comment);
     ElMessage.success('评论成功！');
 }
 </script>
-
 <style scoped>
 /* 主题变量定义 */
 .about-wrapper.dark {
-    --bg-primary: rgba(25, 25, 35, 0.75);
-    --bg-secondary: rgba(30, 30, 40, 0.8);
-    --bg-tertiary: rgba(40, 40, 55, 0.7);
+    --bg-primary: rgba(25, 25, 35, 0.2);
+    --bg-secondary: rgba(30, 30, 40, 0.3);
+    --bg-tertiary: rgba(40, 40, 55, 0.3);
     --text-color: #ffffff;
     --text-secondary: rgba(255, 255, 255, 0.8);
     --title-gradient: linear-gradient(45deg, #ffffff, #b8c6db);
     --title-shadow: 0 2px 4px rgba(216, 216, 216, 0.5);
     --divider-color: rgba(255, 255, 255, 0.2);
-    --card-bg: rgba(30, 30, 40, 0.7);
-    --card-bg-hover: rgba(40, 40, 55, 0.8);
-    --card-border: rgba(255, 255, 255, 0.1);
+    --card-bg: rgba(30, 30, 40, 0.4);
+    --card-bg-hover: rgba(40, 40, 55, 0.6);
+    --card-border: rgba(255, 255, 255, 0.5);
     --card-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
     --accent-color: #5a9eff;
     --accent-secondary: #4a90e2;
     --heading-color: #ffffff;
     --text-muted: rgba(255, 255, 255, 0.6);
-    --tag-bg: rgba(60, 60, 80, 0.7);
+    --tag-bg: rgba(255, 255, 255, 0.15);
     --timeline-line: rgba(255, 255, 255, 0.2);
     --timeline-dot: #5a9eff;
-    --quote-bg: rgba(30, 30, 40, 0.8);
+    --quote-bg: rgba(30, 30, 40, 0.4);
     --profile-decoration: rgba(255, 255, 255, 0.1);
     --social-bg: rgba(255, 255, 255, 0.1);
     --social-hover: rgba(255, 255, 255, 0.2);
@@ -632,26 +499,26 @@ const handlePhotoComment = ({ photoId, comment }) => {
 }
 
 .about-wrapper.light {
-    --bg-primary: rgba(245, 245, 250, 0.85);
-    --bg-secondary: rgba(255, 255, 255, 0.9);
-    --bg-tertiary: rgba(235, 235, 245, 0.7);
+    --bg-primary: rgba(255, 255, 255, 0.3);
+    --bg-secondary: rgba(255, 255, 255, 0.4);
+    --bg-tertiary: rgba(235, 235, 245, 0.3);
     --text-color: #333333;
     --text-secondary: rgba(0, 0, 0, 0.7);
     --title-gradient: linear-gradient(45deg, #333333, #555555);
     --title-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     --divider-color: rgba(0, 0, 0, 0.1);
-    --card-bg: rgba(255, 255, 255, 0.85);
-    --card-bg-hover: rgba(255, 255, 255, 0.95);
-    --card-border: rgba(0, 0, 0, 0.1);
+    --card-bg: rgba(255, 255, 255, 0.4);
+    --card-bg-hover: rgba(255, 255, 255, 0.6);
+    --card-border: rgba(255, 255, 255, 0.8);
     --card-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
     --accent-color: #3a7bd5;
     --accent-secondary: #3a7bd5;
     --heading-color: #333333;
     --text-muted: rgba(0, 0, 0, 0.5);
-    --tag-bg: rgba(240, 240, 245, 0.8);
+    --tag-bg: rgba(255, 255, 255, 0.5);
     --timeline-line: rgba(0, 0, 0, 0.1);
     --timeline-dot: #3a7bd5;
-    --quote-bg: rgba(248, 248, 252, 0.9);
+    --quote-bg: rgba(248, 248, 252, 0.5);
     --profile-decoration: rgba(0, 0, 0, 0.05);
     --social-bg: rgba(0, 0, 0, 0.05);
     --social-hover: rgba(0, 0, 0, 0.1);
@@ -660,21 +527,15 @@ const handlePhotoComment = ({ photoId, comment }) => {
     --research-tag-color: #333333;
 }
 
-.bg-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: filter 0.5s ease;
+.global-bg {
     position: fixed;
     top: 0;
     left: 0;
-    opacity: 1;
+    width: 100%;
+    height: 100%;
     z-index: -2;
-}
 
-.bg-image.dim-bg {
-    filter: brightness(0.9) saturate(0.8);
-    /* 只调整亮度和饱和度，不添加模糊 */
+    background: linear-gradient(225deg, #fcb8e2 0.000%, #feb9e4 5.000%, #ffbce7 10.000%, #ffc2ea 15.000%, #ffc8ed 20.000%, #ffd0f0 25.000%, #ffd8f3 30.000%, #fee0f6 35.000%, #fbe8f9 40.000%, #f7effb 45.000%, #f3f4fd 50.000%, #eef8ff 55.000%, #e8f9ff 60.000%, #e3f9ff 65.000%, #dcf6ff 70.000%, #d6f2ff 75.000%, #d0ecff 80.000%, #c9e5ff 85.000%, #c3ddfe 90.000%, #bdd5fc 95.000%, #b8cdfa 100.000%);
 }
 
 .about-theme-toggler {
@@ -689,7 +550,8 @@ const handlePhotoComment = ({ photoId, comment }) => {
     min-height: calc(100vh - 50px);
     display: flex;
     flex-direction: column;
-    padding-bottom: 100px; /* 调整为与Play页面一致的100px */
+    padding-bottom: 100px;
+    /* 调整为与Play页面一致的100px */
     position: relative;
 }
 
@@ -709,23 +571,6 @@ const handlePhotoComment = ({ photoId, comment }) => {
     margin: 0 auto;
     width: 100%;
     color: var(--text-color);
-}
-
-/* 背景图片样式 */
-.bg-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: filter 0.5s ease;
-    position: fixed;
-    top: 0;
-    left: 0;
-    opacity: 1;
-    z-index: -2;
-}
-
-.bg-image.dim-bg {
-    filter: brightness(0.9) saturate(0.8);
 }
 
 /* 页面标题 - 调整与 Play 页面一致 */
@@ -935,8 +780,8 @@ const handlePhotoComment = ({ photoId, comment }) => {
     color: var(--accent-color);
 }
 
-/* 教育和研究区域 */
-.education-research {
+/* 教育和技术栈区域 */
+.education-tech {
     display: flex;
     gap: 20px;
     /* 减少间距 */
@@ -961,7 +806,7 @@ const handlePhotoComment = ({ photoId, comment }) => {
     flex: 1;
 }
 
-.research {
+.tech {
     flex: 1;
 }
 
@@ -1045,45 +890,7 @@ const handlePhotoComment = ({ photoId, comment }) => {
     margin: 0;
 }
 
-/* 研究方向标签 */
-.research-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.research-tag {
-    background-color: var(--research-tag-bg);
-    color: var(--research-tag-color);
-    padding: 8px 15px;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: 500;
-    transition: all 0.3s ease;
-}
-
-.research-tag:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* 技术栈和兴趣 */
-.tech-interests {
-    display: flex;
-    gap: 20px;
-    /* 减少间距 */
-    margin-bottom: 25px;
-    /* 减少底部margin */
-}
-
-.tech {
-    flex: 1;
-}
-
-.interests {
-    flex: 1;
-}
-
+/* 技术栈样式 */
 .skill-categories {
     display: flex;
     flex-direction: column;
@@ -1108,54 +915,6 @@ const handlePhotoComment = ({ photoId, comment }) => {
 .skill-tag {
     margin-right: 0;
     margin-bottom: 4px;
-}
-
-/* 兴趣爱好 */
-.interests-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.interest-item {
-    display: flex;
-    gap: 10px;
-    align-items: flex-start;
-}
-
-.interest-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    overflow: hidden;
-    /* 确保图片不会溢出圆形边界 */
-}
-
-.interest-icon img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.interest-content {
-    flex: 1;
-}
-
-.interest-content h4 {
-    margin: 0 0 5px 0;
-    font-size: 16px;
-    color: var(--heading-color);
-}
-
-.interest-content p {
-    margin: 0;
-    font-size: 13px;
-    line-height: 1.4;
-    color: var(--text-secondary);
 }
 
 /* 座右铭和联系方式 */
@@ -1440,8 +1199,7 @@ blockquote cite {
         flex-direction: column;
     }
 
-    .education-research,
-    .tech-interests {
+    .education-tech {
         flex-direction: column;
     }
 
@@ -1469,7 +1227,7 @@ blockquote cite {
         grid-template-columns: repeat(1, 1fr);
         grid-auto-rows: auto;
     }
-    
+
     /* 移动端特别样式 - 重置所有网格项为单列 */
     .masonry-item {
         grid-column: span 1 !important;
@@ -1477,7 +1235,7 @@ blockquote cite {
         height: 250px;
         margin-bottom: 20px;
     }
-    
+
     /* 移动端直接显示照片信息，不需要悬浮 */
     .photo-overlay {
         transform: translateY(0);
@@ -1487,20 +1245,22 @@ blockquote cite {
         flex-direction: column;
         justify-content: flex-end;
     }
-    
+
     /* 调整标签在移动端的显示，与Play页面保持一致 */
     .tags {
         max-width: 100%;
         overflow-x: auto;
         padding-bottom: 5px;
         flex-wrap: nowrap;
-        scrollbar-width: none; /* Firefox */
+        scrollbar-width: none;
+        /* Firefox */
     }
-    
+
     .tags::-webkit-scrollbar {
-        display: none; /* Chrome, Safari, Edge */
+        display: none;
+        /* Chrome, Safari, Edge */
     }
-    
+
     /* 移动端照片统计显示优化 */
     .photo-stats {
         position: absolute;
@@ -1544,16 +1304,16 @@ blockquote cite {
     .masonry-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .masonry-item {
         height: 220px;
     }
-    
+
     /* 标题字体缩小 */
     .photo-overlay h4 {
         font-size: 18px;
     }
-    
+
     /* 照片计数移到左上角 */
     .photo-count {
         left: 10px;

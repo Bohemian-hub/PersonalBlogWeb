@@ -10,9 +10,7 @@
         <el-option label="草稿" value="draft" />
       </el-select>
       <el-input v-model="searchKeyword" placeholder="搜索文章标题" prefix-icon="Search" style="width: 250px" clearable
-        @input="handleSearch" />
-
-      <!-- 批量操作按钮 -->
+        @input="handleSearch" /> <!-- 批量操作按钮 -->
       <div class="batch-actions">
         <el-button size="small" type="danger" :disabled="!canBatchDelete" @click="confirmBatchDelete">
           批量删除 ({{ selectedArticles.length }})
@@ -24,9 +22,7 @@
           批量撤回 ({{ selectedArticles.length }})
         </el-button>
       </div>
-    </div>
-
-    <!-- 文章列表 -->
+    </div> <!-- 文章列表 -->
     <el-table :data="filteredArticles" stripe style="width: 100%" v-loading="loading"
       @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" />
@@ -96,9 +92,7 @@
           </el-button>
         </template>
       </el-table-column>
-    </el-table>
-
-    <!-- 分页 -->
+    </el-table> <!-- 分页 -->
     <div class="pagination-container">
       <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize" :page-sizes="[10, 20, 50, 100]"
         layout="total, sizes, prev, pager, next, jumper" :total="totalArticles" @size-change="handleSizeChange"
@@ -106,7 +100,6 @@
     </div>
   </div>
 </template>
-
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import { Search } from '@element-plus/icons-vue';
@@ -122,54 +115,38 @@ import {
   batchUnpublishArticles
 } from '@/api/article';
 import { baseUrl } from '@/common/config'
-
-
 const base_url = ref(baseUrl);
 // 分类数据
 const categories = [
-  { value: 'research', label: '学术札记' },
-  { value: 'studio', label: '实践工坊' },
-  { value: 'play', label: '游民时代' },
-  { value: 'feel', label: '认知轨迹' },
-  { value: 'say', label: '互动集市' },
-];
-
-// 文章列表状态
+  { value: 'research', label: '我的文章' },
+  { value: 'studio', label: '我的项目' },
+  { value: 'play', label: '朋友圈' },
+];// 文章列表状态
 const articles = ref([]);
 const loading = ref(false);
 const selectedArticles = ref([]);
 const currentPage = ref(1);
 const pageSize = ref(10);
-const totalArticles = ref(0);
-
-// 筛选状态
+const totalArticles = ref(0);// 筛选状态
 const searchKeyword = ref('');
 const categoryFilter = ref('');
-const statusFilter = ref('');
-
-// 获取分类标签
+const statusFilter = ref('');// 获取分类标签
 const getCategoryLabel = (value) => {
   const category = categories.find(c => c.value === value);
   return category ? category.label : value;
-};
-
-// 筛选后的文章列表
+};// 筛选后的文章列表
 const filteredArticles = computed(() => {
   // 实际应用中，这里应该调用API进行服务器端筛选
   // 这里只是前端示例
   return articles.value;
-});
-
-// 获取文章列表
+});// 获取文章列表
 const fetchArticles = async () => {
   loading.value = true;
   try {
     const params = {
       page: currentPage.value,
       page_size: pageSize.value,
-    };
-
-    // 添加筛选条件
+    };    // 添加筛选条件
     if (searchKeyword.value.trim()) {
       params.keyword = searchKeyword.value.trim();
     }
@@ -178,12 +155,8 @@ const fetchArticles = async () => {
     }
     if (statusFilter.value) {
       params.status = statusFilter.value;
-    }
-
-    const response = await getArticles(params);
-    console.log('API响应:', response); // 调试输出
-
-    // 直接使用封装后的响应数据
+    } const response = await getArticles(params);
+    console.log('API响应:', response); // 调试输出    // 直接使用封装后的响应数据
     articles.value = response.items || [];
     totalArticles.value = response.total || 0;
   } catch (error) {
@@ -195,48 +168,32 @@ const fetchArticles = async () => {
   } finally {
     loading.value = false;
   }
-};
-
-// 处理搜索
+};// 处理搜索
 const handleSearch = () => {
   currentPage.value = 1;
   fetchArticles();
-};
-
-// 处理筛选
+};// 处理筛选
 const handleFilter = () => {
   currentPage.value = 1;
   fetchArticles();
-};
-
-// 处理多选
+};// 处理多选
 const handleSelectionChange = (selection) => {
   selectedArticles.value = selection;
-};
-
-// 处理页码变化
+};// 处理页码变化
 const handleCurrentChange = (val) => {
   currentPage.value = val;
   fetchArticles();
-};
-
-// 处理每页条数变化
+};// 处理每页条数变化
 const handleSizeChange = (val) => {
   pageSize.value = val;
   currentPage.value = 1;
   fetchArticles();
-};
-
-// 编辑文章 - 修改为通过事件通信
+};// 编辑文章 - 修改为通过事件通信
 const editArticle = (id) => {
   // 通过emit通知父组件切换到编辑模式
   emit('editArticle', id);
-};
-
-// 定义emit
-const emit = defineEmits(['editArticle']);
-
-// 发布草稿
+};// 定义emit
+const emit = defineEmits(['editArticle']);// 发布草稿
 const publishArticle = async (id) => {
   try {
     await publishDraftArticle(id);
@@ -246,9 +203,7 @@ const publishArticle = async (id) => {
     console.error('发布错误:', error);
     ElMessage.error('发布失败：' + (error.message || '网络错误'));
   }
-};
-
-// 撤回已发布文章
+};// 撤回已发布文章
 const unpublishArticle = async (id) => {
   try {
     await unPublishArticle(id);
@@ -258,9 +213,7 @@ const unpublishArticle = async (id) => {
     console.error('撤回错误:', error);
     ElMessage.error('撤回失败：' + (error.message || '网络错误'));
   }
-};
-
-// 确认删除
+};// 确认删除
 const confirmDelete = (id) => {
   ElMessageBox.confirm(
     '确定要删除这篇文章吗？此操作不可逆',
@@ -286,29 +239,19 @@ const confirmDelete = (id) => {
   }).catch(() => {
     // 用户取消操作
   });
-};
-
-// 批量操作的计算属性
+};// 批量操作的计算属性
 const canBatchDelete = computed(() => {
   return selectedArticles.value.length > 0 &&
     selectedArticles.value.every(article => article.status === 'draft');
-});
-
-const canBatchPublish = computed(() => {
+}); const canBatchPublish = computed(() => {
   return selectedArticles.value.length > 0 &&
     selectedArticles.value.every(article => article.status === 'draft');
-});
-
-const canBatchUnpublish = computed(() => {
+}); const canBatchUnpublish = computed(() => {
   return selectedArticles.value.length > 0 &&
     selectedArticles.value.every(article => article.status === 'published');
-});
-
-// 批量删除确认
+});// 批量删除确认
 const confirmBatchDelete = () => {
-  if (!canBatchDelete.value) return;
-
-  ElMessageBox.confirm(
+  if (!canBatchDelete.value) return; ElMessageBox.confirm(
     `确定要删除选中的 ${selectedArticles.value.length} 篇草稿文章吗？此操作不可逆`,
     '批量删除确认',
     {
@@ -319,16 +262,12 @@ const confirmBatchDelete = () => {
   ).then(async () => {
     try {
       const articleIds = selectedArticles.value.map(article => article.id);
-      const response = await batchDeleteArticles(articleIds);
-
-      if (response.success_count > 0) {
+      const response = await batchDeleteArticles(articleIds); if (response.success_count > 0) {
         ElMessage.success(response.msg || `成功删除 ${response.success_count} 篇文章`);
       }
       if (response.error_count > 0) {
         ElMessage.warning(response.msg || `有 ${response.error_count} 篇文章删除失败`);
-      }
-
-      fetchArticles();
+      } fetchArticles();
     } catch (error) {
       console.error('批量删除错误:', error);
       ElMessage.error('批量删除失败：' + (error.message || '网络错误'));
@@ -336,13 +275,9 @@ const confirmBatchDelete = () => {
   }).catch(() => {
     // 用户取消操作
   });
-};
-
-// 批量发布确认
+};// 批量发布确认
 const confirmBatchPublish = () => {
-  if (!canBatchPublish.value) return;
-
-  ElMessageBox.confirm(
+  if (!canBatchPublish.value) return; ElMessageBox.confirm(
     `确定要发布选中的 ${selectedArticles.value.length} 篇草稿文章吗？`,
     '批量发布确认',
     {
@@ -353,16 +288,12 @@ const confirmBatchPublish = () => {
   ).then(async () => {
     try {
       const articleIds = selectedArticles.value.map(article => article.id);
-      const response = await batchPublishArticles(articleIds);
-
-      if (response.success_count > 0) {
+      const response = await batchPublishArticles(articleIds); if (response.success_count > 0) {
         ElMessage.success(response.msg || `成功发布 ${response.success_count} 篇文章`);
       }
       if (response.error_count > 0) {
         ElMessage.warning(response.msg || `有 ${response.error_count} 篇文章发布失败`);
-      }
-
-      fetchArticles();
+      } fetchArticles();
     } catch (error) {
       console.error('批量发布错误:', error);
       ElMessage.error('批量发布失败：' + (error.message || '网络错误'));
@@ -370,13 +301,9 @@ const confirmBatchPublish = () => {
   }).catch(() => {
     // 用户取消操作
   });
-};
-
-// 批量撤回确认
+};// 批量撤回确认
 const confirmBatchUnpublish = () => {
-  if (!canBatchUnpublish.value) return;
-
-  ElMessageBox.confirm(
+  if (!canBatchUnpublish.value) return; ElMessageBox.confirm(
     `确定要撤回选中的 ${selectedArticles.value.length} 篇已发布文章吗？`,
     '批量撤回确认',
     {
@@ -387,16 +314,12 @@ const confirmBatchUnpublish = () => {
   ).then(async () => {
     try {
       const articleIds = selectedArticles.value.map(article => article.id);
-      const response = await batchUnpublishArticles(articleIds);
-
-      if (response.success_count > 0) {
+      const response = await batchUnpublishArticles(articleIds); if (response.success_count > 0) {
         ElMessage.success(response.msg || `成功撤回 ${response.success_count} 篇文章`);
       }
       if (response.error_count > 0) {
         ElMessage.warning(response.msg || `有 ${response.error_count} 篇文章撤回失败`);
-      }
-
-      fetchArticles();
+      } fetchArticles();
     } catch (error) {
       console.error('批量撤回错误:', error);
       ElMessage.error('批量撤回失败：' + (error.message || '网络错误'));
@@ -404,9 +327,7 @@ const confirmBatchUnpublish = () => {
   }).catch(() => {
     // 用户取消操作
   });
-};
-
-// 监听搜索关键词变化，实现防抖搜索
+};// 监听搜索关键词变化，实现防抖搜索
 let searchTimer = null;
 watch(searchKeyword, (newVal) => {
   if (searchTimer) {
@@ -415,13 +336,10 @@ watch(searchKeyword, (newVal) => {
   searchTimer = setTimeout(() => {
     handleSearch();
   }, 500);
-});
-
-onMounted(() => {
+}); onMounted(() => {
   fetchArticles();
 });
 </script>
-
 <style scoped>
 .article-manage {
   height: 100%;

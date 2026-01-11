@@ -1,10 +1,6 @@
 <template>
   <div class="theme-toggler-container">
-    <div 
-      class="theme-toggler" 
-      @click="toggleTheme" 
-      :title="currentTheme === 'dark' ? '切换到浅色模式' : '切换到深色模式'"
-    >
+    <div class="theme-toggler" @click="toggleTheme" :title="currentTheme === 'dark' ? '切换到浅色模式' : '切换到深色模式'">
       <div class="toggle-background" :class="currentTheme">
         <div class="celestial-body" :class="currentTheme">
           <div v-if="currentTheme === 'dark'" class="sun-rays"></div>
@@ -24,12 +20,10 @@
     </div>
   </div>
 </template>
-
 <script setup>
 import { Sunny, Moon } from '@element-plus/icons-vue'
 import { currentTheme, toggleTheme } from '../stores/themeStore'
 </script>
-
 <style scoped>
 .theme-toggler-container {
   position: relative;
@@ -45,6 +39,7 @@ import { currentTheme, toggleTheme } from '../stores/themeStore'
   transition: all 0.3s ease;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
   overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .toggle-background {
@@ -166,21 +161,25 @@ import { currentTheme, toggleTheme } from '../stores/themeStore'
   left: 20%;
   animation-delay: 0s;
 }
+
 .star:nth-child(2) {
   top: 15%;
   left: 60%;
   animation-delay: 0.5s;
 }
+
 .star:nth-child(3) {
   top: 50%;
   left: 80%;
   animation-delay: 1s;
 }
+
 .star:nth-child(4) {
   top: 70%;
   left: 30%;
   animation-delay: 1.5s;
 }
+
 .star:nth-child(5) {
   top: 80%;
   left: 70%;
@@ -201,10 +200,12 @@ import { currentTheme, toggleTheme } from '../stores/themeStore'
     transform: translate(-50%, -50%) scale(1);
     opacity: 0.3;
   }
+
   50% {
     transform: translate(-50%, -50%) scale(1.2);
     opacity: 0.1;
   }
+
   100% {
     transform: translate(-50%, -50%) scale(1);
     opacity: 0.3;
@@ -216,10 +217,12 @@ import { currentTheme, toggleTheme } from '../stores/themeStore'
     transform: scale(0);
     opacity: 0;
   }
+
   50% {
     transform: scale(1);
     opacity: 0.8;
   }
+
   100% {
     transform: scale(0);
     opacity: 0;

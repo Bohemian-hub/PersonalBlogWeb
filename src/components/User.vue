@@ -250,7 +250,7 @@ onBeforeUnmount(() => {
 <style scoped>
 /* 主题变量定义 */
 .user.dark {
-  --user-bg: rgba(40, 40, 50, 0.95);
+  --user-bg: rgba(40, 40, 50, 0.2);
   --user-text: #ffffff;
   --user-border: rgba(255, 255, 255, 0.1);
   --user-shadow: rgba(0, 0, 0, 0.25);
@@ -263,12 +263,12 @@ onBeforeUnmount(() => {
   --user-btn-hover: #66b1ff;
   --user-divider: rgba(255, 255, 255, 0.1);
   --user-menu-item-hover: rgba(70, 130, 180, 0.2);
-  --user-angle-color: rgba(40, 40, 50, 0.95);
+  --user-angle-color: rgba(40, 40, 50, 0.2);
   --user-angle-shadow: rgba(0, 0, 0, 0.3);
 }
 
 .user.light {
-  --user-bg: rgba(255, 255, 255, 0.95);
+  --user-bg: rgba(255, 255, 255, 0.3);
   --user-text: #333333;
   --user-border: rgba(0, 0, 0, 0.1);
   --user-shadow: rgba(0, 0, 0, 0.1);
@@ -281,7 +281,7 @@ onBeforeUnmount(() => {
   --user-btn-hover: #66b1ff;
   --user-divider: rgba(0, 0, 0, 0.1);
   --user-menu-item-hover: #f5f5f5;
-  --user-angle-color: rgba(255, 255, 255, 0.95);
+  --user-angle-color: rgba(255, 255, 255, 0.3);
   --user-angle-shadow: rgba(0, 0, 0, 0.1);
 }
 
@@ -304,6 +304,7 @@ onBeforeUnmount(() => {
   width: 280px;
   height: 0;
   background-color: var(--user-bg);
+  backdrop-filter: blur(10px);
   position: fixed;
   right: 10px;
   top: 60px;
@@ -330,7 +331,7 @@ onBeforeUnmount(() => {
 
 .show-panel {
   height: auto !important;
-  opacity: .95;
+  opacity: 1;
 }
 
 /* 显示遮罩层 */

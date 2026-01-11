@@ -1,7 +1,6 @@
 <template>
     <div class="article-page" :class="currentTheme">
         <TopBar :visible="showTopBar" />
-
         <div class="article-container">
             <!-- 顶部封面图 -->
             <div class="article-cover" :style="{ backgroundImage: `url('${article.coverUrl}')` }">
@@ -11,13 +10,10 @@
                         <h1 class="article-title-floating">{{ article.title }}</h1>
                     </div>
                 </div>
-            </div>
-
-            <!-- 文章主体内容 -->
+            </div> <!-- 文章主体内容 -->
             <div class="article-content-wrapper">
                 <div class="article-header">
                     <!-- <h1 class="article-title">{{ article.title }}</h1> -->
-
                     <div class="article-info">
                         <div class="author-info">
                             <img :src="article.author.avatar" alt="作者头像" class="author-avatar">
@@ -26,33 +22,23 @@
                                 <div class="article-date">{{ formatDate(article.publishDate) }}</div>
                             </div>
                         </div>
-
                         <div class="article-stats">
                             <span class="stat-item"><i class="icon-eye"></i> {{ article.views }}</span>
                             <span class="stat-item"><i class="icon-heart"></i> {{ article.likes }}</span>
                             <span class="stat-item"><i class="icon-comment"></i> {{ article.comments.length }}</span>
                         </div>
                     </div>
-
                     <div class="article-tags">
                         <span class="tag" v-for="(tag, index) in article.tags" :key="index">{{ tag }}</span>
-                    </div>
-
-                    <!-- 添加摘要部分 -->
+                    </div> <!-- 添加摘要部分 -->
                     <div class="article-summary">
                         <p>{{ article.summary }}</p>
                     </div>
-                </div>
-
-                <!-- 文章正文 (渲染Markdown) -->
-                <div class="article-content" v-html="renderedContent"></div>
-
-                <!-- 分割线 -->
+                </div> <!-- 文章正文 (渲染Markdown) -->
+                <div class="article-content" v-html="renderedContent"></div> <!-- 分割线 -->
                 <div class="content-divider">
                     <span class="divider-icon">✦</span>
-                </div>
-
-                <!-- 操作栏（从底部移至此处） -->
+                </div> <!-- 操作栏（从底部移至此处） -->
                 <div class="article-actions-bar">
                     <div class="actions-container">
                         <div class="action-btn" @click="toggleLike">
@@ -74,13 +60,9 @@
                             <span>分享</span>
                         </div>
                     </div>
-                </div>
-
-                <!-- 评论区域 -->
+                </div> <!-- 评论区域 -->
                 <div class="comments-section">
-                    <h2 class="section-title">评论区 ({{ article.comments.length }})</h2>
-
-                    <!-- 评论输入框 -->
+                    <h2 class="section-title">评论区 ({{ article.comments.length }})</h2> <!-- 评论输入框 -->
                     <div class="comment-input-container">
                         <div class="comment-avatar">
                             <img :src="currentUser.avatar" alt="Your avatar">
@@ -94,9 +76,7 @@
                                     :disabled="!newComment.trim()">发表评论</button>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- 评论列表 -->
+                    </div> <!-- 评论列表 -->
                     <div class="comments-list" v-if="article.comments.length > 0">
                         <div class="comment-item" v-for="(comment, index) in article.comments" :key="index">
                             <div class="comment-avatar">
@@ -120,22 +100,16 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- 暂无评论提示 -->
+                    </div> <!-- 暂无评论提示 -->
                     <div class="no-comments" v-else>
                         <div class="no-comments-icon">💬</div>
                         <p>暂无评论，成为第一个评论的人吧！</p>
                     </div>
                 </div>
-            </div>
-
-            <!-- 返回顶部按钮 -->
+            </div> <!-- 返回顶部按钮 -->
             <div class="back-to-top" v-show="showBackToTop" :class="{ 'show': showBackToTop }" @click="scrollToTop">
                 <i class="icon-arrow-up"></i>
-            </div>
-
-            <!-- 分享弹窗 -->
+            </div> <!-- 分享弹窗 -->
             <div class="share-modal" v-if="showShareModal" @click.self="showShareModal = false">
                 <div class="share-modal-content">
                     <h3>分享文章</h3>
@@ -159,11 +133,8 @@
                     </div>
                     <button class="close-modal-btn" @click="showShareModal = false">关闭</button>
                 </div>
-            </div>
-
-            <!-- 背景图片 -->
-            <el-image class="bg-image" :src="bgUrl" :fit="'cover'" draggable="false"
-                :class="{ 'dim-bg': currentTheme === 'dark' }" />
+            </div> <!-- 背景图片 -->
+            <div class="global-bg"></div>
         </div>
         <!-- 添加主题切换按钮 -->
         <ThemeToggler class="home-theme-toggler" />
@@ -171,7 +142,6 @@
         <Footer />
     </div>
 </template>
-
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { marked } from 'marked';
@@ -181,8 +151,6 @@ import TopBar from '../components/TopBar.vue'
 import ThemeToggler from '../components/ThemeToggler.vue' // 导入主题切换组件
 import Footer from '../components/Footer.vue'  // 导入新的Footer组件
 import { currentTheme } from '../stores/themeStore' // 导入主题变量
-// 添加背景图片URL
-const bgUrl = 'https://picsum.photos/1920/1080?blur=5'; // 使用模糊效果的背景图，也可以导入本地图片
 
 const newComment = ref('');
 const isLiked = ref(false);
@@ -198,14 +166,12 @@ const currentUser = {
     id: 'current-user',
     name: '当前用户',
     avatar: 'https://randomuser.me/api/portraits/men/22.jpg'
-};
-
-// 示例文章数据
+};// 示例文章数据
 const article = ref({
     id: 1,
     title: '深度学习在自然语言处理中的应用与挑战',
     coverUrl: 'https://picsum.photos/1920/1080?random=25',
-    category: '学术札记',
+    category: '我的文章',
     summary: '本文探讨了深度学习技术在自然语言处理领域的最新应用及面临的主要挑战...',
     content: `
   
@@ -331,9 +297,7 @@ const article = ref({
             isLiked: false
         }
     ]
-});
-
-// 使用marked库解析Markdown
+});// 使用marked库解析Markdown
 // 配置highlight.js来渲染代码块
 marked.setOptions({
     highlight: function (code, lang) {
@@ -343,18 +307,12 @@ marked.setOptions({
     langPrefix: 'hljs language-',
     gfm: true,
     breaks: true
-});
-
-// 将Markdown渲染为HTML
+});// 将Markdown渲染为HTML
 const renderedContent = computed(() => {
     return marked(article.value.content);
-});
-
-// 添加评论
+});// 添加评论
 const addComment = () => {
-    if (!newComment.value.trim()) return;
-
-    const comment = {
+    if (!newComment.value.trim()) return; const comment = {
         id: `comment-${Date.now()}`,
         author: currentUser.name,
         avatar: currentUser.avatar,
@@ -362,13 +320,9 @@ const addComment = () => {
         date: new Date().toISOString(),
         likes: 0,
         isLiked: false
-    };
-
-    article.value.comments.unshift(comment);
+    }; article.value.comments.unshift(comment);
     newComment.value = '';
-};
-
-// 回复评论
+};// 回复评论
 const replyToComment = (comment) => {
     // 设置评论框内容为回复格式
     newComment.value = `@${comment.author} `;
@@ -376,9 +330,7 @@ const replyToComment = (comment) => {
     document.querySelector('.comment-input').focus();
     // 滚动到评论框
     document.querySelector('.comment-input-container').scrollIntoView({ behavior: 'smooth' });
-};
-
-// 点赞/取消点赞评论
+};// 点赞/取消点赞评论
 const toggleLikeComment = (index) => {
     const comment = article.value.comments[index];
     if (comment.isLiked) {
@@ -387,9 +339,7 @@ const toggleLikeComment = (index) => {
         comment.likes++;
     }
     comment.isLiked = !comment.isLiked;
-};
-
-// 点赞/取消点赞文章
+};// 点赞/取消点赞文章
 const toggleLike = () => {
     if (isLiked.value) {
         article.value.likes--;
@@ -397,99 +347,67 @@ const toggleLike = () => {
         article.value.likes++;
     }
     isLiked.value = !isLiked.value;
-};
-
-// 分享文章
+};// 分享文章
 const shareArticle = () => {
     showShareModal.value = true;
-};
-
-// 通过不同平台分享
+};// 通过不同平台分享
 const shareVia = (platform) => {
     // 实际应用中应根据不同平台实现分享逻辑
     console.log(`通过${platform}分享文章: ${article.value.title}`);
     showShareModal.value = false;
-};
-
-// 复制文章链接
+};// 复制文章链接
 const copyLink = () => {
     const url = window.location.href;
     navigator.clipboard.writeText(url).then(() => {
         alert('链接已复制到剪贴板');
         showShareModal.value = false;
     });
-};
-
-// 日期格式化
+};// 日期格式化
 const formatDate = (dateString) => {
     const date = new Date(dateString);
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const day = date.getDate().toString().padStart(2, '0');
     return `${year}-${month}-${day}`;
-};
-
-// 返回顶部
+};// 返回顶部
 const scrollToTop = () => {
     window.scrollTo({
         top: 0,
         behavior: 'smooth'
     });
-};
-
-// 监听滚动事件以显示/隐藏返回顶部按钮
+};// 监听滚动事件以显示/隐藏返回顶部按钮
 const handleScroll = () => {
     showBackToTop.value = window.scrollY > 500;
     // 当滚动位置为0（页面顶部）时显示TopBar，否则隐藏
     showTopBar.value = window.scrollY <= 400
 };
 onMounted(() => {
-    window.addEventListener('scroll', handleScroll);
-
-    // 设置文章标题为网页标题
-    document.title = `${article.value.title} - Hedong的个人博客`;
-
-    // 添加分享所需的meta标签
+    window.addEventListener('scroll', handleScroll);    // 设置文章标题为网页标题
+    document.title = `${article.value.title} - Hedong的个人博客`;    // 添加分享所需的meta标签
     const metaTags = [
         // Open Graph协议标签（微信、微博等平台通用）
         { property: 'og:title', content: article.value.title },
         { property: 'og:description', content: article.value.summary },
         { property: 'og:image', content: article.value.coverUrl },
         { property: 'og:url', content: window.location.href },
-        { property: 'og:type', content: 'article' },
-
-        // 微信特定标签
+        { property: 'og:type', content: 'article' },        // 微信特定标签
         { name: 'description', content: article.value.summary },
         { itemprop: 'name', content: article.value.title },
         { itemprop: 'description', content: article.value.summary },
         { itemprop: 'image', content: article.value.coverUrl }
-    ];
-
-    // 保存已添加的标签引用，以便在组件卸载时移除
-    const addedTags = [];
-
-    metaTags.forEach(tagInfo => {
-        const metaTag = document.createElement('meta');
-
-        // 设置标签属性
+    ];    // 保存已添加的标签引用，以便在组件卸载时移除
+    const addedTags = []; metaTags.forEach(tagInfo => {
+        const metaTag = document.createElement('meta');        // 设置标签属性
         Object.keys(tagInfo).forEach(key => {
             metaTag.setAttribute(key, tagInfo[key]);
-        });
-
-        // 添加到文档头部
+        });        // 添加到文档头部
         document.head.appendChild(metaTag);
         addedTags.push(metaTag);
-    });
-
-    // 添加到组件实例上，以便在卸载时引用
+    });    // 添加到组件实例上，以便在卸载时引用
     articleMetaTags = addedTags;
 });
-
-
 onUnmounted(() => {
-    window.removeEventListener('scroll', handleScroll);
-
-    // 移除添加的meta标签
+    window.removeEventListener('scroll', handleScroll);    // 移除添加的meta标签
     articleMetaTags.forEach(tag => {
         if (document.head.contains(tag)) {
             document.head.removeChild(tag);
@@ -497,7 +415,6 @@ onUnmounted(() => {
     });
 });
 </script>
-
 <style scoped>
 .article-page.dark {
     --article-bg: rgba(25, 25, 35, 0.8);
@@ -505,9 +422,9 @@ onUnmounted(() => {
     --article-secondary: rgba(255, 255, 255, 0.8);
     --article-tertiary: rgba(255, 255, 255, 0.6);
     --heading-color: #e1e6fa;
-    --card-bg: rgba(40, 40, 50, 0.8);
+    --card-bg: rgba(40, 40, 50, 0.4);
     --card-shadow: rgba(0, 0, 0, 0.25);
-    --card-border: rgba(255, 255, 255, 0.1);
+    --card-border: rgba(255, 255, 255, 0.5);
     --accent-color: #7a92e6;
     --tag-bg: rgba(40, 40, 60, 0.7);
     --tag-text: #ffffff;
@@ -523,8 +440,8 @@ onUnmounted(() => {
     --blockquote-bg: rgba(122, 146, 230, 0.1);
     --scrollbar-track: rgba(30, 30, 40, 0.8);
     --scrollbar-thumb: rgba(255, 255, 255, 0.2);
-    --content-wrapper-bg: rgba(30, 30, 45, 0.75);
-    --overlay-gradient: linear-gradient(to bottom, rgba(20, 20, 30, 0.85), rgba(10, 10, 18, 0.9));
+    --content-wrapper-bg: rgba(30, 30, 45, 0.5);
+    --overlay-gradient: linear-gradient(to bottom, rgba(20, 20, 30, 0.3), rgba(10, 10, 18, 0.5));
     --comment-bg: rgba(255, 255, 255, 0.05);
     --comment-border: rgba(255, 255, 255, 0.1);
     --comment-text: rgba(255, 255, 255, 0.95);
@@ -534,14 +451,14 @@ onUnmounted(() => {
 }
 
 .article-page.light {
-    --article-bg: rgba(255, 255, 255, 0.9);
+    --article-bg: rgba(255, 255, 255, 0.5);
     --article-text: #333333;
     --article-secondary: rgba(0, 0, 0, 0.7);
     --article-tertiary: rgba(0, 0, 0, 0.5);
     --heading-color: #2c3e50;
-    --card-bg: rgba(255, 255, 255, 0.95);
+    --card-bg: rgba(255, 255, 255, 0.4);
     --card-shadow: rgba(0, 0, 0, 0.1);
-    --card-border: rgba(0, 0, 0, 0.1);
+    --card-border: rgba(255, 255, 255, 0.6);
     --accent-color: #4a6cb3;
     --tag-bg: rgba(240, 240, 255, 0.8);
     --tag-text: #333333;
@@ -557,8 +474,8 @@ onUnmounted(() => {
     --blockquote-bg: rgba(74, 108, 179, 0.05);
     --scrollbar-track: rgba(240, 240, 245, 0.8);
     --scrollbar-thumb: rgba(0, 0, 0, 0.15);
-    --content-wrapper-bg: rgba(255, 255, 255, 0.85);
-    --overlay-gradient: linear-gradient(to bottom, rgba(245, 245, 250, 0.5), rgba(235, 235, 240, 0.8));
+    --content-wrapper-bg: rgba(255, 255, 255, 0.5);
+    --overlay-gradient: linear-gradient(to bottom, rgba(245, 245, 250, 0.2), rgba(235, 235, 240, 0.4));
     --comment-bg: rgba(0, 0, 0, 0.03);
     --comment-border: rgba(0, 0, 0, 0.1);
     --comment-text: rgba(0, 0, 0, 0.8);
@@ -586,16 +503,16 @@ onUnmounted(() => {
     position: relative;
 }
 
-/* 添加背景图片样式 */
-.bg-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+/* 全局背景样式 */
+.global-bg {
     position: fixed;
     top: 0;
     left: 0;
-    opacity: 1;
+    width: 100%;
+    height: 100%;
     z-index: -2;
+
+    background: linear-gradient(225deg, #fcb8e2 0.000%, #feb9e4 5.000%, #ffbce7 10.000%, #ffc2ea 15.000%, #ffc8ed 20.000%, #ffd0f0 25.000%, #ffd8f3 30.000%, #fee0f6 35.000%, #fbe8f9 40.000%, #f7effb 45.000%, #f3f4fd 50.000%, #eef8ff 55.000%, #e8f9ff 60.000%, #e3f9ff 65.000%, #dcf6ff 70.000%, #d6f2ff 75.000%, #d0ecff 80.000%, #c9e5ff 85.000%, #c3ddfe 90.000%, #bdd5fc 95.000%, #b8cdfa 100.000%);
 }
 
 /* 为页面添加蒙层以增加文字与背景的对比度 */

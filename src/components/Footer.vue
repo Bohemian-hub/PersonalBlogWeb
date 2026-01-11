@@ -13,12 +13,9 @@
     </div>
   </footer>
 </template>
-
 <script setup>
 import { computed } from 'vue'
-import { currentTheme } from '../stores/themeStore'
-
-// 计算网站运行天数
+import { currentTheme } from '../stores/themeStore'// 计算网站运行天数
 const runningDays = computed(() => {
   const startDate = new Date('2024-01-01') // 假设网站从2024年1月1日开始运行
   const today = new Date()
@@ -26,11 +23,10 @@ const runningDays = computed(() => {
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 })
 </script>
-
 <style scoped>
 /* 主题变量定义 */
 .site-footer.dark {
-  --footer-bg: rgba(25, 25, 35, 0.75);
+  --footer-bg: rgba(25, 25, 35, 0.2);
   --text-color: rgba(255, 255, 255, 0.8);
   --border-color: rgba(255, 255, 255, 0.1);
   --title-gradient: linear-gradient(45deg, #ffffff, #b8c6db);
@@ -39,7 +35,7 @@ const runningDays = computed(() => {
 }
 
 .site-footer.light {
-  --footer-bg: rgba(245, 245, 250, 0.85);
+  --footer-bg: rgba(245, 245, 250, 0.3);
   --text-color: rgba(0, 0, 0, 0.7);
   --border-color: rgba(0, 0, 0, 0.1);
   --title-gradient: linear-gradient(45deg, #333333, #666666);

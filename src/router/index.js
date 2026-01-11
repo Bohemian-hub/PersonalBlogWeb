@@ -4,8 +4,6 @@ import About from '../views/About.vue'
 import Research from '../views/Research.vue'
 import Studio from '../views/Studio.vue'
 import Play from '../views/Play.vue'
-import Feel from '../views/Feel.vue'
-import Say from '../views/Say.vue'
 import Article from '../views/Article.vue'
 import Manage from '../views/Manage.vue'
 import NotFound from '../views/NotFound.vue'
@@ -24,7 +22,7 @@ const routes = [
         name: 'Research',
         component: Research,
         meta: {
-            title: '学术札记 - HeDong的博客'
+            title: '我的文章 - HeDong的博客'
         }
     },
     {
@@ -32,7 +30,7 @@ const routes = [
         name: 'Studio',
         component: Studio,
         meta: {
-            title: '实践工坊 - HeDong的博客'
+            title: '我的项目 - HeDong的博客'
         }
     },
     {
@@ -40,23 +38,7 @@ const routes = [
         name: 'Play',
         component: Play,
         meta: {
-            title: '游民时代 - HeDong的博客'
-        }
-    },
-    {
-        path: '/feel',
-        name: 'Feel',
-        component: Feel,
-        meta: {
-            title: '认知轨迹 - HeDong的博客'
-        }
-    },
-    {
-        path: '/say',
-        name: 'Say',
-        component: Say,
-        meta: {
-            title: '互动集市 - HeDong的博客'
+            title: '朋友圈 - HeDong的博客'
         }
     },
     {
