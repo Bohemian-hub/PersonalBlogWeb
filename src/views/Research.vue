@@ -1,3 +1,11 @@
+<!--
+ * @Author: Bohemian-hub dongshangwl@gmail.com
+ * @Date: 2025-08-30 14:41:08
+ * @LastEditors: Bohemian-hub dongshangwl@gmail.com
+ * @LastEditTime: 2025-10-06 11:27:49
+ * @FilePath: \personalBlog\PersonalBlogWeb\src\views\Research.vue
+ * @Description: 
+-->
 <template>
     <TopBar />
     <!-- 添加主题切换按钮 -->
@@ -71,7 +79,7 @@ onMounted(() => {
     handleScroll()
 })// 组件卸载时移除事件监听，防止内存泄漏
 onUnmounted(() => {
-    window.removeEventListener('scroll', handleScroll)
+  window.removeEventListener('scroll', handleScroll)
 })
 // 文章列表数据
 const articles = ref([
@@ -131,8 +139,8 @@ const articles = ref([
     }
 ])// 分页数据
 const paginationData = ref({
-    total: 50,
-    pageSize: 6
+  total: 50,
+  pageSize: 6
 })
 </script>
 <style scoped>
@@ -205,126 +213,126 @@ const paginationData = ref({
 }
 
 .page-wrapper {
-    min-height: calc(100vh - 50px);
-    display: flex;
-    flex-direction: column;
-    padding-bottom: 100px;
-    position: relative;
+  min-height: calc(100vh - 50px);
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 100px;
+  position: relative;
 }
 
 .page-wrapper::after {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    /* background-color: var(--bg-overlay); */
-    z-index: -1;
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* background-color: var(--bg-overlay); */
+  z-index: -1;
 }
 
 .page-content {
-    padding: 80px 40px 40px;
-    max-width: 1400px;
-    margin: 0 auto;
-    width: 100%;
-    color: var(--text-color);
+  padding: 80px 40px 40px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  color: var(--text-color);
 }
 
 .home-theme-toggler {
-    position: fixed;
-    bottom: 30px;
-    left: 30px;
-    z-index: 1000;
+  position: fixed;
+  bottom: 30px;
+  left: 30px;
+  z-index: 1000;
 }
 
 .page-header {
-    text-align: center;
-    margin-bottom: 40px;
-    position: relative;
+  text-align: center;
+  margin-bottom: 40px;
+  position: relative;
 }
 
 .page-title {
-    font-size: 40px;
-    margin-bottom: 16px;
-    font-weight: 600;
-    background: var(--title-gradient);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    letter-spacing: 2px;
-    text-shadow: var(--title-shadow);
+  font-size: 40px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  background: var(--title-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  letter-spacing: 2px;
+  text-shadow: var(--title-shadow);
 }
 
 .description {
-    font-size: 18px;
-    opacity: 0.95;
-    margin-bottom: 20px;
-    font-style: italic;
-    max-width: 800px;
-    margin: 0 auto 30px;
-    text-shadow: var(--title-shadow);
-    color: var(--text-secondary);
+  font-size: 18px;
+  opacity: 0.95;
+  margin-bottom: 20px;
+  font-style: italic;
+  max-width: 800px;
+  margin: 0 auto 30px;
+  text-shadow: var(--title-shadow);
+  color: var(--text-secondary);
 }
 
 .divider {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 20px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px 0;
 }
 
 .divider::before,
 .divider::after {
-    content: "";
-    flex: 1;
-    height: 1px;
-    background: var(--divider-color);
-    margin: 0 15px;
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--divider-color);
+  margin: 0 15px;
 }
 
 /* 内容布局 */
 .content-layout {
-    display: flex;
-    gap: 30px;
+  display: flex;
+  gap: 30px;
 }
 
 .main-column {
-    flex: 1;
-    min-width: 0;
+  flex: 1;
+  min-width: 0;
 }
 
 .side-column {
-    width: 340px;
-    flex-shrink: 0;
+  width: 340px;
+  flex-shrink: 0;
 }
 
 /* 移动端显示隐藏控制 */
 .mobile-first {
-    display: none;
+  display: none;
 }
 
 .desktop-only {
-    display: block;
+  display: block;
 }
 
 /* 内容容器样式更新为与Index页面一致 */
 .section-container {
-    background-color: var(--bg-primary);
-    border-radius: 12px;
-    padding: 25px;
-    margin-bottom: 30px;
-    backdrop-filter: blur(10px);
-    box-shadow: var(--card-shadow);
-    border: 1px solid var(--card-border);
-    color: var(--text-color);
-    transition: all 0.3s ease;
+  background-color: var(--bg-primary);
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 30px;
+  backdrop-filter: blur(10px);
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--card-border);
+  color: var(--text-color);
+  transition: all 0.3s ease;
 }
 
 .section-container:hover {
-    background-color: var(--bg-secondary);
-    transform: var(--card-hover-transform);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  background-color: var(--bg-secondary);
+  transform: var(--card-hover-transform);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 .section-title {
@@ -339,15 +347,15 @@ const paginationData = ref({
 
 /* 文章列表 */
 .filter-bar {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  align-items: center;
 }
 
 .search-input {
-    width: 220px;
+  width: 220px;
 }
 
 .articles-container {
@@ -371,8 +379,8 @@ const paginationData = ref({
 }
 
 .article-card:hover {
-    transform: var(--card-hover-transform);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  transform: var(--card-hover-transform);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
 
 /* 封面图 */
@@ -385,14 +393,14 @@ const paginationData = ref({
 }
 
 .article-cover img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.5s ease;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
 }
 
 .article-card:hover .article-cover img {
-    transform: scale(1.05);
+  transform: scale(1.05);
 }
 
 .article-category-tag {
@@ -470,15 +478,15 @@ const paginationData = ref({
 }
 
 @media (max-width: 768px) {
-    .page-content {
-        padding: 60px 20px 20px;
-    }
+  .page-content {
+    padding: 60px 20px 20px;
+  }
 
-    /* 移动端布局调整 */
-    .mobile-first {
-        display: block;
-        margin-bottom: 24px;
-    }
+  /* 移动端布局调整 */
+  .mobile-first {
+    display: block;
+    margin-bottom: 24px;
+  }
 
     .desktop-only {
         display: none;
@@ -492,9 +500,9 @@ const paginationData = ref({
         /* 减小内边距使卡片更紧凑 */
     }
 
-    .page-title {
-        font-size: 32px;
-    }
+  .page-title {
+    font-size: 32px;
+  }
 
     .article-card {
         flex-direction: column;
