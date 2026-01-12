@@ -26,7 +26,8 @@
                             记录自己的成就之路
                         </h2>
                         <div class="articles-container">
-                            <div class="article-card" v-for="article in articles" :key="article.id">
+                            <div class="article-card" v-for="article in articles" :key="article.id"
+                                @click="goToArticle(article.id)" style="cursor: pointer;">
                                 <!-- 左侧：文章封面图 -->
                                 <div class="article-cover">
                                     <img :src="article.coverImg" :alt="article.title" />
@@ -60,6 +61,9 @@
 </template>
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { getArticles } from '../api/article'
+import { baseUrl } from '@/common/config'
 import {
     Document, Search
 } from '@element-plus/icons-vue'
@@ -67,7 +71,9 @@ import TopBar from '../components/TopBar.vue'
 import Footer from '../components/Footer.vue'
 import ThemeToggler from '../components/ThemeToggler.vue'
 import PageHeader from '../components/PageHeader.vue'
-import { currentTheme } from '../stores/themeStore'// 创建一个响应式变量来控制TopBar的显示和隐藏
+import { currentTheme } from '../stores/themeStore'
+const router = useRouter()
+// 创建一个响应式变量来控制TopBar的显示和隐藏
 const showTopBar = ref(true)// 处理滚动事件的函数
 const handleScroll = () => {
     // 当滚动位置为0（页面顶部）时显示TopBar，否则隐藏
@@ -77,70 +83,46 @@ onMounted(() => {
     window.addEventListener('scroll', handleScroll)
     // 初始化状态
     handleScroll()
+    loadArticles()
 })// 组件卸载时移除事件监听，防止内存泄漏
 onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll)
+    window.removeEventListener('scroll', handleScroll)
 })
 // 文章列表数据
-const articles = ref([
-    {
-        id: 1,
-        title: '大规模语言模型的认知偏差研究',
-        excerpt: '这篇研究探讨了人工智能模型在处理复杂信息时的认知局限性与可能的优化方向',
-        date: '2024年1月15日',
-        coverImg: 'https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1469&q=80',
-        category: '人工智能',
-        readTime: 6
-    },
-    {
-        id: 2,
-        title: '数字化转型中的伦理边界探讨',
-        excerpt: '这篇研究探讨了数字化转型过程中的伦理挑战和可能的解决框架',
-        date: '2024年2月20日',
-        coverImg: 'https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1469&q=80',
-        category: '科技伦理',
-        readTime: 7
-    },
-    {
-        id: 3,
-        title: '人工智能辅助教学系统设计与实现',
-        excerpt: '这篇研究探讨了如何设计更智能、更人性化的教学辅助系统',
-        date: '2024年3月5日',
-        coverImg: 'https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1469&q=80',
-        category: '教育科技',
-        readTime: 8
-    },
-    {
-        id: 4,
-        title: '深度学习在文本分析中的最新进展',
-        excerpt: '这篇研究探讨了深度学习技术在文本分析领域的突破性应用',
-        date: '2024年4月10日',
-        coverImg: 'https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1469&q=80',
-        category: '人工智能',
-        readTime: 9
-    },
-    {
-        id: 5,
-        title: '科技伦理教育的理论框架与实践路径',
-        excerpt: '这篇研究探讨了科技伦理教育的核心问题与创新教学方法',
-        date: '2024年5月18日',
-        coverImg: 'https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1469&q=80',
-        category: '科技伦理',
-        readTime: 10
-    },
-    {
-        id: 6,
-        title: '教育场景中的人机协作模式研究',
-        excerpt: '这篇研究探讨了人机协作在教育场景中的新模式与效果评估',
-        date: '2024年6月22日',
-        coverImg: 'https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1469&q=80',
-        category: '教育科技',
-        readTime: 11
+const articles = ref([])
+
+const loadArticles = async () => {
+    try {
+        const res = await getArticles({
+            page: 1,
+            page_size: paginationData.value.pageSize,
+            status: 'published',
+            category: 'research'
+        });
+        if (res && res.items) {
+            articles.value = res.items.map(item => ({
+                id: item.id,
+                title: item.title,
+                excerpt: item.summary,
+                date: item.created_at,
+                coverImg: item.cover_image_url ? baseUrl + item.cover_image_url : '',
+                category: item.category,
+                readTime: Math.ceil((item.summary?.length || 100) / 300) + 1
+            }));
+            paginationData.value.total = res.total;
+        }
+    } catch (e) {
+        console.error("加载文章列表失败", e);
     }
-])// 分页数据
+}
+
+const goToArticle = (id) => {
+    router.push(`/article/${id}`);
+}
+
 const paginationData = ref({
-  total: 50,
-  pageSize: 6
+    total: 50,
+    pageSize: 6
 })
 </script>
 <style scoped>
@@ -213,126 +195,126 @@ const paginationData = ref({
 }
 
 .page-wrapper {
-  min-height: calc(100vh - 50px);
-  display: flex;
-  flex-direction: column;
-  padding-bottom: 100px;
-  position: relative;
+    min-height: calc(100vh - 50px);
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 100px;
+    position: relative;
 }
 
 .page-wrapper::after {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  /* background-color: var(--bg-overlay); */
-  z-index: -1;
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /* background-color: var(--bg-overlay); */
+    z-index: -1;
 }
 
 .page-content {
-  padding: 80px 40px 40px;
-  max-width: 1400px;
-  margin: 0 auto;
-  width: 100%;
-  color: var(--text-color);
+    padding: 80px 40px 40px;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+    color: var(--text-color);
 }
 
 .home-theme-toggler {
-  position: fixed;
-  bottom: 30px;
-  left: 30px;
-  z-index: 1000;
+    position: fixed;
+    bottom: 30px;
+    left: 30px;
+    z-index: 1000;
 }
 
 .page-header {
-  text-align: center;
-  margin-bottom: 40px;
-  position: relative;
+    text-align: center;
+    margin-bottom: 40px;
+    position: relative;
 }
 
 .page-title {
-  font-size: 40px;
-  margin-bottom: 16px;
-  font-weight: 600;
-  background: var(--title-gradient);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  letter-spacing: 2px;
-  text-shadow: var(--title-shadow);
+    font-size: 40px;
+    margin-bottom: 16px;
+    font-weight: 600;
+    background: var(--title-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: 2px;
+    text-shadow: var(--title-shadow);
 }
 
 .description {
-  font-size: 18px;
-  opacity: 0.95;
-  margin-bottom: 20px;
-  font-style: italic;
-  max-width: 800px;
-  margin: 0 auto 30px;
-  text-shadow: var(--title-shadow);
-  color: var(--text-secondary);
+    font-size: 18px;
+    opacity: 0.95;
+    margin-bottom: 20px;
+    font-style: italic;
+    max-width: 800px;
+    margin: 0 auto 30px;
+    text-shadow: var(--title-shadow);
+    color: var(--text-secondary);
 }
 
 .divider {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 20px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px 0;
 }
 
 .divider::before,
 .divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--divider-color);
-  margin: 0 15px;
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--divider-color);
+    margin: 0 15px;
 }
 
 /* 内容布局 */
 .content-layout {
-  display: flex;
-  gap: 30px;
+    display: flex;
+    gap: 30px;
 }
 
 .main-column {
-  flex: 1;
-  min-width: 0;
+    flex: 1;
+    min-width: 0;
 }
 
 .side-column {
-  width: 340px;
-  flex-shrink: 0;
+    width: 340px;
+    flex-shrink: 0;
 }
 
 /* 移动端显示隐藏控制 */
 .mobile-first {
-  display: none;
+    display: none;
 }
 
 .desktop-only {
-  display: block;
+    display: block;
 }
 
 /* 内容容器样式更新为与Index页面一致 */
 .section-container {
-  background-color: var(--bg-primary);
-  border-radius: 12px;
-  padding: 25px;
-  margin-bottom: 30px;
-  backdrop-filter: blur(10px);
-  box-shadow: var(--card-shadow);
-  border: 1px solid var(--card-border);
-  color: var(--text-color);
-  transition: all 0.3s ease;
+    background-color: var(--bg-primary);
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 30px;
+    backdrop-filter: blur(10px);
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--card-border);
+    color: var(--text-color);
+    transition: all 0.3s ease;
 }
 
 .section-container:hover {
-  background-color: var(--bg-secondary);
-  transform: var(--card-hover-transform);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    background-color: var(--bg-secondary);
+    transform: var(--card-hover-transform);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 .section-title {
@@ -347,15 +329,15 @@ const paginationData = ref({
 
 /* 文章列表 */
 .filter-bar {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-  margin-bottom: 20px;
-  align-items: center;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    align-items: center;
 }
 
 .search-input {
-  width: 220px;
+    width: 220px;
 }
 
 .articles-container {
@@ -379,8 +361,8 @@ const paginationData = ref({
 }
 
 .article-card:hover {
-  transform: var(--card-hover-transform);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    transform: var(--card-hover-transform);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
 
 /* 封面图 */
@@ -393,14 +375,14 @@ const paginationData = ref({
 }
 
 .article-cover img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.5s ease;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
 }
 
 .article-card:hover .article-cover img {
-  transform: scale(1.05);
+    transform: scale(1.05);
 }
 
 .article-category-tag {
@@ -478,15 +460,15 @@ const paginationData = ref({
 }
 
 @media (max-width: 768px) {
-  .page-content {
-    padding: 60px 20px 20px;
-  }
+    .page-content {
+        padding: 60px 20px 20px;
+    }
 
-  /* 移动端布局调整 */
-  .mobile-first {
-    display: block;
-    margin-bottom: 24px;
-  }
+    /* 移动端布局调整 */
+    .mobile-first {
+        display: block;
+        margin-bottom: 24px;
+    }
 
     .desktop-only {
         display: none;
@@ -500,9 +482,9 @@ const paginationData = ref({
         /* 减小内边距使卡片更紧凑 */
     }
 
-  .page-title {
-    font-size: 32px;
-  }
+    .page-title {
+        font-size: 32px;
+    }
 
     .article-card {
         flex-direction: column;

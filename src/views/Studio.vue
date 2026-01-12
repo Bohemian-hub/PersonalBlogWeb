@@ -18,7 +18,8 @@
                             谁还没点事做了
                         </h2>
                         <div class="articles-container">
-                            <div class="article-card" v-for="article in techArticles" :key="article.id">
+                            <div class="article-card" v-for="article in techArticles" :key="article.id"
+                                @click="goToArticle(article.id)" style="cursor: pointer;">
                                 <div class="article-cover">
                                     <img :src="article.coverImg" :alt="article.title" />
                                     <span class="article-category-tag">{{ article.category }}</span>
@@ -60,7 +61,10 @@
     <div class="global-bg"></div>
 </template>
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { getArticles } from '../api/article'
+import { baseUrl } from '@/common/config'
 import {
     Document, ArrowRight, Timer
 } from '@element-plus/icons-vue'
@@ -72,8 +76,47 @@ import { currentTheme } from '../stores/themeStore'// 分页数据
 const paginationData = ref({
     total: 42,
     pageSize: 6
-})// 个人技术资料 (已删除)// 技术文章
-const techArticles = ref([
+})
+// 个人技术资料 (已删除)
+const router = useRouter()
+
+// 技术文章
+const techArticles = ref([])
+
+const loadArticles = async () => {
+    try {
+        const res = await getArticles({
+            page: 1,
+            page_size: paginationData.value.pageSize,
+            status: 'published',
+            category: 'studio'
+        });
+        if (res && res.items) {
+            techArticles.value = res.items.map(item => ({
+                id: item.id,
+                title: item.title,
+                excerpt: item.summary,
+                date: item.created_at,
+                coverImg: item.cover_image_url ? baseUrl + item.cover_image_url : '',
+                category: item.category,
+                readTime: Math.ceil((item.summary?.length || 100) / 300) + 1
+            }));
+            paginationData.value.total = res.total;
+        }
+    } catch (e) {
+        console.error("加载文章列表失败", e);
+    }
+}
+
+const goToArticle = (id) => {
+    router.push(`/article/${id}`);
+}
+
+onMounted(() => {
+    loadArticles()
+})
+
+const techArticles_unused = ref([
     {
         id: 1,
         title: 'Vue3 Composition API实战经验',

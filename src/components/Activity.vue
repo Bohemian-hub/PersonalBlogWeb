@@ -22,7 +22,7 @@
                                         }
                                     ]"
                                     :style="dayData.activity && backgroundActivity[dayData.activity.mood] ? { background: backgroundActivity[dayData.activity.mood] } : {}"
-                                    v-bind="dayData.activity ? { 'data-tooltip': dayData.activity.desc } : {}">
+                                    v-bind="dayData.activity ? { 'data-tooltip': dayData.activity.description || dayData.activity.desc } : {}">
                                     {{ dayData.day }}
                                 </div>
                             </div>
@@ -46,11 +46,25 @@
 <script setup>
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { currentTheme } from '../stores/themeStore'
+import { getActivities } from '../api/activity'
 
 const weeks = computed(() => {
     return ['日', '一', '二', '三', '四', '五', '六']
 })
-const recentActivity = ref([{ 'date': '2025-01-01', 'mood': '玩耍', 'desc': '今天运动了' }, { 'date': '2025-01-02', 'mood': '工作', 'desc': '今天参加了会议' }, { 'date': '2025-01-03', 'mood': '玩耍', 'desc': '今天运动了' }, { 'date': '2025-01-04', 'mood': '学习', 'desc': '今天阅读了文献' }, { 'date': '2025-01-05', 'mood': '躺平', 'desc': '今天休息了一天' }, { 'date': '2025-01-06', 'mood': '玩耍', 'desc': '今天玩了游戏' }, { 'date': '2025-01-07', 'mood': '玩耍', 'desc': '今天去了公园' }, { 'date': '2025-01-08', 'mood': '躺平', 'desc': '今天逛了街' }, { 'date': '2025-01-09', 'mood': '学习', 'desc': '今天研究了新课题' }, { 'date': '2025-01-10', 'mood': '学习', 'desc': '今天阅读了文献' }, { 'date': '2025-01-11', 'mood': '学习', 'desc': '今天做了实验' }, { 'date': '2025-01-12', 'mood': '玩耍', 'desc': '今天去了公园' }, { 'date': '2025-01-13', 'mood': '工作', 'desc': '今天完成了项目报告' }, { 'date': '2025-01-14', 'mood': '学习', 'desc': '今天分析了数据' }, { 'date': '2025-01-15', 'mood': '学习', 'desc': '今天做了练习题' }, { 'date': '2025-01-16', 'mood': '玩耍', 'desc': '今天去了公园' }, { 'date': '2025-01-17', 'mood': '玩耍', 'desc': '今天去了公园' }, { 'date': '2025-01-18', 'mood': '学习', 'desc': '今天研究了新课题' }, { 'date': '2025-01-19', 'mood': '激动', 'desc': '今天完成了重要任务' }, { 'date': '2025-01-20', 'mood': '学习', 'desc': '今天学习了新知识' }, { 'date': '2025-01-21', 'mood': '玩耍', 'desc': '今天去了公园' }, { 'date': '2025-01-22', 'mood': '躺平', 'desc': '今天休息了一天' }, { 'date': '2025-01-23', 'mood': '躺平', 'desc': '今天睡了懒觉' }, { 'date': '2025-01-24', 'mood': '玩耍', 'desc': '今天和朋友聚会' }, { 'date': '2025-01-25', 'mood': '躺平', 'desc': '今天休息了一天' }, { 'date': '2025-01-26', 'mood': '玩耍', 'desc': '今天去了公园' }, { 'date': '2025-01-27', 'mood': '学习', 'desc': '今天做了实验' }, { 'date': '2025-01-28', 'mood': '躺平', 'desc': '今天逛了街' }, { 'date': '2025-01-29', 'mood': '玩耍', 'desc': '今天玩了游戏' }, { 'date': '2025-01-30', 'mood': '学习', 'desc': '今天研究了新课题' }, { 'date': '2025-01-31', 'mood': '工作', 'desc': '今天完成了项目报告' }, { 'date': '2025-02-01', 'mood': '学习', 'desc': '今天参加了培训' }, { 'date': '2025-02-02', 'mood': '学习', 'desc': '今天写了论文' }, { 'date': '2025-02-03', 'mood': '玩耍', 'desc': '今天运动了' }, { 'date': '2025-02-04', 'mood': '躺平', 'desc': '今天逛了街' }, { 'date': '2025-02-05', 'mood': '玩耍', 'desc': '今天和朋友聚会' }, { 'date': '2025-02-06', 'mood': '工作', 'desc': '今天处理了邮件' }, { 'date': '2025-02-07', 'mood': '激动', 'desc': '今天赢得了比赛' }, { 'date': '2025-02-08', 'mood': '躺平', 'desc': '今天逛了街' }, { 'date': '2025-02-09', 'mood': '激动', 'desc': '今天收到了好消息' }, { 'date': '2025-02-10', 'mood': '学习', 'desc': '今天做了实验' }, { 'date': '2025-02-11', 'mood': '躺平', 'desc': '今天逛了街' }, { 'date': '2025-02-12', 'mood': '激动', 'desc': '今天赢得了比赛' }, { 'date': '2025-02-13', 'mood': '躺平', 'desc': '今天逛了街' }, { 'date': '2025-02-14', 'mood': '玩耍', 'desc': '今天去了公园' }, { 'date': '2025-02-15', 'mood': '躺平', 'desc': '今天休息了一天' }, { 'date': '2025-02-16', 'mood': '躺平', 'desc': '今天逛了街' }, { 'date': '2025-02-17', 'mood': '工作', 'desc': '今天与客户沟通' }, { 'date': '2025-02-18', 'mood': '躺平', 'desc': '今天看了电影' }, { 'date': '2025-02-19', 'mood': '学习', 'desc': '今天参加了培训' }, { 'date': '2025-02-20', 'mood': '躺平', 'desc': '今天休息了一天' }, { 'date': '2025-02-21', 'mood': '玩耍', 'desc': '今天去了公园' }, { 'date': '2025-02-22', 'mood': '躺平', 'desc': '今天休息了一天' }, { 'date': '2025-02-23', 'mood': '工作', 'desc': '今天处理了邮件' }, { 'date': '2025-02-24', 'mood': '工作', 'desc': '今天与客户沟通' }, { 'date': '2025-02-25', 'mood': '学习', 'desc': '今天阅读了文献' }, { 'date': '2025-02-26', 'mood': '激动', 'desc': '今天参加了活动' }, { 'date': '2025-02-27', 'mood': '学习', 'desc': '今天做了实验' }, { 'date': '2025-02-28', 'mood': '玩耍', 'desc': '今天运动了' }, { 'date': '2025-03-01', 'mood': '激动', 'desc': '今天参加了活动' }, { 'date': '2025-03-02', 'mood': '工作', 'desc': '今天参加了会议' }, { 'date': '2025-03-03', 'mood': '激动', 'desc': '今天完成了重要任务' }, { 'date': '2025-03-04', 'mood': '学习', 'desc': '今天参加了培训' }, { 'date': '2025-03-05', 'mood': '玩耍', 'desc': '今天和朋友聚会' }, { 'date': '2025-03-06', 'mood': '学习', 'desc': '今天做了练习题' }, { 'date': '2025-03-07', 'mood': '学习', 'desc': '今天研究了新课题' }, { 'date': '2025-03-08', 'mood': '激动', 'desc': '今天收到了好消息' }, { 'date': '2025-03-09', 'mood': '躺平', 'desc': '今天逛了街' }, { 'date': '2025-03-10', 'mood': '学习', 'desc': '今天做了实验' }, { 'date': '2025-03-11', 'mood': '工作', 'desc': '今天与客户沟通' }, { 'date': '2025-03-12', 'mood': '学习', 'desc': '今天学习了新知识' }, { 'date': '2025-03-13', 'mood': '躺平', 'desc': '今天睡了懒觉' }, { 'date': '2025-03-14', 'mood': '工作', 'desc': '今天完成了项目报告' }, { 'date': '2025-03-15', 'mood': '工作', 'desc': '今天完成了项目报告' }, { 'date': '2025-03-16', 'mood': '学习', 'desc': '今天分析了数据' }, { 'date': '2025-03-17', 'mood': '学习', 'desc': '今天参加了培训' }, { 'date': '2025-03-18', 'mood': '玩耍', 'desc': '今天和朋友聚会' }, { 'date': '2025-03-19', 'mood': '躺平', 'desc': '今天睡了懒觉' }, { 'date': '2025-03-20', 'mood': '激动', 'desc': '今天完成了重要任务' }, { 'date': '2025-03-21', 'mood': '玩耍', 'desc': '今天运动了' }, { 'date': '2025-03-22', 'mood': '躺平', 'desc': '今天休息了一天' }, { 'date': '2025-03-23', 'mood': '学习', 'desc': '今天参加了培训' }, { 'date': '2025-03-24', 'mood': '激动', 'desc': '今天完成了重要任务' }, { 'date': '2025-03-25', 'mood': '玩耍', 'desc': '今天玩了游戏' }, { 'date': '2025-03-26', 'mood': '工作', 'desc': '今天处理了邮件' }, { 'date': '2025-03-27', 'mood': '学习', 'desc': '今天做了练习题' }, { 'date': '2025-03-28', 'mood': '工作', 'desc': '今天与客户沟通' }, { 'date': '2025-03-29', 'mood': '学习', 'desc': '今天参加了培训' }, { 'date': '2025-03-30', 'mood': '躺平', 'desc': '今天看了电影' }, { 'date': '2025-03-31', 'mood': '玩耍', 'desc': '今天玩了游戏' }, { 'date': '2025-04-01', 'mood': '学习', 'desc': '今天做了练习题' }, { 'date': '2025-04-02', 'mood': '躺平', 'desc': '今天看了电影' }, { 'date': '2025-04-03', 'mood': '学习', 'desc': '今天写了论文' }, { 'date': '2025-04-04', 'mood': '学习', 'desc': '今天做了实验' }, { 'date': '2025-04-05', 'mood': '工作', 'desc': '今天完成了项目报告' }, { 'date': '2025-04-06', 'mood': '学习', 'desc': '今天分析了数据' }, { 'date': '2025-04-07', 'mood': '躺平', 'desc': '今天睡了懒觉' }, { 'date': '2025-04-08', 'mood': '玩耍', 'desc': '玩耍 2' }])
+const recentActivity = ref([])
+
+// 加载活动数据
+const loadActivities = async () => {
+    try {
+        const res = await getActivities({ limit: 365 }); // 获取最近一年的数据
+        if (res) {
+            recentActivity.value = res;
+        }
+    } catch (error) {
+        console.error('Failed to load activities:', error);
+    }
+}
+
 //每个 mood 和格子背景颜色的对应表
 const darkMoodColors = {
     '工作': 'linear-gradient(135deg, rgba(85, 150, 95, 0.75), rgba(70, 130, 80, 0.7))',     // 柔和森林绿
@@ -97,6 +111,7 @@ const checkDeviceType = () => {
 onMounted(() => {
     checkDeviceType() // 初始检查
     window.addEventListener('resize', checkDeviceType)
+    loadActivities() // 加载数据
 })
 
 onUnmounted(() => {
@@ -239,7 +254,7 @@ const getDaysForColumn = (col, daysInMonth, year, month) => {
     --activity-text-secondary: rgba(0, 0, 0, 0.6);
     --activity-border-color: rgba(0, 0, 0, 0.1);
     --activity-bg-primary: rgba(245, 245, 250, 0.7);
-    --activity-bg-secondary: rgba(240, 240, 245, 0.6); 
+    --activity-bg-secondary: rgba(240, 240, 245, 0.6);
     --activity-bg-hover: rgba(235, 235, 240, 0.9);
     --activity-month-bg: rgba(255, 255, 255, 0.75);
     --activity-day-cell-bg: rgba(0, 0, 0, 0.05);

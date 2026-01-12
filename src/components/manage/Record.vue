@@ -146,7 +146,7 @@ const currentArticleId = ref(null); // 新增：当前文章ID，用于追踪新
 const categories = [
     { value: 'research', label: '我的文章' },
     { value: 'studio', label: '我的项目' },
-    { value: 'play', label: '朋友圈' },
+    { value: 'play', label: '朋友圈（开发中）' },
 ];
 
 const tags = [

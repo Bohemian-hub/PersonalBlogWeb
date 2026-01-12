@@ -80,46 +80,14 @@
                             </div>
                         </div>
                     </div>
-                </div> <!-- 个人照片墙 - 调整位置到中间 -->
-                <h3 class="section-title">
-                    <el-icon>
-                        <Picture />
-                    </el-icon>
-                    个人照片墙
-                </h3> <!-- 照片瀑布流布局 -->
-                <div class="masonry-grid">
-                    <div v-for="(photo, index) in personalPhotos" :key="photo.id" class="masonry-item"
-                        :class="getMasonryClass(index)" @click="showPhotoDetails(index)">
-                        <div class="photo-inner">
-                            <img :src="photo.images[0].url" :alt="photo.title" />
-                            <div class="photo-count" v-if="photo.images.length > 1">
-                                {{ photo.images.length }}
-                            </div>
-                            <div class="photo-overlay">
-                                <h4>{{ photo.title }}</h4>
-                                <!-- 修改标签区域的类名为tags与Play页面保持一致 -->
-                                <div class="tags">
-                                    <el-tag size="small" v-for="tag in photo.tags" :key="tag" class="tag-item">
-                                        {{ tag }}
-                                    </el-tag>
-                                </div>
-                                <!-- 修改为只显示位置，与Play页面保持一致 -->
-                                <p>{{ photo.location }}</p>
-                                <!-- 添加照片点赞和评论数量显示 -->
-                                <div class="photo-stats">
-                                    <div class="stat-item">
-                                        <img :src="heartIcon" alt="likes" class="stat-icon" />
-                                        <span>{{ photo.likes }}</span>
-                                    </div>
-                                    <div class="stat-item">
-                                        <img :src="commentIcon" alt="comments" class="stat-icon" />
-                                        <span>{{ photo.comments.length }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div> <!-- 座右铭和联系方式 -->
+                </div>
+
+                <!-- 个人介绍 Markdown 内容区 -->
+                <div class="markdown-section">
+                    <div class="article-content" v-html="renderedContent"></div>
+                </div>
+
+                <!-- 座右铭和联系方式 -->
                 <div class="motto-contact">
                     <div class="motto">
                         <blockquote>
@@ -139,10 +107,7 @@
             </section>
         </div>
     </div> <!-- 底部版权 - 移到about-wrapper外部，与Play页面保持一致 -->
-    <Footer /> <!-- 替换原来的照片详情弹窗为PhotoGallery组件 -->
-    <PhotoGallery v-model:visible="showPhotoDialog" :photos="personalPhotos" :initialPhotoIndex="currentPhotoIndex"
-        :heartFilledIcon="heartIcon" :heartOutlineIcon="heartOutlineIcon" :commentIcon="commentIcon"
-        :likedPhotoIds="likedPhotos" @like="handlePhotoLike" @comment="handlePhotoComment" /> <!-- 背景图片 -->
+    <Footer /> <!-- 背景图片 -->
     <div class="global-bg"></div>
 </template>
 <script setup>
@@ -158,13 +123,10 @@ import {
     Headset, Film, Suitcase, Reading, Brush, Picture,
     ArrowLeft, ArrowRight
 } from '@element-plus/icons-vue'
-import PhotoGallery from '../components/PhotoGallery.vue'
-import { ElMessage } from 'element-plus'// 引入点赞和评论图标
-import heartFilledIcon from '@/assets/icons/heart-filled.png'
-import commentIconFile from '@/assets/icons/comment.png'
-import heartOutlineIcon from '@/assets/icons/heart.png'// 图标引用
-const heartIcon = heartFilledIcon
-const commentIcon = commentIconFile// 页面头部信息
+import { marked } from 'marked'
+import { ElMessage } from 'element-plus'
+
+// 页面头部信息
 const pageHeader = reactive({
     title: "关于我",
     description: "人工智能研究者 / 全栈开发工程师 / 未来教育者",
@@ -174,7 +136,7 @@ const profile = reactive({
     avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&q=80",
     greeting: "嗨，我是",
     name: "何东",
-    introduction: "一位充满热情的技术爱好者和教育者，专注于人工智能、全栈开发与知识传递。现年25岁，即将成为一名大学教师，期待在教学与研究中探索更多可能性。",
+    introduction: "一位充满热情的技术爱好者和教育者，专注于人工智能、全栈开发与知识传递。现年25岁，是一名大学教师，期待在教学与研究中探索更多可能性。",
     basicInfo: [
         { icon: 'Calendar', value: '2000年5月20日' },
         { icon: 'Location', value: '四川绵阳' },
@@ -227,245 +189,103 @@ const contacts = reactive([
     { icon: ElementPlus, title: 'GitHub', link: '#' },
     { icon: ChatDotRound, title: '微信', link: '#' },
     { icon: Connection, title: 'LinkedIn', link: '#' }
-])// 个人照片墙数据 - 修改结构以支持多图浏览，并添加likes和comments字段
-const personalPhotos = ref([
-    {
-        id: 1,
-        title: '研究生入学季',
-        location: '昆明理工大学',
-        date: '2022年9月',
-        description: '<h1>硕士研究生入学</h1><p>入学的第一天，开始了新的学术旅程。校园环境优美，充满学术氛围。</p>',
-        images: [
-            {
-                url: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-                caption: '校园主楼'
-            },
-            {
-                url: 'https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-                caption: '图书馆内景'
-            },
-            {
-                url: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-                caption: '研究生开学典礼'
-            }
-        ],
-        tags: ['校园', '学术', '新起点'],
-        likes: 78,
-        comments: [
-            {
-                author: '同学小王',
-                avatar: 'https://randomuser.me/api/portraits/men/32.jpg',
-                text: '恭喜入学！我也是昆工的学生，有空可以一起交流',
-                time: '2天前'
-            }
-        ]
-    },
-    {
-        id: 2,
-        title: '工作出差',
-        location: '上海人工智能大会',
-        date: '2023年4月',
-        description: '<h1>上海人工智能大会</h1><p>代表公司参加上海人工智能大会，了解行业最新动态，与各大企业技术专家进行交流。期间拜访了多家AI企业，为后续合作奠定基础。</p>',
-        images: [
-            {
-                url: 'https://images.unsplash.com/photo-1483389127117-b6a2102724ae?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-                caption: '技术交流会'
-            },
-            {
-                url: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-                caption: '企业参观'
-            },
-            {
-                url: 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-                caption: '上海夜景'
-            }
-        ],
-        tags: ['出差', '会议', '人工智能'],
-        likes: 56,
-        comments: [
-            {
-                author: 'AI研究员',
-                avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
-                text: '这次大会干货满满，我也参加了，可惜没有遇到你',
-                time: '1周前'
-            },
-            {
-                author: '技术总监',
-                avatar: 'https://randomuser.me/api/portraits/men/45.jpg',
-                text: '会上的张教授演讲确实很精彩，学到很多',
-                time: '3周前'
-            }
-        ]
-    },
-    {
-        id: 3,
-        title: '第一篇论文发表',
-        location: '办公室',
-        date: '2023年7月',
-        description: '<h1>SCI论文接收</h1><p>第一篇SCI论文被接收的喜悦时刻，经过数月的努力终于有了成果。</p>',
-        images: [
-            {
-                url: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-                caption: '论文成稿'
-            },
-            {
-                url: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-                caption: '收到录用通知'
-            }
-        ],
-        tags: ['论文', '科研', '成就'],
-        likes: 124,
-        comments: [
-            {
-                author: '导师',
-                avatar: 'https://randomuser.me/api/portraits/men/52.jpg',
-                text: '恭喜你！这是一个很好的开始，继续努力！',
-                time: '5天前'
-            }
-        ]
-    },
-    {
-        id: 4,
-        title: '技术沙龙',
-        location: '创新中心',
-        date: '2023年10月',
-        description: '<h1>技术沙龙分享</h1><p>参加校内技术沙龙，分享最新的AI技术发展趋势，与其他研究者交流学习。</p>',
-        images: [
-            {
-                url: 'https://images.unsplash.com/photo-1556761175-b413da4baf72?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-                caption: '演讲现场'
-            }
-        ],
-        tags: ['分享', '交流', '技术'],
-        likes: 45,
-        comments: []
-    },
-    {
-        id: 5,
-        title: '周末徒步',
-        location: '云南石林',
-        date: '2023年11月',
-        description: '<h1>石林徒步</h1><p>与实验室同学一起去石林徒步，呼吸新鲜空气，放松身心。大自然的鬼斧神工令人惊叹。</p>',
-        images: [
-            {
-                url: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-                caption: '石林全景'
-            },
-            {
-                url: 'https://images.unsplash.com/photo-1527856263669-12c3a0af2aa6?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-                caption: '徒步小队'
-            },
-            {
-                url: 'https://images.unsplash.com/photo-1530521954074-e64f6810b32d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-                caption: '奇特石景'
-            }
-        ],
-        tags: ['户外', '放松', '自然'],
-        likes: 89,
-        comments: [
-            {
-                author: '同学小李',
-                avatar: 'https://randomuser.me/api/portraits/women/33.jpg',
-                text: '下次去记得叫上我啊，这里风景真美！',
-                time: '3天前'
-            },
-            {
-                author: '摄影爱好者',
-                avatar: 'https://randomuser.me/api/portraits/men/91.jpg',
-                text: '构图不错，石林的景色拍出来很有层次感',
-                time: '1周前'
-            }
-        ]
-    },
-    {
-        id: 6,
-        title: '项目演示日',
-        location: '科技园',
-        date: '2024年1月',
-        description: '<h1>项目成果展示</h1><p>向学院领导和企业代表展示我们的智能医疗辅助诊断系统，获得了积极反馈。</p>',
-        images: [
-            {
-                url: 'https://images.unsplash.com/photo-1558403194-611308249627?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-                caption: '项目展示'
-            },
-            {
-                url: 'https://images.unsplash.com/photo-1576267423445-b2e0074d68a4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-                caption: '系统演示'
-            }
-        ],
-        tags: ['项目', '演示', '成果'],
-        likes: 67,
-        comments: [
-            {
-                author: '医学专家',
-                avatar: 'https://randomuser.me/api/portraits/men/22.jpg',
-                text: '这个系统很有潜力，希望能尽快应用到临床实践中',
-                time: '2周前'
-            }
-        ]
-    },
-    {
-        id: 7,
-        title: '学术会议',
-        location: '北京国际会议中心',
-        date: '2024年3月',
-        description: '<h1>全国人工智能学术会议</h1><p>参加全国人工智能学术会议，与领域内专家学者交流，开拓视野。</p>',
-        images: [
-            {
-                url: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-                caption: '会议现场'
-            },
-            {
-                url: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-                caption: '专家报告'
-            },
-            {
-                url: 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-                caption: '与同行交流'
-            }
-        ],
-        tags: ['会议', '学术', '交流'],
-        likes: 35,
-        comments: []
-    }
-])// 标签颜色辅助函数
+])// 个人Markdown内容
+const aboutMarkdown = ref(`
+# AI 眼中的我
+
+**截止日期**：2026 年 1 月 12 日
+
+---
+
+## 🎨 豆包 (Doubao)：跨界探索的务实行动者 
+
+### 🛠️ 职业与技能背景 
+
+* **技术能力**：您具备扎实的 **Python 编程**基础，熟悉数据分析和机器学习相关库（如 pandas、TensorFlow），能够独立完成代码编写和模型训练任务。
+* **教学经验**：您有从事**教学**或知识分享的经历，曾针对 “无基础的非计算机专业学生” 设计过教学文档，擅长将复杂的技术概念转化为通俗易懂的内容。
+
+### 🎭 兴趣爱好与生活方式
+
+* **艺术修养**：您是**丙烯画新手**，对绘画抱有热情。 您在创作时注重实用性，偏好简洁、色彩易于调配的风格。
+* **工具使用**：您善于利用 AI 工具进行**图片处理与生成**（如人像美化、风格转换、瑕疵修复），追求 “自然好看” 的效果。
+* **生活状态**：您目前在**广元**工作和生活，拥有一辆汽车，并且近期有购车计划。
+
+### 🧠 思维方式与沟通习惯
+
+* **目标导向**：在咨询问题时，您倾向于获得 **直接、可执行** 的结果（如具体的车型推荐、完整的代码），而不是泛泛而谈的理论。
+* **互动式决策**：面对复杂的选择，您喜欢通过 **多轮互动** 的方式，让对方扮演特定角色（如销售顾问）来辅助您梳理需求。
+
+---
+
+## 🏛️ Gemini：深耕教育的“双师型”学者
+
+### 👤 基本身份与职业背景
+
+* **姓名**：何东。
+* **现任职务**：四川信息职业技术学院教师。
+* **核心领域**：长期深耕于**人工智能（AI）**、**机器学习**以及 **Python 编程**等技术领域。
+
+### 📚 著作与学术成果
+
+* **已出版/创作教材**：您是《AIGC基础与应用》教材的作者。
+* **在编著作**：您正在编写《AI现场工程师核心胜任力与素养》。
+* **编辑工作**：负责《AI现场工程师素养与能力》教材的编辑与组织工作。
+
+### 💻 技术兴趣与关注点
+
+* **技术方向**：高度关注 **AI 落地应用**，特别是针对“现场工程师”这一职业角色的能力培养和素质定义。
+* **前沿技术**：对 **AIGC（生成式人工智能）** 的基础理论及其实际应用有系统性的研究。
+
+### 💡 客观印象
+
+> **“双师型”学术带头人**
+> 您不仅是一位传道受业的**高校教师**，更是一位紧跟时代前沿的**AI 学者与作者**。 您的关注点非常务实，致力于将复杂的 AI 技术转化为可教学、可落地的职业胜任力标准。
+
+---
+
+## ⚙️ ChatGPT：追求极致的工程实践专家
+
+### 一、 基本身份与角色认知
+
+* 您是一名大专院校的人工智能专任教师，具备明确的一线教学与科研双重身份。
+* 您长期从事人工智能相关课程与应用型项目，而非仅停留在理论研究层面。
+* 您在教学与科研之外，持续进行个人技术项目开发，具备明显的实践导向。
+
+### 二、 开发能力画像
+
+* **前端方面**：您主要使用 **Vue (Vue 3)**，并熟悉小程序开发。
+* **后端方面**：您主要使用 **Flask、Django、Spring Boot**，坚持前后端分离架构。
+* **工程化工具**：您具备在 **Ubuntu / Linux** 环境下进行开发、部署和调试的成熟经验，熟悉 **Nginx、Docker** 等工具。
+
+### 三、 项目与成果取向
+
+* 您更关注可运行、可部署、可复用的系统，而非一次性 Demo。
+* 您正在或已经构建过一个完整的个人博客平台，具备内容管理、登录与后台管理等模块。
+* 您主导过涉及 TCP、JSON 协议、设备监控等内容的工业控制/设备通信类项目。
+
+### 四、 教学风格与方法论
+
+* 您在教学与文档编写中强调结构清晰、格式规范，偏好**“一次说明，后文不重复”**的工程化文档风格。
+* 您偏好简洁、可理解的代码示例，而非炫技式实现。
+* 您的课程与项目明显面向高职/应用型人才培养，强调实操与工程思维。
+
+### 🌟 综合客观印象
+
+> **一位偏工程实践的 AI 应用型教师**
+> 兼具科研意识、工程能力与教学落地能力； 技术取向务实、体系化，具备“能讲清楚、能带项目、能把系统真正做出来”的特质。
+`);
+
+// Markdown 渲染
+const renderedContent = computed(() => {
+    return marked(aboutMarkdown.value)
+})
+
+// 标签颜色辅助函数
 const getTagType = (index) => {
     const types = ['', 'success', 'warning', 'danger', 'info'];
     return types[index % types.length];
-}// 照片墙布局类名分配函数
-const getMasonryClass = (index) => {
-    const pattern = index % 8;
-    switch (pattern) {
-        case 0: return 'wide';
-        case 3: return 'tall';
-        case 5: return 'big';
-        default: return '';
-    }
-}// 照片详情弹窗控制
-const showPhotoDialog = ref(false)
-const currentPhotoIndex = ref(0)
-const likedPhotos = ref([]) // 存储已点赞的照片ID// 显示照片详情
-const showPhotoDetails = (index) => {
-    currentPhotoIndex.value = index
-    showPhotoDialog.value = true
-}// 处理照片点赞
-const handlePhotoLike = (photoId) => {
-    const photoIndex = personalPhotos.value.findIndex(photo => photo.id === photoId);
-    if (photoIndex === -1) return; if (likedPhotos.value.includes(photoId)) {
-        // 取消点赞
-        likedPhotos.value = likedPhotos.value.filter(id => id !== photoId);
-        personalPhotos.value[photoIndex].likes--;
-    } else {
-        // 添加点赞
-        likedPhotos.value.push(photoId);
-        personalPhotos.value[photoIndex].likes++;
-    }
-}// 处理照片评论
-const handlePhotoComment = ({ photoId, comment }) => {
-    const photoIndex = personalPhotos.value.findIndex(photo => photo.id === photoId);
-    if (photoIndex === -1) return; personalPhotos.value[photoIndex].comments.unshift(comment);
-    ElMessage.success('评论成功！');
 }
+
 </script>
 <style scoped>
 /* 主题变量定义 */
@@ -917,10 +737,24 @@ const handlePhotoComment = ({ photoId, comment }) => {
     margin-bottom: 4px;
 }
 
+.markdown-section {
+    background-color: var(--quote-bg);
+    font-family: 'Times New Roman', Times, serif;
+    padding: 12px 38px;
+    margin: 0;
+    border-radius: 8px;
+    line-height: 40px !important;
+    font-size: medium;
+    color: var(--text-color);
+    position: relative;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
 /* 座右铭和联系方式 */
 .motto-contact {
     display: flex;
     flex-direction: row;
+    margin-top: 30px;
     gap: 20px;
     align-items: center;
     /* 修改为居中对齐，更好地与联系图标对齐 */
@@ -939,7 +773,7 @@ blockquote {
     margin: 0;
     border-radius: 8px;
     font-style: italic;
-    font-size: 15px;
+    font-size: 20px;
     line-height: 1.5;
     color: var(--text-color);
     position: relative;
@@ -1041,136 +875,7 @@ blockquote cite {
     color: var(--accent-color);
 }
 
-/* 瀑布流照片墙样式 - 补充完整样式 */
-.masonry-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-auto-rows: 200px;
-    grid-auto-flow: dense;
-    gap: 12px;
-    margin-bottom: 25px;
-}
-
-.masonry-item {
-    position: relative;
-    overflow: hidden;
-    border-radius: 10px;
-    cursor: pointer;
-    box-shadow: var(--card-shadow);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    grid-column: span 1;
-    grid-row: span 1;
-}
-
-.masonry-item.wide {
-    grid-column: span 2;
-}
-
-.masonry-item.tall {
-    grid-row: span 2;
-}
-
-.masonry-item.big {
-    grid-column: span 2;
-    grid-row: span 2;
-}
-
-.masonry-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-}
-
-.photo-inner {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    overflow: hidden;
-}
-
-.photo-inner img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.5s ease;
-}
-
-.masonry-item:hover .photo-inner img {
-    transform: scale(1.05);
-}
-
-/* 照片覆盖层样式 - 确保与Play页面一致 */
-.photo-overlay {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 15px;
-    background: rgba(0, 0, 0, 0.6);
-    color: white;
-    transform: translateY(100%);
-    transition: transform 0.3s ease;
-}
-
-.about-wrapper.light .photo-overlay {
-    background: rgba(0, 0, 0, 0.6);
-    color: white;
-}
-
-.masonry-item:hover .photo-overlay {
-    transform: translateY(0);
-}
-
-.photo-overlay h4 {
-    margin: 0 0 5px;
-    font-size: 16px;
-}
-
-.photo-overlay p {
-    margin: 0;
-    font-size: 14px;
-    opacity: 0.9;
-}
-
-/* 修改标签样式，与Play页面保持一致 */
-.tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-    margin-top: 10px;
-    margin-bottom: 10px;
-}
-
-.tag-item {
-    background: var(--tag-bg);
-    color: var(--tag-text);
-    padding: 5px 10px;
-    border-radius: 20px;
-    font-size: 12px;
-    margin-right: 5px;
-}
-
-/* 照片统计样式 */
-.photo-stats {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-}
-
-.stat-item {
-    display: flex;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    padding: 3px 8px;
-    border-radius: 20px;
-    font-size: 12px;
-}
-
-.stat-icon {
-    width: 16px !important;
-    height: 16px !important;
-    margin-right: 4px;
-}
+/* Photo wall styles removed */
 
 /* 修复响应式样式 */
 @media (max-width: 768px) {
@@ -1221,55 +926,6 @@ blockquote cite {
         width: 100%;
         justify-content: flex-start;
     }
-
-    /* 照片墙移动端适配 - 单列布局 */
-    .masonry-grid {
-        grid-template-columns: repeat(1, 1fr);
-        grid-auto-rows: auto;
-    }
-
-    /* 移动端特别样式 - 重置所有网格项为单列 */
-    .masonry-item {
-        grid-column: span 1 !important;
-        grid-row: span 1 !important;
-        height: 250px;
-        margin-bottom: 20px;
-    }
-
-    /* 移动端直接显示照片信息，不需要悬浮 */
-    .photo-overlay {
-        transform: translateY(0);
-        background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0) 120px);
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-end;
-    }
-
-    /* 调整标签在移动端的显示，与Play页面保持一致 */
-    .tags {
-        max-width: 100%;
-        overflow-x: auto;
-        padding-bottom: 5px;
-        flex-wrap: nowrap;
-        scrollbar-width: none;
-        /* Firefox */
-    }
-
-    .tags::-webkit-scrollbar {
-        display: none;
-        /* Chrome, Safari, Edge */
-    }
-
-    /* 移动端照片统计显示优化 */
-    .photo-stats {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        background: rgba(0, 0, 0, 0.6);
-        border-radius: 20px;
-        padding: 3px 8px;
-    }
 }
 
 @media (max-width: 600px) {
@@ -1299,25 +955,6 @@ blockquote cite {
     .contact-tooltip {
         font-size: 11px;
         padding: 4px 8px;
-    }
-
-    .masonry-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .masonry-item {
-        height: 220px;
-    }
-
-    /* 标题字体缩小 */
-    .photo-overlay h4 {
-        font-size: 18px;
-    }
-
-    /* 照片计数移到左上角 */
-    .photo-count {
-        left: 10px;
-        right: auto;
     }
 }
 </style>

@@ -78,7 +78,7 @@ const menuList = ref([
   { text: '首页', icon: icon_index, route: '/' },
   { text: '我的文章', icon: icon_ai, route: '/research' },
   { text: '我的项目', icon: icon_command, route: '/studio' },
-  { text: '朋友圈', icon: icon_traval, route: '/play' },
+  { text: '朋友圈（开发中）', icon: icon_traval, route: '/play' },
   { text: '关于我', icon: icon_about, route: '/about' }
 ])
 // 添加设置随机颜色的方法

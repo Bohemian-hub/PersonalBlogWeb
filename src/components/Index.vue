@@ -36,7 +36,7 @@
                 <section class="section academic-notes">
                     <div class="section-header">
                         <h2>{{ academicSection.title }}</h2>
-                        <span class="view-all">{{ academicSection.viewAllText }}</span>
+                        <span class="view-all" @click="goToResearch">{{ academicSection.viewAllText }}</span>
                     </div>
                     <div class="section-content">
                         <p class="section-desc">{{ academicSection.description }}</p>
@@ -49,7 +49,7 @@
                                     <h3 class="article-title">{{ article.title }}</h3>
                                     <div class="article-tags">
                                         <span class="tag" v-for="(tag, index) in article.tags" :key="index">{{ tag
-                                        }}</span>
+                                            }}</span>
                                     </div>
                                     <p class="article-summary">{{ article.summary }}</p>
                                     <!-- 点赞和评论 -->
@@ -71,7 +71,7 @@
                 <section class="section workshop">
                     <div class="section-header">
                         <h2>{{ workshopSection.title }}</h2>
-                        <span class="view-all">{{ workshopSection.viewAllText }}</span>
+                        <span class="view-all" @click="goToStudio">{{ workshopSection.viewAllText }}</span>
                     </div>
                     <div class="section-content">
                         <p class="section-desc">{{ workshopSection.description }}</p>
@@ -83,7 +83,7 @@
                                     <h3 class="project-title">{{ project.title }}</h3>
                                     <div class="project-tags">
                                         <span class="tag" v-for="(tag, index) in project.tags" :key="index">{{ tag
-                                        }}</span>
+                                            }}</span>
                                     </div>
                                     <p class="project-summary">{{ project.summary }}</p>
                                     <div class="project-meta">
@@ -108,7 +108,7 @@
                     </div>
                 </section>
             </div>
-        </div> <!-- 朋友圈 - 全宽度区域 -->
+        </div> <!-- 朋友圈（开发中） - 全宽度区域 -->
         <section class="section life-section">
             <div class="section-header">
                 <h2>{{ lifeSection.title }}</h2>
@@ -147,7 +147,37 @@
                 :initialPhotoIndex="currentPhotoIndex" :heartFilledIcon="heartFilledIcon"
                 :heartOutlineIcon="heartOutlineIcon" :commentIcon="commentIcon" :likedPhotoIds="likedPhotoIds"
                 @like="handlePhotoLike" @comment="handlePhotoComment" />
-        </section> <!-- 底部区域 -->
+        </section>
+        <!-- 弹窗 -->
+        <el-dialog v-model="showApplyDialog" title="申请友情链接" width="500px">
+            <el-alert title="申请前请先将本站添加到您的网站" type="warning" :closable="false" show-icon style="margin-bottom: 20px"
+                description="本站名称：个人博客 | 地址：http://your-domain.com" />
+
+            <el-form :model="applyForm" label-width="80px">
+                <el-form-item label="网站名称" required>
+                    <el-input v-model="applyForm.name" placeholder="请输入网站名称" />
+                </el-form-item>
+                <el-form-item label="网站链接" required>
+                    <el-input v-model="applyForm.url" placeholder="https://example.com" />
+                </el-form-item>
+                <el-form-item label="描述">
+                    <el-input v-model="applyForm.description" type="textarea" placeholder="一句话介绍您的网站" />
+                </el-form-item>
+                <el-form-item label="Logo">
+                    <el-input v-model="applyForm.logo" placeholder="Logo图片链接 (可选)" />
+                </el-form-item>
+                <el-form-item label="联系邮箱">
+                    <el-input v-model="applyForm.email" placeholder="方便审核结果通知 (可选)" />
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="showApplyDialog = false">取消</el-button>
+                    <el-button type="primary" @click="submitApply" :loading="submittingApply">提交申请</el-button>
+                </span>
+            </template>
+        </el-dialog>
+        <!-- 底部区域 -->
         <div class="bottom-sections">
             <!-- 互动交集 -->
             <section class="section interaction">
@@ -156,11 +186,14 @@
                 </div>
                 <div class="section-content">
                     <div class="friends-links">
-                        <h3>友情链接</h3>
+                        <div class="friend-link-header">
+                            <h3>友情链接</h3>
+                        </div>
                         <div class="links-grid">
                             <!-- 使用v-for循环渲染友链 -->
-                            <a v-for="link in friendLinks" :key="link.id" :href="link.url" target="_blank"
-                                class="friend-link">
+                            <a v-for="link in friendLinks" :key="link.id"
+                                :href="link.url.startsWith('http') ? link.url : 'http://' + link.url" target="_blank"
+                                class="friend-link" :title="link.description">
                                 <div class="link-icon">
                                     <img :src="link.logo" :alt="`${link.name} logo`" class="link-logo">
                                 </div>
@@ -170,6 +203,11 @@
                                 </div>
                             </a>
                         </div>
+                        <div class="apply-link-container">
+                            <button class="apply-link-btn" @click="showApplyDialog = true">
+                                <span>➕ 申请加入友链</span>
+                            </button>
+                        </div>
                     </div>
                     <div class="message-board">
                         <h3>留言板</h3> <!-- 留言输入区域 -->
@@ -177,10 +215,9 @@
                             <textarea v-model="messageInput" placeholder="写下你的留言..." class="message-input"></textarea>
                             <div class="message-actions">
                                 <div class="privacy-toggle">
-                                    <input type="checkbox" id="privacy-toggle" v-model="isPrivate">
+                                    <input type="checkbox" id="privacy-toggle" v-model="isPublic">
                                     <label for="privacy-toggle">
-                                        <span v-if="isPrivate">私密留言</span>
-                                        <span v-else>公开留言</span>
+                                        <span>{{ isPublic ? '公开' : '私密' }}</span>
                                     </label>
                                 </div> <button class="send-btn" @click="addMessage">发送</button>
                             </div>
@@ -199,7 +236,7 @@
                                 </div>
                             </div>
                         </div> <!-- 查看更多按钮 -->
-                        <button class="view-more-btn" @click="viewMoreMessages">查看更多留言</button>
+                        <button class="view-more-btn" @click="viewMoreMessages">仅展示 5 个最新留言</button>
                     </div>
                 </div>
             </section>
@@ -207,8 +244,13 @@
     </div>
 </template>
 <script setup>
-import { ref, onMounted, computed, onBeforeMount, onBeforeUnmount, watch } from 'vue';
+import { ref, onMounted, computed, onBeforeMount, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
+import { getArticles } from '../api/article';
+import { getMessages, addMessage as apiAddMessage } from '../api/message';
+import { getFriendLinks, createFriendLinkRequest } from '../api/friend_link';
+import { baseUrl } from '@/common/config';
+import { ElMessage } from 'element-plus';
 import Activity from '../components/Activity.vue'
 import { currentTheme } from '../stores/themeStore'
 import PhotoGallery from './PhotoGallery.vue';
@@ -216,7 +258,26 @@ import PhotoGallery from './PhotoGallery.vue';
 import heartFilledIcon from '@/assets/icons/heart-filled.png';
 import heartOutlineIcon from '@/assets/icons/heart.png';
 import commentIcon from '@/assets/icons/comment.png';
-const router = useRouter();// 添加响应式布局相关的状态
+const router = useRouter();
+
+// 导航函数
+const goToArticle = (id) => {
+    router.push(`/article/${id}`);
+};
+
+const goToResearch = () => {
+    router.push('/research');
+};
+
+const goToStudio = () => {
+    router.push('/studio');
+};
+
+const handleAboutClick = () => {
+    router.push('/about');
+};
+
+// 添加响应式布局相关的状态
 const isMobile = ref(false);
 const windowWidth = ref(window.innerWidth);
 // 添加照片画廊相关状态
@@ -257,6 +318,7 @@ onMounted(() => {
     if (savedTheme) {
         currentTheme.value = savedTheme;
     }
+    loadData();
 });// 在组件卸载时移除事件监听器
 onBeforeUnmount(() => {
     window.removeEventListener('resize', checkScreenSize);
@@ -271,71 +333,116 @@ const personalInfo = ref({
     ],
     aboutBtnText: '关于我',
     tagline: '浅夜未央，星河流转，无论走到哪里，都是追寻自我的旅程'
-});// 我的文章数据
+});
+
+// 我的文章数据
 const academicSection = ref({
     title: '我的文章',
     description: '分享科研心得、学术观点与专业探索',
     viewAllText: '查看全部',
-    articles: [
-        {
-            id: 1,
-            title: '复杂网络与知识图谱',
-            image: 'https://picsum.photos/400/250?random=1',
-            summary: '探索知识图谱在复杂网络分析中的应用，及其在科研数据挖掘中的潜力...',
-            tags: ['数据科学', '网络分析'],
-            likes: 42,
-            comments: 18
-        },
-        {
-            id: 2,
-            title: '深度学习模型优化策略',
-            image: 'https://picsum.photos/400/250?random=2',
-            summary: '分析当前主流深度学习模型的性能瓶颈，并提出创新优化方法...',
-            tags: ['AI', '机器学习'],
-            likes: 42,
-            comments: 18
-        },
-        {
-            id: 3,
-            title: '数据可视化的认知基础',
-            image: 'https://picsum.photos/400/250?random=3',
-            summary: '从认知科学角度探讨有效数据可视化的设计原则与方法论...',
-            tags: ['可视化', '认知科学'],
-            likes: 42,
-            comments: 18
-        }
-    ]
+    articles: []
 });
+
 // 我的项目数据
 const workshopSection = ref({
     title: '我的项目',
     description: '展示个人项目、工具开发与方法分享',
     viewAllText: '查看全部',
-    projects: [
-        {
-            id: 1,
-            title: '自动化数据分析平台',
-            image: 'https://picsum.photos/500/300?random=4',
-            summary: '基于Python的自动化数据分析工具，支持多种数据源和可视化输出...',
-            tags: ['Python', '数据分析', '开源'],
-            date: '2023-09',
-            likes: 76,
-            comments: 24
-        },
-        {
-            id: 2,
-            title: '知识库管理系统',
-            image: 'https://picsum.photos/500/300?random=5',
-            summary: '一款轻量级个人知识管理系统，支持笔记整理、标签管理和全文检索...',
-            tags: ['Vue.js', 'Node.js', 'MongoDB'],
-            date: '2023-06',
-            likes: 76,
-            comments: 24
+    projects: []
+});
+
+// 加载数据
+const loadData = async () => {
+    try {
+        // 加载文章 (前3篇)
+        const articleRes = await getArticles({
+            page: 1,
+            page_size: 3,
+            status: 'published',
+            category: 'research'
+        });
+        if (articleRes && articleRes.items) {
+            academicSection.value.articles = articleRes.items.map(item => ({
+                id: item.id,
+                title: item.title,
+                image: item.cover_image_url ? baseUrl + item.cover_image_url : '', // 处理图片URL
+                summary: item.summary,
+                tags: typeof item.tags === 'string' ? item.tags.split(',') : (Array.isArray(item.tags) ? item.tags : [item.category]),
+                likes: 0, // 接口暂无 likes 字段，需根据实际情况调整
+                comments: 0 // 接口暂无 comments 字段
+            }));
         }
-    ]
-});// 朋友圈数据
+
+        // 加载项目 (前2篇)
+        const projectRes = await getArticles({
+            page: 1,
+            page_size: 2,
+            status: 'published',
+            category: 'studio'
+        });
+        if (projectRes && projectRes.items) {
+            workshopSection.value.projects = projectRes.items.map(item => ({
+                id: item.id,
+                title: item.title,
+                image: item.cover_image_url ? baseUrl + item.cover_image_url : '',
+                summary: item.summary,
+                tags: typeof item.tags === 'string' ? item.tags.split(',') : (Array.isArray(item.tags) ? item.tags : [item.category]),
+                date: item.created_at ? item.created_at.substring(0, 10) : '',
+                likes: 0,
+                comments: 0
+            }));
+        }
+    } catch (error) {
+        console.error('Failed to load home data:', error);
+    }
+
+    try {
+        const linkRes = await getFriendLinks();
+        if (linkRes) {
+            friendLinks.value = linkRes;
+        }
+
+        await fetchMessages();
+    } catch (err) {
+        console.error('Failed to load friend links', err);
+    }
+};
+
+// 友链申请相关
+const showApplyDialog = ref(false);
+const applyForm = ref({
+    name: '',
+    url: '',
+    description: '',
+    logo: '',
+    email: ''
+});
+const submittingApply = ref(false);
+
+const submitApply = async () => {
+    if (!applyForm.value.name || !applyForm.value.url) {
+        ElMessage.warning('请填写网站名称和链接');
+        return;
+    }
+
+    submittingApply.value = true;
+    try {
+        await createFriendLinkRequest(applyForm.value);
+        ElMessage.success('申请已提交，请等待审核');
+        showApplyDialog.value = false;
+        applyForm.value = { name: '', url: '', description: '', logo: '', email: '' }; // 重置表单
+    } catch (e) {
+        // Interceptor already handles error messages, but we catch here to stop loading state
+        // If we want to show generic message only if interceptor didn't show one, it's tricky.
+        // But usually interceptor shows error.
+    } finally {
+        submittingApply.value = false;
+    }
+};
+
+// 朋友圈（开发中）数据
 const lifeSection = ref({
-    title: '朋友圈',
+    title: '朋友圈（开发中）',
     description: '生活瞬间、旅行记忆与个人故事集',
     viewAllText: '查看全部',
     mediaItems: [
@@ -468,123 +575,97 @@ const lifeSection = ref({
         }
     ]
 });// 友情链接数据
-const friendLinks = ref([
-    {
-        id: 1,
-        name: 'Google',
-        url: 'https://www.google.com',
-        logo: 'https://img0.baidu.com/it/u=1949615176,3216656098&fm=253&fmt=auto&app=138&f=JPEG?w=357&h=365',
-        description: '全球最大搜索引擎'
-    },
-    {
-        id: 2,
-        name: '百度',
-        url: 'https://www.baidu.com',
-        logo: 'https://www.baidu.com/favicon.ico',
-        description: '中文搜索引擎'
-    },
-    {
-        id: 3,
-        name: 'Google Scholar',
-        url: 'https://scholar.google.com',
-        logo: 'https://img0.baidu.com/it/u=1217823906,428491688&fm=253&fmt=auto&app=138&f=JPEG?w=506&h=285',
-        description: '学术文献搜索'
-    },
-    {
-        id: 4,
-        name: 'ResearchGate',
-        url: 'https://www.researchgate.net',
-        logo: 'https://img0.baidu.com/it/u=1030169371,2184594443&fm=253&fmt=auto&app=138&f=JPEG?w=231&h=231',
-        description: '科研社交平台'
-    },
-    {
-        id: 5,
-        name: '中国知网',
-        url: 'https://www.cnki.net',
-        logo: 'https://pic.rmb.bdstatic.com/bjh/news/2253ad0f3fd8bfa719967c9fed00bb4d.jpeg',
-        description: '学术资源平台'
-    },
-    {
-        id: 6,
-        name: 'arXiv',
-        url: 'https://arxiv.org',
-        logo: 'https://img1.baidu.com/it/u=3693130707,297865347&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=500',
-        description: '开放学术预印本'
-    }
-]);
+const friendLinks = ref([]);
 // 留言板数据
 const messageInput = ref(''); // 用户输入的留言内容
-const isPrivate = ref(false); // 是否是私密留言
-const messages = ref([
-    {
-        id: 1,
-        author: '张三',
-        avatar: 'https://randomuser.me/api/portraits/men/1.jpg',
-        content: '博客内容非常精彩，期待更多更新！',
-        date: '2025-04-05',
-        isPrivate: false
-    },
-    {
-        id: 2,
-        author: '李四',
-        avatar: 'https://randomuser.me/api/portraits/women/2.jpg',
-        content: '我的文章部分的观点很有启发性，已经收藏了。',
-        date: '2025-04-04',
-        isPrivate: false
-    },
-    {
-        id: 3,
-        author: '王五',
-        avatar: 'https://randomuser.me/api/portraits/men/3.jpg',
-        content: '请问我的项目中提到的知识库管理系统是否已开源？很感兴趣！',
-        date: '2025-04-03',
-        isPrivate: false
-    },
-    {
-        id: 4,
-        author: '赵六',
-        avatar: 'https://randomuser.me/api/portraits/women/4.jpg',
-        content: '朋友圈的照片拍得太美了，请问使用的是什么相机？',
-        date: '2025-04-02',
-        isPrivate: false
-    },
-    {
-        id: 5,
-        author: '钱七',
-        avatar: 'https://randomuser.me/api/portraits/men/5.jpg',
-        content: '认知轨迹中关于数字极简主义的文章对我帮助很大，谢谢分享！',
-        date: '2025-04-01',
-        isPrivate: false
-    }
-]);// 添加跳转函数
-const goToArticle = (articleId) => {
-    router.push({
-        name: 'Article',
-        query: { id: articleId }
-    });
-};// 计算属性：只显示最新的5条公开留言
-const displayMessages = computed(() => {
-    return messages.value
-        .filter(message => !message.isPrivate)
-        .slice(0, 5);
-});// 添加留言方法
-const addMessage = () => {
-    if (!messageInput.value.trim()) return;    // 创建新留言
-    const newMessage = {
-        id: Date.now(), // 使用时间戳作为唯一ID
-        author: '访客用户', // 实际应用中可能需要登录系统
-        avatar: 'https://randomuser.me/api/portraits/lego/1.jpg',
-        content: messageInput.value,
-        date: new Date().toISOString().split('T')[0],
-        isPrivate: isPrivate.value
-    };    // 添加到留言列表最前面
-    messages.value.unshift(newMessage);    // 清空输入框
-    messageInput.value = '';
-};// 查看更多留言
-const viewMoreMessages = () => {
-    // console.log('查看更多留言被点击');
-    // 这里可以添加导航到留言详情页面的逻辑
+const isPublic = ref(true); // 是否是公开留言 (默认公开)
+const messages = ref([]);
+
+// 格式化日期时间
+const formatDateTime = (dateStr) => {
+    if (!dateStr) return '';
+    // 兼容 iOS/Safari 的日期格式 (将空格替换为T)
+    const safeDateStr = typeof dateStr === 'string' ? dateStr.replace(' ', 'T') : dateStr;
+    const date = new Date(safeDateStr);
+
+    if (isNaN(date.getTime())) return dateStr;
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 };
+
+const fetchMessages = async () => {
+    try {
+        const res = await getMessages(1, 10);
+        if (res && res.list) {
+            messages.value = res.list.map(m => ({
+                id: m.id,
+                author: m.author || '访客',
+                avatar: m.avatar || 'https://www.mtmba.com/static/inxweb/img/avatar-boy.gif',
+                content: m.content,
+                date: formatDateTime(m.created_at),
+                isPrivate: !!m.is_private
+            }));
+        }
+    } catch (err) {
+        console.error('Failed to load messages', err);
+    }
+};
+
+const displayMessages = computed(() => {
+    return messages.value;
+});
+
+// 添加留言方法
+const addMessage = async () => {
+    if (!messageInput.value.trim()) {
+        ElMessage.warning('请输入留言内容');
+        return;
+    }
+
+    // 获取当前用户信息
+    let author = '访客';
+    let avatar = 'https://www.mtmba.com/static/inxweb/img/avatar-boy.gif';
+    let email = '';
+
+    const userStr = sessionStorage.getItem('user');
+    if (userStr) {
+        try {
+            const user = JSON.parse(userStr);
+            author = user.nickname || user.username || '用户';
+            // 如果用户有头像则使用，否则使用默认头像(这里假设用户对象里有avatar字段且不为空)
+            if (user.avatar) {
+                avatar = user.avatar;
+            }
+            email = user.email || '';
+        } catch (e) {
+            console.error('Failed to parse user info', e);
+        }
+    }
+
+    try {
+        await apiAddMessage({
+            content: messageInput.value,
+            isPrivate: !isPublic.value,
+            author,
+            avatar,
+            email
+        });
+        ElMessage.success('留言成功');
+        messageInput.value = '';
+        isPublic.value = true;
+        await fetchMessages();
+    } catch (err) {
+        console.error('Failed to add message', err);
+    }
+};
+
 // 日期格式化函数
 const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -594,11 +675,8 @@ const formatDate = (dateString) => {
         year: date.getFullYear()
     };
 };
-// 关于我按钮点击处理
-const handleAboutClick = () => {
-    // console.log('关于我按钮被点击');
-    // 这里可以添加导航到关于页面或显示关于信息弹窗的逻辑
-};</script>
+
+</script>
 <style scoped>
 /* 主题变量定义 */
 .dark {
@@ -933,7 +1011,7 @@ const handleAboutClick = () => {
     border: 1px dashed rgba(255, 255, 255, 0.2);
 }
 
-/* 朋友圈 */
+/* 朋友圈（开发中） */
 .media-gallery {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -976,33 +1054,35 @@ const handleAboutClick = () => {
 
 .friend-link {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     background-color: var(--card-bg);
-    border-radius: 10px;
-    padding: 10px;
+    border-radius: 12px;
+    padding: 15px;
     text-decoration: none;
     color: var(--text-primary);
     transition: all 0.3s ease;
     box-shadow: 0 4px 12px var(--shadow-color);
-    height: 60px;
+    height: 90px;
 }
 
 .friend-link:hover {
     transform: translateY(-4px);
-    background-color: rgba(50, 50, 70, 0.85);
+    background-color: var(--hover-bg);
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
 }
 
 .link-icon {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
     background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    margin-right: 10px;
+    border-radius: 10px;
+    margin-right: 12px;
     overflow: hidden;
+    flex-shrink: 0;
+    margin-top: 2px;
 }
 
 .link-logo {
@@ -1014,17 +1094,58 @@ const handleAboutClick = () => {
 .link-info {
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+    /* 配合文本溢出隐藏 */
+    justify-content: flex-start;
+    height: 100%;
 }
 
 .link-name {
-    font-size: 14px;
-    font-weight: 500;
-    margin-bottom: 3px;
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
 }
 
 .link-desc {
-    font-size: 11px;
-    opacity: 0.7;
+    font-size: 12px;
+    opacity: 0.8;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    white-space: normal;
+}
+
+.apply-link-container {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+}
+
+.apply-link-btn {
+    width: 90%;
+    background-color: transparent;
+    border: 1px dashed rgba(255, 255, 255, 0.3);
+    color: var(--text-secondary);
+    padding: 10px 0;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.apply-link-btn:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.6);
+    color: var(--text-primary);
 }
 
 /* 各种占位符元素的样式修改 */
@@ -1355,7 +1476,7 @@ h3 {
     color: var(--text-secondary);
 }
 
-/* 朋友圈卡片样式 */
+/* 朋友圈（开发中）卡片样式 */
 .media-item {
     position: relative;
     border: 1px solid var(--border-color);
@@ -1528,7 +1649,7 @@ h3 {
     color: rgba(115, 192, 222, 0.9);
 }
 
-/* 朋友圈调整 */
+/* 朋友圈（开发中）调整 */
 .media-stats {
     margin-top: 10px;
     opacity: 0;
@@ -1595,7 +1716,7 @@ h3 {
     align-items: center;
     gap: 8px;
     font-size: 14px;
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--text-primary);
 }
 
 .privacy-toggle input[type="checkbox"] {
@@ -1605,12 +1726,13 @@ h3 {
     background-color: rgba(255, 255, 255, 0.1);
     border-radius: 10px;
     position: relative;
+    background-color: rgba(153, 96, 180, 0.213);
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .privacy-toggle input[type="checkbox"]:checked {
-    background-color: rgba(154, 96, 180, 0.5);
+    background-color: rgba(153, 96, 180, 0.778);
 }
 
 .privacy-toggle input[type="checkbox"]::before {
@@ -1693,7 +1815,8 @@ h3 {
 
 .message-date {
     font-size: 12px;
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--text-secondary);
+    opacity: 0.8;
 }
 
 .message-text {
@@ -1843,7 +1966,7 @@ h3 {
         grid-template-columns: 1fr;
     }
 
-    /* 移动端朋友圈卡片默认显示摘要和点赞信息 */
+    /* 移动端朋友圈（开发中）卡片默认显示摘要和点赞信息 */
     .media-summary {
         opacity: 0.9;
         height: auto;

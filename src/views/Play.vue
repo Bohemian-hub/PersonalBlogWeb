@@ -4,7 +4,7 @@
     <div class="page-wrapper" :class="currentTheme">
         <div class="page-content">
             <!-- 使用封装的页面标题组件 -->
-            <PageHeader title="朋友圈" description="记录生活点滴，分享旅行见闻与个人兴趣爱好" icon="🌈" />
+            <PageHeader title="朋友圈（开发中）" description="记录生活点滴，分享旅行见闻与个人兴趣爱好" icon="🌈" />
 
             <!-- 照片墙 - 瀑布流照片墙 -->
             <section class="section-container photo-gallery">
@@ -21,6 +21,9 @@
                         :class="getMasonryClass(index)" @click="showPhotoGallery(index)">
                         <div class="photo-inner">
                             <img :src="photoGroup.images[0].url" :alt="photoGroup.title" />
+                            <div class="photo-date">
+                                {{ photoGroup.date }}
+                            </div>
                             <div class="photo-count" v-if="photoGroup.images.length > 1">
                                 {{ photoGroup.images.length }}
                             </div>
@@ -55,144 +58,7 @@
                     :likedPhotoIds="likedPhotos" @like="handlePhotoLike" @comment="handlePhotoComment" />
             </section>
 
-            <!-- 主内容区 - 日常生活和音乐收藏左右布局 -->
-            <div class="content-layout">
-                <!-- 日常生活板块 -->
-                <section class="section-container daily-life">
-                    <h2 class="section-title">
-                        <el-icon>
-                            <House />
-                        </el-icon>
-                        日常生活
-                    </h2>
 
-                    <div class="article-grid">
-                        <!-- 旅行日记文章 -->
-                        <div v-for="article in lifeArticles" :key="article.id" class="article-card">
-                            <div class="article-cover">
-                                <img :src="article.cover" :alt="article.title" />
-                                <div class="article-tags">{{ article.tags }}</div>
-                            </div>
-                            <div class="article-content">
-                                <h3 class="article-title">{{ article.title }}</h3>
-                                <p class="article-excerpt">{{ article.excerpt }}</p>
-                                <div class="article-footer">
-                                    <div class="article-meta">
-                                        <span class="article-date">{{ article.date }}</span>
-                                        <span class="article-stats">
-                                            <el-icon>
-                                                <View />
-                                            </el-icon> {{ article.views }}
-                                        </span>
-                                    </div>
-                                    <el-button type="primary" size="small" class="read-btn">
-                                        阅读全文 <el-icon>
-                                            <ArrowRight />
-                                        </el-icon>
-                                    </el-button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="pagination">
-                        <el-button @click="prevPage" :disabled="currentPage === 1" plain>
-                            <el-icon>
-                                <ArrowLeft />
-                            </el-icon> 上一页
-                        </el-button>
-                        <span>{{ currentPage }} / {{ totalPages }}</span>
-                        <el-button @click="nextPage" :disabled="currentPage === totalPages" plain>
-                            下一页 <el-icon>
-                                <ArrowRight />
-                            </el-icon>
-                        </el-button>
-                    </div>
-                </section>
-
-                <!-- 音乐收藏板块 -->
-                <section class="section-container music-collection">
-                    <h2 class="section-title">
-                        <el-icon>
-                            <Headset />
-                        </el-icon>
-                        音乐收藏
-                    </h2>
-
-                    <div class="music-player">
-                        <div class="current-album">
-                            <div class="album-cover" :class="{ 'playing': isPlaying }">
-                                <img :src="currentPlaylist.cover" :alt="currentPlaylist.title" />
-                                <div class="play-overlay" @click="togglePlayPause">
-                                    <el-icon v-if="!isPlaying">
-                                        <VideoPlay />
-                                    </el-icon>
-                                    <el-icon v-else>
-                                        <VideoPause />
-                                    </el-icon>
-                                </div>
-                            </div>
-                            <div class="player-info-controls">
-                                <div class="album-info">
-                                    <h3>{{ currentPlaylist.title }}</h3>
-                                    <p>{{ currentPlaylist.description }}</p>
-                                </div>
-                                <div class="player-controls">
-                                    <el-slider v-model="audioProgress" :show-tooltip="false" @change="seekAudio" />
-                                    <div class="time-display">
-                                        <span>{{ formatTime(currentTime) }}</span>
-                                        <span>{{ formatTime(duration) }}</span>
-                                    </div>
-                                    <div class="control-buttons">
-                                        <el-button circle @click="prevTrack">
-                                            <el-icon>
-                                                <Back />
-                                            </el-icon>
-                                        </el-button>
-                                        <el-button circle @click="togglePlayPause" class="play-btn">
-                                            <el-icon v-if="!isPlaying">
-                                                <VideoPlay />
-                                            </el-icon>
-                                            <el-icon v-else>
-                                                <VideoPause />
-                                            </el-icon>
-                                        </el-button>
-                                        <el-button circle @click="nextTrack">
-                                            <el-icon>
-                                                <Right />
-                                            </el-icon>
-                                        </el-button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="playlist">
-                            <div class="track-list">
-                                <div v-for="(track, idx) in currentPlaylist.tracks" :key="idx" class="track-item"
-                                    :class="{ 'current-track': currentTrackIndex === idx }" @click="playTrack(idx)">
-                                    <div class="track-number">{{ idx + 1 }}</div>
-                                    <div class="track-info">
-                                        <div class="track-name">{{ track.title }}</div>
-                                        <div class="track-artist">{{ track.artist }}</div>
-                                    </div>
-                                    <div class="track-duration">{{ track.duration }}</div>
-                                    <div class="track-play-icon" v-if="currentTrackIndex === idx && isPlaying">
-                                        <div class="playing-animation">
-                                            <span></span>
-                                            <span></span>
-                                            <span></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 隐藏的音频元素 -->
-                    <audio ref="audioPlayer" @timeupdate="onTimeUpdate" @loadedmetadata="onAudioLoaded"
-                        @ended="onAudioEnded" @error="handleAudioError"></audio>
-                </section>
-            </div>
         </div>
     </div>
     <Footer />
@@ -202,8 +68,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import {
-    Picture, Location, Calendar, House, View,
-    ArrowLeft, ArrowRight, VideoPlay, VideoPause, Headset, Back, Right
+    Picture
 } from '@element-plus/icons-vue'
 import TopBar from '../components/TopBar.vue'
 import Footer from '../components/Footer.vue'
@@ -243,6 +108,37 @@ onUnmounted(() => {
 
 // 照片墙数据 - 添加点赞和评论
 const photos = ref([
+    {
+        id: 0,
+        title: '城市夜景',
+        location: '纽约市',
+        date: '2025年6月10日',
+        description: '<h1>纽约的璀璨夜空</h1><p>站在高楼之上，俯瞰这座不夜城，灯火辉煌，车水马龙，仿佛置身于星河之中。</p><h2>拍摄心得</h2><p>使用长曝光技术捕捉了城市的动感与活力。</p>',
+        tags: ['城市', '夜景', '旅行'],
+        likes: 204,
+        comments: [
+            {
+                author: '摄影爱好者小张',
+                avatar: 'https://randomuser.me/api/portraits/men/45.jpg',
+                text: '这张照片拍得太棒了！纽约的夜景果然名不虚传',
+                time: '3小时前'
+            }
+        ],
+        images: [
+            {
+                url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '纽约夜景全景'
+            },
+            {
+                url: 'https://images.unsplash.com/photo-1494526585095-c41746248156?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '时代广场灯光'
+            },
+            {
+                url: 'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+                caption: '布鲁克林大桥夜景'
+            }
+        ]
+    },
     {
         id: 1,
         title: '山水之间',
@@ -467,6 +363,14 @@ const photos = ref([
     }
 ])
 
+// 按日期降序排序照片
+photos.value.sort((a, b) => {
+    const parseDate = (dateStr) => {
+        return new Date(dateStr.replace(/年|月/g, '/').replace('日', ''))
+    }
+    return parseDate(b.date) - parseDate(a.date)
+})
+
 // 照片墙布局类名分配函数
 const getMasonryClass = (index) => {
     // 为不同位置的图片分配不同的大小类，创建视觉上的不规则布局
@@ -544,293 +448,6 @@ const handlePhotoComment = ({ photoId, comment }) => {
     photos.value[photoIndex].comments.unshift(comment);
 }
 
-// 日常生活文章数据 - 合并了旅行日记、兴趣爱好和书影推荐
-const allArticles = ref([
-    {
-        id: 1,
-        title: '京都の秋 - 红叶与古寺',
-        tags: '旅行日记',
-        date: '2023年11月',
-        cover: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-        excerpt: '深秋时节的京都，红叶如火，古寺庭院中落叶缤纷，漫步在这座千年古城，仿佛穿越回了平安时代。',
-        views: 325
-    },
-    {
-        id: 2,
-        title: '北欧极光之旅 - 追寻夜空中的舞者',
-        tags: '旅行日记',
-        date: '2023年1月',
-        cover: 'https://images.unsplash.com/photo-1483086431886-3590a88317fe?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-        excerpt: '零下20度的寒冷夜晚，漫天繁星下，耐心地等待着北极光的出现。当第一抹绿光在天际浮现时，所有的寒冷瞬间消散。',
-        views: 452
-    },
-    {
-        id: 3,
-        title: '摄影入门指南：如何拍出有故事的照片',
-        tags: '兴趣爱好',
-        date: '2024年2月',
-        cover: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-        excerpt: '摄影不仅是记录，更是讲述故事的艺术。本文分享我的摄影经验，从构图、光线到后期处理的实用技巧。',
-        views: 287
-    },
-    {
-        id: 4,
-        title: '意大利面的50种做法 - 从经典到创新',
-        tags: '兴趣爱好',
-        date: '2024年3月',
-        cover: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-        excerpt: '从传统的博洛尼亚肉酱面到创新的松露奶油意面，探索这个充满魔力的意大利美食世界。',
-        views: 314
-    },
-    {
-        id: 5,
-        title: '2024年必看的五部科幻电影',
-        tags: '书影推荐',
-        date: '2024年4月',
-        cover: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-        excerpt: '从太空冒险到人工智能伦理，这五部科幻电影不仅有震撼的视觉效果，更有深刻的思想内涵。',
-        views: 195
-    },
-    {
-        id: 6,
-        title: '那些改变我人生轨迹的书籍',
-        tags: '书影推荐',
-        date: '2023年12月',
-        cover: 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-        excerpt: '分享五本对我影响深远的书籍，它们在不同人生阶段给予我力量、智慧和勇气。',
-        views: 263
-    },
-    {
-        id: 7,
-        title: '威尼斯水城漫步 - 迷失在水巷里',
-        tags: '旅行日记',
-        date: '2022年6月',
-        cover: 'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-        excerpt: '没有汽车喧嚣的城市，只有贡多拉穿梭在纵横交错的水道上。每一座桥、每一条巷子都藏着故事。',
-        views: 287
-    },
-    {
-        id: 8,
-        title: '徒步者的装备指南 - 从新手到专业',
-        tags: '兴趣爱好',
-        date: '2024年1月',
-        cover: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-        excerpt: '无论是周末短途还是长线徒步，适合的装备能让旅程更安全、舒适。本文详解各类装备的选择与使用。',
-        views: 231
-    },
-    {
-        id: 9,
-        title: '百年孤独 - 一场魔幻的文学盛宴',
-        tags: '书影推荐',
-        date: '2023年9月',
-        cover: 'https://images.unsplash.com/photo-1474932430478-367dbb6832c1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-        excerpt: '加西亚·马尔克斯的代表作如何通过魔幻现实主义的手法，展现了拉丁美洲的历史与文化。',
-        views: 175
-    }
-])
-
-// 分页控制 - 修改每页文章数量，适配不同设备
-const getArticlesPerPage = () => {
-    // 根据屏幕宽度返回不同的文章数
-    return window.innerWidth <= 768 ? 4 : 3
-}
-
-const articlesPerPage = ref(getArticlesPerPage())
-const currentPage = ref(1)
-const totalPages = computed(() => Math.ceil(allArticles.value.length / articlesPerPage.value))
-
-// 更新每页文章数量
-const updateArticlesPerPage = () => {
-    articlesPerPage.value = getArticlesPerPage()
-}
-
-// 当前页显示的文章
-const lifeArticles = computed(() => {
-    const start = (currentPage.value - 1) * articlesPerPage.value
-    const end = start + articlesPerPage.value
-    return allArticles.value.slice(start, end)
-})
-
-const prevPage = () => {
-    if (currentPage.value > 1) currentPage.value--
-}
-
-const nextPage = () => {
-    if (currentPage.value < totalPages.value) currentPage.value++
-}
-
-// 音乐收藏与播放功能
-// 修改播放列表，使用更可靠的音源
-const currentPlaylist = ref({
-    title: '午后时光',
-    description: '适合安静阅读或工作时聆听的轻音乐集',
-    cover: 'https://images.unsplash.com/photo-1507838153414-b4b713384a76?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
-    tracks: [
-
-        {
-            title: 'Kiss the Rain',
-            artist: 'Yiruma',
-            duration: '4:11',
-            url: 'https://music.163.com/song/media/outer/url?id=29450088.mp3',
-            backupUrl: 'https://freepd.com/music/Inspiring%20Corporate.mp3'
-        },
-        {
-            title: 'Path of the Wind',
-            artist: 'Joe Hisaishi',
-            duration: '3:17',
-            url: 'https://music.163.com/song/media/outer/url?id=448706028.mp3',
-            backupUrl: 'https://freepd.com/music/Night%20Run.mp3'
-        }
-    ]
-})
-
-// 音频播放相关
-const audioPlayer = ref(null)
-const isPlaying = ref(false)
-const currentTrackIndex = ref(0)
-const audioProgress = ref(0)
-const currentTime = ref(0)
-const duration = ref(0)
-const useBackupSource = ref(false)
-
-// 格式化时间
-const formatTime = (seconds) => {
-    if (isNaN(seconds)) return '0:00'
-    const mins = Math.floor(seconds / 60)
-    const secs = Math.floor(seconds % 60)
-    return `${mins}:${secs < 10 ? '0' + secs : secs}`
-}
-
-// 处理音频错误
-const handleAudioError = (error) => {
-    console.error('音频加载错误:', error);
-
-    const currentTrack = currentPlaylist.value.tracks[currentTrackIndex.value];
-
-    // 尝试使用备用链接
-    if (!useBackupSource.value && currentTrack.backupUrl) {
-        useBackupSource.value = true;
-        audioPlayer.value.src = currentTrack.backupUrl;
-        audioPlayer.value.load();
-        if (isPlaying.value) {
-            audioPlayer.value.play().catch(err => {
-                ElMessage.error('无法播放音频，请检查网络连接');
-                isPlaying.value = false;
-            });
-        }
-    } else {
-        ElMessage.warning(`无法播放 "${currentTrack.title}"，可能是音源不可用`);
-        isPlaying.value = false;
-    }
-}
-
-// 播放/暂停切换
-const togglePlayPause = () => {
-    if (audioPlayer.value) {
-        if (isPlaying.value) {
-            audioPlayer.value.pause();
-        } else {
-            audioPlayer.value.play().catch(err => {
-                handleAudioError(err);
-            });
-        }
-        isPlaying.value = !isPlaying.value;
-    }
-}
-
-// 播放指定曲目
-const playTrack = (index) => {
-    currentTrackIndex.value = index;
-    useBackupSource.value = false; // 重置备用源标志
-    loadTrack();
-    audioPlayer.value.play().catch(err => {
-        handleAudioError(err);
-    });
-    isPlaying.value = true;
-}
-
-// 加载当前曲目
-const loadTrack = () => {
-    if (audioPlayer.value && currentPlaylist.value.tracks[currentTrackIndex.value]) {
-        const track = currentPlaylist.value.tracks[currentTrackIndex.value];
-        audioPlayer.value.src = useBackupSource.value ? track.backupUrl : track.url;
-        audioPlayer.value.load();
-    }
-}
-
-// 下一曲
-const nextTrack = () => {
-    if (currentTrackIndex.value < currentPlaylist.value.tracks.length - 1) {
-        currentTrackIndex.value++;
-        useBackupSource.value = false; // 重置备用源标志
-        loadTrack();
-        if (isPlaying.value) {
-            audioPlayer.value.play().catch(err => {
-                handleAudioError(err);
-            });
-        }
-    }
-}
-
-// 上一曲
-const prevTrack = () => {
-    if (currentTrackIndex.value > 0) {
-        currentTrackIndex.value--;
-        useBackupSource.value = false; // 重置备用源标志
-        loadTrack();
-        if (isPlaying.value) {
-            audioPlayer.value.play().catch(err => {
-                handleAudioError(err);
-            });
-        }
-    }
-}
-
-// 进度条更新
-const onTimeUpdate = () => {
-    if (audioPlayer.value) {
-        currentTime.value = audioPlayer.value.currentTime;
-        audioProgress.value = (audioPlayer.value.currentTime / audioPlayer.value.duration) * 100;
-    }
-}
-
-// 音频加载完成
-const onAudioLoaded = () => {
-    if (audioPlayer.value) {
-        duration.value = audioPlayer.value.duration;
-    }
-}
-
-// 音频播放结束
-const onAudioEnded = () => {
-    nextTrack();
-}
-
-// 拖动进度条
-const seekAudio = (value) => {
-    if (audioPlayer.value) {
-        const seekTime = (value / 100) * audioPlayer.value.duration;
-        audioPlayer.value.currentTime = seekTime;
-    }
-}
-
-// 监听轨道变化，自动加载新曲目
-watch(currentTrackIndex, () => {
-    loadTrack();
-})
-
-// 组件挂载时加载第一首曲目
-onMounted(() => {
-    window.addEventListener('resize', updateArticlesPerPage)
-    updateArticlesPerPage() // 初始化设置
-    loadTrack() // 音乐播放器初始化
-})
-
-// 组件卸载时移除监听
-onUnmounted(() => {
-    window.removeEventListener('scroll', handleScroll)
-    window.removeEventListener('resize', updateArticlesPerPage)
-})
 </script>
 
 <style scoped>
@@ -1120,6 +737,20 @@ onUnmounted(() => {
     margin: 0;
     font-size: 14px;
     opacity: 0.9;
+}
+
+/* 添加照片时间标签样式 */
+.photo-date {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 8px;
+    border-radius: 12px;
+    z-index: 2;
 }
 
 /* 添加照片数量标签样式 */
@@ -1444,392 +1075,10 @@ onUnmounted(() => {
     float: right;
 }
 
-/* 左右布局 */
-.content-layout {
-    display: flex;
-    gap: 30px;
-}
-
-.daily-life {
-    flex: 2;
-}
-
-.music-collection {
-    flex: 1;
-}
-
-/* 日常生活文章卡片 */
-.article-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    margin-bottom: 20px;
-}
-
-.article-card {
-    background-color: var(--card-bg);
-    border-radius: 10px;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    box-shadow: var(--card-shadow);
-    border: 1px solid var(--card-border);
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-}
-
-.article-card:hover {
-    transform: var(--card-hover-transform);
-    background-color: var(--card-bg-hover);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-}
-
-.article-cover {
-    position: relative;
-    padding-top: 56.25%;
-    /* 16:9 比例 */
-}
-
-.article-cover img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.article-tags {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    background: var(--accent-gradient);
-    color: white;
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 500;
-}
-
-.article-content {
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-}
-
-.article-title {
-    margin: 0 0 10px;
-    font-size: 18px;
-    font-weight: 600;
-    line-height: 1.4;
-}
-
-.article-excerpt {
-    color: var(--text-secondary);
-    margin: 0 0 15px;
-    line-height: 1.6;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    flex: 1;
-}
-
-.article-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: auto;
-}
-
-.article-meta {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    color: var(--text-muted);
-    font-size: 14px;
-}
-
-.article-stats {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.read-btn {
-    border-radius: 20px;
-}
-
-/* 分页控制 */
-.pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    margin-top: 30px;
-}
-
-/* 音乐播放器样式 - 调整封面大小 */
-.music-player {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-}
-
-/* 将音乐播放器改为水平布局 */
-.current-album {
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    /* 改为水平排列 */
-    align-items: center;
-    /* 垂直居中对齐 */
-    gap: 20px;
-}
-
-/* 调整封面尺寸 */
-.album-cover {
-    position: relative;
-    width: 120px;
-    /* 固定宽度 */
-    height: 120px;
-    /* 固定高度，保持正方形 */
-    flex-shrink: 0;
-    /* 防止缩小 */
-    padding-top: 0;
-    /* 移除之前的padding-top百分比设置 */
-    margin: 0;
-    /* 移除自动居中 */
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-}
-
-.album-cover img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.8s ease;
-}
-
-.album-cover.playing img {
-    animation: rotate 20s linear infinite;
-}
-
-@keyframes rotate {
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-.play-overlay {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: rgba(0, 0, 0, 0.4);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    cursor: pointer;
-}
-
-.album-cover:hover .play-overlay {
-    opacity: 1;
-}
-
-.play-overlay .el-icon {
-    font-size: 48px;
-    color: white;
-}
-
-
-/* 调整专辑信息和控制区布局 */
-.player-info-controls {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    /* 占据剩余空间 */
-}
-
-.album-info {
-    text-align: left;
-    /* 左对齐 */
-    margin-bottom: 15px;
-}
-
-.album-info h3 {
-    margin: 0 0 5px;
-    font-size: 20px;
-    font-weight: 600;
-}
-
-.album-info p {
-    color: var(--text-secondary);
-    margin: 0;
-    font-size: 14px;
-}
-
-.player-controls {
-    width: 100%;
-}
-
-.time-display {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 5px;
-    font-size: 12px;
-    color: var(--text-muted);
-}
-
-.control-buttons {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 15px;
-    margin-top: 15px;
-}
-
-.play-btn {
-    transform: scale(1.2);
-    background: var(--accent-gradient);
-    border: none;
-    color: white;
-}
-
-.playlist {
-    background-color: var(--bg-tertiary);
-    border-radius: 10px;
-    padding: 15px;
-    max-height: 300px;
-    overflow-y: auto;
-}
-
-.track-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.track-item {
-    display: flex;
-    align-items: center;
-    padding: 10px;
-    border-radius: 6px;
-    background-color: rgba(255, 255, 255, 0.1);
-    transition: background-color 0.2s ease;
-    cursor: pointer;
-}
-
-.track-item:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-}
-
-.track-item.current-track {
-    background-color: var(--accent-color);
-    color: white;
-}
-
-.track-number {
-    width: 24px;
-    font-weight: 500;
-}
-
-.track-info {
-    flex: 1;
-    overflow: hidden;
-}
-
-.track-name {
-    font-weight: 500;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-}
-
-.track-artist {
-    font-size: 12px;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    opacity: 0.8;
-}
-
-.track-duration {
-    font-size: 12px;
-    opacity: 0.8;
-    margin: 0 10px;
-}
-
-.track-play-icon {
-    width: 20px;
-}
-
-.playing-animation {
-    display: flex;
-    align-items: flex-end;
-    height: 15px;
-    gap: 2px;
-}
-
-.playing-animation span {
-    width: 3px;
-    background-color: white;
-    border-radius: 1px;
-    animation: audio-wave 1.2s infinite ease-in-out;
-}
-
-.playing-animation span:nth-child(1) {
-    animation-delay: 0s;
-    height: 8px;
-}
-
-.playing-animation span:nth-child(2) {
-    animation-delay: 0.3s;
-    height: 15px;
-}
-
-.playing-animation span:nth-child(3) {
-    animation-delay: 0.6s;
-    height: 10px;
-}
-
-@keyframes audio-wave {
-    0% {
-        height: 5px;
-    }
-
-    50% {
-        height: 15px;
-    }
-
-    100% {
-        height: 5px;
-    }
-}
-
-
 /* 响应式布局 */
 @media (max-width: 1200px) {
     .masonry-grid {
         grid-template-columns: repeat(3, 1fr);
-    }
-
-    .content-layout {
-        flex-direction: column;
-    }
-
-    .daily-life,
-    .music-collection {
-        width: 100%;
     }
 }
 
@@ -1881,10 +1130,6 @@ onUnmounted(() => {
         /* Chrome, Safari, Edge */
     }
 
-    .article-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
     .gallery-container {
         flex-direction: column;
         height: auto;
@@ -1928,14 +1173,6 @@ onUnmounted(() => {
 
     .masonry-item {
         height: 220px;
-    }
-
-    .article-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .control-buttons {
-        gap: 10px;
     }
 
     /* 标题字体缩小 */

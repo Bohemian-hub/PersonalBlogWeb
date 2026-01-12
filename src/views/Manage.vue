@@ -45,7 +45,28 @@
               </el-icon>
               <span>分类管理</span>
             </el-menu-item>
-            <el-menu-item index="settings">
+            <el-menu-item index="activity-manage">
+              <el-icon>
+                <Calendar />
+              </el-icon>
+              <span>动态管理</span>
+            </el-menu-item> <el-menu-item index="friend-link-manage">
+              <el-icon>
+                <Link />
+              </el-icon>
+              <span>友链管理</span>
+            </el-menu-item>
+            <el-menu-item index="friend-link-request-manage">
+              <el-icon>
+                <Bell />
+              </el-icon>
+              <span>友链申请</span>
+            </el-menu-item> <el-menu-item index="message-manage">
+              <el-icon>
+                <ChatSquare />
+              </el-icon>
+              <span>留言管理</span>
+            </el-menu-item> <el-menu-item index="settings">
               <el-icon>
                 <Setting />
               </el-icon>
@@ -90,12 +111,16 @@ import { ref, shallowRef, onMounted, onBeforeMount, defineAsyncComponent } from 
 import { useRouter } from 'vue-router';
 import {
   Document, Collection, ChatDotRound, Folder, Setting,
-  Menu, ArrowRight, Back, Plus, Delete
+  Menu, ArrowRight, Back, Plus, Delete, Calendar, Link, Bell, ChatSquare
 } from '@element-plus/icons-vue';// 组件动态引入
 const ArticlePublish = defineAsyncComponent(() => import('../components/manage/Record.vue'));
 const ArticleManage = defineAsyncComponent(() => import('../components/manage/ArticleManage.vue'));
 const CommentManage = defineAsyncComponent(() => import('../components/manage/CommentManage.vue'));
 const CategoryManage = defineAsyncComponent(() => import('../components/manage/CategoryManage.vue'));
+const ActivityManage = defineAsyncComponent(() => import('../components/manage/ActivityManage.vue'));
+const FriendLinkManage = defineAsyncComponent(() => import('../components/manage/FriendLinkManage.vue'));
+const FriendLinkRequestManage = defineAsyncComponent(() => import('../components/manage/FriendLinkRequestManage.vue'));
+const MessageManage = defineAsyncComponent(() => import('../components/manage/MessageManage.vue'));
 const SystemSettings = defineAsyncComponent(() => import('../components/manage/SystemSettings.vue')); const router = useRouter();
 const activeIndex = ref('article-manage'); // 默认激活的菜单项
 const isSidebarVisible = ref(true); // 控制侧边栏显示状态
@@ -116,6 +141,18 @@ const updateCurrentComponent = () => {
     case 'category-manage':
       currentComponent.value = CategoryManage;
       break;
+    case 'activity-manage':
+      currentComponent.value = ActivityManage;
+      break;
+    case 'friend-link-manage':
+      currentComponent.value = FriendLinkManage;
+      break;
+    case 'friend-link-request-manage':
+      currentComponent.value = FriendLinkRequestManage;
+      break;
+    case 'message-manage':
+      currentComponent.value = MessageManage;
+      break;
     case 'settings':
       currentComponent.value = SystemSettings;
       break;
@@ -128,7 +165,11 @@ const getPanelTitle = (index) => {
     'article-publish': '发布文章',
     'article-manage': '文章管理',
     'comment-manage': '评论管理',
+    'friend-link-request-manage': '友链申请审核',
     'category-manage': '分类管理',
+    'activity-manage': '动态管理',
+    'friend-link-manage': '友情链接管理',
+    'message-manage': '留言管理',
     'settings': '系统设置'
   };
   return titles[index] || '管理面板';
@@ -136,9 +177,12 @@ const getPanelTitle = (index) => {
 const getPanelIcon = (index) => {
   const icons = {
     'article-publish': Document,
+    'friend-link-request-manage': Bell,
     'article-manage': Collection,
+    'message-manage': ChatSquare,
     'comment-manage': ChatDotRound,
     'category-manage': Folder,
+    'activity-manage': Calendar,
     'settings': Setting
   };
   return icons[index] || Document;

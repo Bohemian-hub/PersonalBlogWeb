@@ -67,7 +67,7 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 const categories = [
   { value: 'research', label: '我的文章' },
   { value: 'studio', label: '我的项目' },
-  { value: 'play', label: '朋友圈' },
+  { value: 'play', label: '朋友圈（开发中）' },
 ];// 文章列表状态
 const articles = ref([]);
 const loading = ref(false);

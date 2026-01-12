@@ -144,6 +144,9 @@
 </template>
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { useRoute } from 'vue-router'
+import { getArticleById } from '../api/article'
+import { baseUrl } from '@/common/config'
 import { marked } from 'marked';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/atom-one-dark.css';
@@ -167,7 +170,63 @@ const currentUser = {
     name: '当前用户',
     avatar: 'https://randomuser.me/api/portraits/men/22.jpg'
 };// 示例文章数据
+const route = useRoute();
 const article = ref({
+    id: '',
+    title: '',
+    coverUrl: '',
+    category: '',
+    summary: '',
+    content: '',
+    publishDate: '',
+    updateDate: '',
+    author: {
+        id: 'author-1',
+        name: 'HeDong',
+        avatar: 'https://randomuser.me/api/portraits/men/85.jpg',
+        bio: 'AI研究者 | 数据科学爱好者'
+    },
+    tags: [],
+    views: 0,
+    likes: 0,
+    comments: []
+});
+
+const loadArticle = async () => {
+    const id = route.params.id;
+    if (!id) return;
+    try {
+        const data = await getArticleById(id);
+        if (data) {
+            article.value = {
+                ...article.value,
+                ...data,
+                coverUrl: data.cover_image_url ? baseUrl + data.cover_image_url : '',
+                publishDate: data.created_at,
+                likes: data.likes_count || 0,
+                views: data.views || 0,
+            };
+            if (data.content_url) {
+                let url = data.content_url;
+                if (!url.startsWith('http')) {
+                    const cleanPath = url.startsWith('/') ? url : '/' + url;
+                    url = `${baseUrl}${cleanPath}`;
+                }
+                try {
+                    const text = await fetch(url).then(r => r.text());
+                    article.value.content = text;
+                } catch (err) {
+                    console.error("加载内容失败", err);
+                }
+            }
+            document.title = `${article.value.title} - Hedong的个人博客`;
+        }
+    } catch (error) {
+        console.error("加载文章失败", error);
+    }
+};
+
+const article_unused = ref({
     id: 1,
     title: '深度学习在自然语言处理中的应用与挑战',
     coverUrl: 'https://picsum.photos/1920/1080?random=25',
@@ -381,8 +440,9 @@ const handleScroll = () => {
     // 当滚动位置为0（页面顶部）时显示TopBar，否则隐藏
     showTopBar.value = window.scrollY <= 400
 };
-onMounted(() => {
-    window.addEventListener('scroll', handleScroll);    // 设置文章标题为网页标题
+onMounted(async () => {
+    window.addEventListener('scroll', handleScroll);
+    await loadArticle();    // 设置文章标题为网页标题
     document.title = `${article.value.title} - Hedong的个人博客`;    // 添加分享所需的meta标签
     const metaTags = [
         // Open Graph协议标签（微信、微博等平台通用）

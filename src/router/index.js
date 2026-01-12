@@ -7,6 +7,7 @@ import Play from '../views/Play.vue'
 import Article from '../views/Article.vue'
 import Manage from '../views/Manage.vue'
 import NotFound from '../views/NotFound.vue'
+import DailyActivity from '../views/DailyActivity.vue'
 
 const routes = [
     {
@@ -38,7 +39,7 @@ const routes = [
         name: 'Play',
         component: Play,
         meta: {
-            title: '朋友圈 - HeDong的博客'
+            title: '朋友圈（开发中） - HeDong的博客'
         }
     },
     {
@@ -50,6 +51,15 @@ const routes = [
         }
     },
     {
+        path: '/activity/daily',
+        name: 'DailyActivity',
+        component: DailyActivity,
+        meta: {
+            title: '每日打卡 - HeDong的博客',
+            hidden: true
+        }
+    },
+    {
         path: '/manage',
         name: 'Manage',
         component: Manage,
@@ -58,11 +68,11 @@ const routes = [
         }
     },
     {
-        path: '/article',
+        path: '/article/:id',
         name: 'Article',
         component: Article,
         meta: {
-            title: '文章'
+            title: '文章详情'
         }
     },
     {
