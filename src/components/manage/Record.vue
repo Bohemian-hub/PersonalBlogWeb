@@ -144,7 +144,7 @@ const currentArticleId = ref(null); // 新增：当前文章ID，用于追踪新
 
 // 分类和标签数据
 const categories = [
-    { value: 'research', label: '我的文章' },
+    { value: 'articles', label: '我的文章' },
     { value: 'studio', label: '我的项目' },
     { value: 'play', label: '朋友圈（开发中）' },
 ];
@@ -506,8 +506,14 @@ const saveAsDraft = async () => {
             if (result && result.id) {
                 currentArticleId.value = result.id;
                 console.log('首次保存草稿，文章ID:', currentArticleId.value);
+                // 切换到编辑模式，防止后续操作重复上传文件
+                isEditMode.value = true;
+                editingArticleId.value = result.id;
             }
         }
+
+        // 更新原始内容基准，避免重复上传
+        originalContent.value = articleForm.content;
 
         loading.close();
         ElMessage.success('草稿保存成功');
@@ -555,8 +561,14 @@ const publishArticle = async () => {
             if (result && result.id) {
                 currentArticleId.value = result.id;
                 console.log('直接发布文章，文章ID:', currentArticleId.value);
+                // 切换到编辑模式
+                isEditMode.value = true;
+                editingArticleId.value = result.id;
             }
         }
+
+        // 更新原始内容基准
+        originalContent.value = articleForm.content;
 
         loading.close();
         ElMessage.success(isEditMode.value ? '文章更新成功' : '文章发布成功');

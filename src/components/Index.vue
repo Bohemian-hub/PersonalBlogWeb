@@ -49,7 +49,7 @@
                                     <h3 class="article-title">{{ article.title }}</h3>
                                     <div class="article-tags">
                                         <span class="tag" v-for="(tag, index) in article.tags" :key="index">{{ tag
-                                            }}</span>
+                                        }}</span>
                                     </div>
                                     <p class="article-summary">{{ article.summary }}</p>
                                     <!-- 点赞和评论 -->
@@ -83,7 +83,7 @@
                                     <h3 class="project-title">{{ project.title }}</h3>
                                     <div class="project-tags">
                                         <span class="tag" v-for="(tag, index) in project.tags" :key="index">{{ tag
-                                            }}</span>
+                                        }}</span>
                                     </div>
                                     <p class="project-summary">{{ project.summary }}</p>
                                     <div class="project-meta">
@@ -266,7 +266,7 @@ const goToArticle = (id) => {
 };
 
 const goToResearch = () => {
-    router.push('/research');
+    router.push('/article');
 };
 
 const goToStudio = () => {
@@ -359,7 +359,7 @@ const loadData = async () => {
             page: 1,
             page_size: 3,
             status: 'published',
-            category: 'research'
+            category: 'article'
         });
         if (articleRes && articleRes.items) {
             academicSection.value.articles = articleRes.items.map(item => ({

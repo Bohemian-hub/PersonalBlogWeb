@@ -314,8 +314,8 @@ const getTagType = (index) => {
     --social-bg: rgba(255, 255, 255, 0.1);
     --social-hover: rgba(255, 255, 255, 0.2);
     --highlight: #61dafb;
-    --research-tag-bg: rgba(74, 144, 226, 0.2);
-    --research-tag-color: #ffffff;
+    --article-tag-bg: rgba(74, 144, 226, 0.2);
+    --article-tag-color: #ffffff;
 }
 
 .about-wrapper.light {
@@ -343,8 +343,8 @@ const getTagType = (index) => {
     --social-bg: rgba(0, 0, 0, 0.05);
     --social-hover: rgba(0, 0, 0, 0.1);
     --highlight: #3a7bd5;
-    --research-tag-bg: rgba(74, 144, 226, 0.1);
-    --research-tag-color: #333333;
+    --article-tag-bg: rgba(74, 144, 226, 0.1);
+    --article-tag-color: #333333;
 }
 
 .global-bg {

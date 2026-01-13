@@ -6,7 +6,7 @@
             <div class="article-cover" :style="{ backgroundImage: `url('${article.coverUrl}')` }">
                 <div class="cover-overlay">
                     <div class="article-meta-floating">
-                        <div class="article-category">{{ article.category }}</div>
+                        <div class="article-category">{{ getCategoryLabel(article.category) }}</div>
                         <h1 class="article-title-floating">{{ article.title }}</h1>
                     </div>
                 </div>
@@ -213,8 +213,36 @@ const loadArticle = async () => {
                     url = `${baseUrl}${cleanPath}`;
                 }
                 try {
-                    const text = await fetch(url).then(r => r.text());
-                    article.value.content = text;
+                    const response = await fetch(url);
+                    const text = await response.text();
+
+                    // 尝试解析JSON响应
+                    try {
+                        const json = JSON.parse(text);
+                        if (json && json.body && json.body.content) {
+                            // 如果是API返回的JSON格式，提取content字段
+                            article.value.content = json.body.content;
+                        } else if (json && json.content) {
+                            // 备用：直接包含content的情况
+                            article.value.content = json.content;
+                        } else {
+                            // 无法识别的JSON结构，使用原始内容（可能是纯JSON文本？）
+                            // 注意：如果这确实是文章内容但恰好是JSON格式，这里会有歧义
+                            // 但鉴于我们目前的后端逻辑，API响应会有 error/body/msg 结构
+                            if (json.error === 0 && json.body) {
+                                // 可能是body里直接是内容？根据上面提供的样例，content在body里
+                                // 上面的 if (json.body.content) 已经覆盖了
+                                // 这里主要是防止 body本身就是内容的情况
+                                article.value.content = typeof json.body === 'string' ? json.body : text;
+                            } else {
+                                article.value.content = text;
+                            }
+                        }
+                    } catch (e) {
+                        // 解析JSON失败，说明是纯文本（Markdown）
+                        article.value.content = text;
+                    }
+
                 } catch (err) {
                     console.error("加载内容失败", err);
                 }
@@ -428,7 +456,19 @@ const formatDate = (dateString) => {
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const day = date.getDate().toString().padStart(2, '0');
     return `${year}-${month}-${day}`;
-};// 返回顶部
+};
+
+// 获取分类显示名称
+const getCategoryLabel = (key) => {
+    const map = {
+        'article': '我的文章',
+        'studio': '我的项目',
+        'play': '朋友圈'
+    };
+    return map[key] || key;
+};
+
+// 返回顶部
 const scrollToTop = () => {
     window.scrollTo({
         top: 0,
@@ -443,18 +483,28 @@ const handleScroll = () => {
 onMounted(async () => {
     window.addEventListener('scroll', handleScroll);
     await loadArticle();    // 设置文章标题为网页标题
-    document.title = `${article.value.title} - Hedong的个人博客`;    // 添加分享所需的meta标签
+    document.title = `${article.value.title} - Hedong的个人博客`;
+
+    // 构造分享信息
+    const shareTitle = `HEDONG 的博客｜${article.value.title}`;
+    // 确保图片链接是绝对路径
+    const shareImage = article.value.coverUrl.startsWith('http')
+        ? article.value.coverUrl
+        : window.location.origin + article.value.coverUrl;
+
+    // 添加分享所需的meta标签
     const metaTags = [
         // Open Graph协议标签（微信、微博等平台通用）
-        { property: 'og:title', content: article.value.title },
+        { property: 'og:title', content: shareTitle },
         { property: 'og:description', content: article.value.summary },
-        { property: 'og:image', content: article.value.coverUrl },
+        { property: 'og:image', content: shareImage },
         { property: 'og:url', content: window.location.href },
-        { property: 'og:type', content: 'article' },        // 微信特定标签
+        { property: 'og:type', content: 'article' },
+        // 微信特定标签
         { name: 'description', content: article.value.summary },
-        { itemprop: 'name', content: article.value.title },
+        { itemprop: 'name', content: shareTitle },
         { itemprop: 'description', content: article.value.summary },
-        { itemprop: 'image', content: article.value.coverUrl }
+        { itemprop: 'image', content: shareImage }
     ];    // 保存已添加的标签引用，以便在组件卸载时移除
     const addedTags = []; metaTags.forEach(tagInfo => {
         const metaTag = document.createElement('meta');        // 设置标签属性

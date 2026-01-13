@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
 import About from '../views/About.vue'
-import Research from '../views/Research.vue'
+import Articles from '../views/Articles.vue'
 import Studio from '../views/Studio.vue'
 import Play from '../views/Play.vue'
 import Article from '../views/Article.vue'
@@ -19,9 +19,9 @@ const routes = [
         }
     },
     {
-        path: '/research',
-        name: 'Research',
-        component: Research,
+        path: '/article',
+        name: 'Articles',
+        component: Articles,
         meta: {
             title: '我的文章 - HeDong的博客'
         }

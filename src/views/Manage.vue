@@ -33,24 +33,13 @@
               </el-icon>
               <span>文章管理</span>
             </el-menu-item>
-            <el-menu-item index="comment-manage">
-              <el-icon>
-                <ChatDotRound />
-              </el-icon>
-              <span>评论管理</span>
-            </el-menu-item>
-            <el-menu-item index="category-manage">
-              <el-icon>
-                <Folder />
-              </el-icon>
-              <span>分类管理</span>
-            </el-menu-item>
             <el-menu-item index="activity-manage">
               <el-icon>
                 <Calendar />
               </el-icon>
               <span>动态管理</span>
-            </el-menu-item> <el-menu-item index="friend-link-manage">
+            </el-menu-item>
+            <el-menu-item index="friend-link-manage">
               <el-icon>
                 <Link />
               </el-icon>
@@ -61,17 +50,14 @@
                 <Bell />
               </el-icon>
               <span>友链申请</span>
-            </el-menu-item> <el-menu-item index="message-manage">
+            </el-menu-item>
+            <el-menu-item index="message-manage">
               <el-icon>
                 <ChatSquare />
               </el-icon>
               <span>留言管理</span>
-            </el-menu-item> <el-menu-item index="settings">
-              <el-icon>
-                <Setting />
-              </el-icon>
-              <span>系统设置</span>
             </el-menu-item>
+
           </el-menu>
         </div>
       </transition> <!-- 内容显示区域 -->
@@ -80,7 +66,8 @@
           <div class="panel-header">
             <div class="panel-title">
               <el-icon :size="20" class="panel-icon">
-                <component :is="getPanelIcon(activeIndex)" />
+                <
+                component :is="getPanelIcon(activeIndex)" />
               </el-icon>
               <h2>{{ getPanelTitle(activeIndex) }}</h2>
             </div>
@@ -110,18 +97,15 @@
 import { ref, shallowRef, onMounted, onBeforeMount, defineAsyncComponent } from 'vue';
 import { useRouter } from 'vue-router';
 import {
-  Document, Collection, ChatDotRound, Folder, Setting,
-  Menu, ArrowRight, Back, Plus, Delete, Calendar, Link, Bell, ChatSquare
+  Document, Collection, Back, Plus, Calendar, Link, Bell, ChatSquare
 } from '@element-plus/icons-vue';// 组件动态引入
 const ArticlePublish = defineAsyncComponent(() => import('../components/manage/Record.vue'));
 const ArticleManage = defineAsyncComponent(() => import('../components/manage/ArticleManage.vue'));
-const CommentManage = defineAsyncComponent(() => import('../components/manage/CommentManage.vue'));
-const CategoryManage = defineAsyncComponent(() => import('../components/manage/CategoryManage.vue'));
 const ActivityManage = defineAsyncComponent(() => import('../components/manage/ActivityManage.vue'));
 const FriendLinkManage = defineAsyncComponent(() => import('../components/manage/FriendLinkManage.vue'));
 const FriendLinkRequestManage = defineAsyncComponent(() => import('../components/manage/FriendLinkRequestManage.vue'));
 const MessageManage = defineAsyncComponent(() => import('../components/manage/MessageManage.vue'));
-const SystemSettings = defineAsyncComponent(() => import('../components/manage/SystemSettings.vue')); const router = useRouter();
+const router = useRouter();
 const activeIndex = ref('article-manage'); // 默认激活的菜单项
 const isSidebarVisible = ref(true); // 控制侧边栏显示状态
 const componentKey = ref(0); // 用于强制重新渲染组件
@@ -135,12 +119,6 @@ const updateCurrentComponent = () => {
     case 'article-manage':
       currentComponent.value = ArticleManage;
       break;
-    case 'comment-manage':
-      currentComponent.value = CommentManage;
-      break;
-    case 'category-manage':
-      currentComponent.value = CategoryManage;
-      break;
     case 'activity-manage':
       currentComponent.value = ActivityManage;
       break;
@@ -153,9 +131,6 @@ const updateCurrentComponent = () => {
     case 'message-manage':
       currentComponent.value = MessageManage;
       break;
-    case 'settings':
-      currentComponent.value = SystemSettings;
-      break;
     default:
       currentComponent.value = ArticleManage;
   }
@@ -164,13 +139,10 @@ const getPanelTitle = (index) => {
   const titles = {
     'article-publish': '发布文章',
     'article-manage': '文章管理',
-    'comment-manage': '评论管理',
     'friend-link-request-manage': '友链申请审核',
-    'category-manage': '分类管理',
     'activity-manage': '动态管理',
     'friend-link-manage': '友情链接管理',
     'message-manage': '留言管理',
-    'settings': '系统设置'
   };
   return titles[index] || '管理面板';
 };// 获取面板图标
@@ -180,10 +152,7 @@ const getPanelIcon = (index) => {
     'friend-link-request-manage': Bell,
     'article-manage': Collection,
     'message-manage': ChatSquare,
-    'comment-manage': ChatDotRound,
-    'category-manage': Folder,
     'activity-manage': Calendar,
-    'settings': Setting
   };
   return icons[index] || Document;
 };// 处理编辑文章事件

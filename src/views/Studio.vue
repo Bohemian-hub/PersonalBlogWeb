@@ -48,8 +48,14 @@
                             </div>
                         </div>
                         <div class="pagination-container">
-                            <el-pagination background layout="prev, pager, next" :total="paginationData.total"
-                                :page-size="paginationData.pageSize" />
+                            <el-pagination 
+                                background 
+                                layout="prev, pager, next" 
+                                :total="paginationData.total"
+                                :page-size="paginationData.pageSize"
+                                v-model:current-page="paginationData.currentPage"
+                                @current-change="handlePageChange"
+                            />
                         </div>
                     </section>
                 </div>
@@ -74,8 +80,9 @@ import ThemeToggler from '../components/ThemeToggler.vue'
 import PageHeader from '../components/PageHeader.vue'
 import { currentTheme } from '../stores/themeStore'// 分页数据
 const paginationData = ref({
-    total: 42,
-    pageSize: 6
+    currentPage: 1,
+    total: 0,
+    pageSize: 10
 })
 // 个人技术资料 (已删除)
 const router = useRouter()
@@ -86,7 +93,7 @@ const techArticles = ref([])
 const loadArticles = async () => {
     try {
         const res = await getArticles({
-            page: 1,
+            page: paginationData.value.currentPage,
             page_size: paginationData.value.pageSize,
             status: 'published',
             category: 'studio'
@@ -106,6 +113,16 @@ const loadArticles = async () => {
     } catch (e) {
         console.error("加载文章列表失败", e);
     }
+}
+
+// 处理页码变更
+const handlePageChange = (val) => {
+    paginationData.value.currentPage = val
+    loadArticles()
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
 }
 
 const goToArticle = (id) => {

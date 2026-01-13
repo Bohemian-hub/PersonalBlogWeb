@@ -47,8 +47,14 @@
                             </div>
                         </div>
                         <div class="pagination-container">
-                            <el-pagination background layout="prev, pager, next" :total="paginationData.total"
-                                :page-size="paginationData.pageSize" />
+                            <el-pagination 
+                                background 
+                                layout="prev, pager, next" 
+                                :total="paginationData.total"
+                                :page-size="paginationData.pageSize"
+                                v-model:current-page="paginationData.currentPage"
+                                @current-change="handlePageChange"
+                            />
                         </div>
                     </section>
                 </div>
@@ -91,13 +97,21 @@ onUnmounted(() => {
 // 文章列表数据
 const articles = ref([])
 
+// 分页数据
+const paginationData = ref({
+    currentPage: 1,
+    pageSize: 10,
+    total: 0
+})
+
+
 const loadArticles = async () => {
     try {
         const res = await getArticles({
-            page: 1,
+            page: paginationData.value.currentPage,
             page_size: paginationData.value.pageSize,
             status: 'published',
-            category: 'research'
+            category: 'article'
         });
         if (res && res.items) {
             articles.value = res.items.map(item => ({
@@ -116,14 +130,19 @@ const loadArticles = async () => {
     }
 }
 
+// 处理页码变更
+const handlePageChange = (val) => {
+    paginationData.value.currentPage = val
+    loadArticles()
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+}
+
 const goToArticle = (id) => {
     router.push(`/article/${id}`);
 }
-
-const paginationData = ref({
-    total: 50,
-    pageSize: 6
-})
 </script>
 <style scoped>
 /* 主题变量定义 */

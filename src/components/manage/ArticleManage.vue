@@ -118,7 +118,7 @@ import { baseUrl } from '@/common/config'
 const base_url = ref(baseUrl);
 // 分类数据
 const categories = [
-  { value: 'research', label: '我的文章' },
+  { value: 'articles', label: '我的文章' },
   { value: 'studio', label: '我的项目' },
   { value: 'play', label: '朋友圈（开发中）' },
 ];// 文章列表状态
